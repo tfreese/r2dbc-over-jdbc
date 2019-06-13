@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Configuration [
+        <!ENTITY level_ROOT "INFO">
+        <!ENTITY level_APPLICATION "DEBUG">
+        ]
+        >
+<configuration debug="false" scan="false">
+
+    <!--Levels are ordered: TRACE < DEBUG < INFO < WARN < ERROR -->
+    <!-- %date{yyyy-MM-dd HH:mm:ss.SSS}; [%-7X{user}]; [%method:%line] -->
+    <property name="PATTERN" value="%date{yyyy-MM-dd HH:mm:ss.SSS} - %5level - [%20.-20thread] - %replace(%-40.-40logger{0}){' ', '.'} - %message%n" />
+
+    <!-- ######################################################################################################################################## -->
+
+    <appender name="CONSOLE_STD" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+        <immediateFlush>true</immediateFlush>
+        <encoder>
+            <pattern>${PATTERN_CONSOLE:-${PATTERN}}</pattern>
+            <outputPatternAsHeader>false</outputPatternAsHeader>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="CONSOLE_ERR" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <immediateFlush>true</immediateFlush>
+        <encoder>
+            <pattern>${PATTERN_CONSOLE:-${PATTERN}}</pattern>
+            <outputPatternAsHeader>false</outputPatternAsHeader>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!-- ######################################################################################################################################## -->
+
+    <logger name="de.freese" level="&level_APPLICATION;" />
+
+    <root level="&level_ROOT;">
+        <appender-ref ref="CONSOLE_STD" />
+        <appender-ref ref="CONSOLE_ERR" />
+    </root>
+</configuration>
