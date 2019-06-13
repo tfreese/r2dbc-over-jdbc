@@ -40,7 +40,7 @@
 
     <!-- ######################################################################################################################################## -->
 
-    <logger name="de.freese" level="&level_APPLICATION;" />
+    <logger name="io.r2dbc.jdbc" level="&level_APPLICATION;" />
 
     <root level="&level_ROOT;">
         <appender-ref ref="CONSOLE_STD" />

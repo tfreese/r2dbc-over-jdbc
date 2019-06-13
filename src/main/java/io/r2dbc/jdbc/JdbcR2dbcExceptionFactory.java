@@ -38,7 +38,7 @@ public class JdbcR2dbcExceptionFactory
     /**
      * @author Thomas Freese
      */
-    static class GenericR2dbcDataException extends R2dbcException
+    static class JdbcR2dbcDataException extends R2dbcException
     {
         /**
          *
@@ -46,14 +46,14 @@ public class JdbcR2dbcExceptionFactory
         private static final long serialVersionUID = -6441515280969268939L;
 
         /**
-         * Erstellt ein neues {@link GenericR2dbcDataException} Object.
+         * Erstellt ein neues {@link JdbcR2dbcDataException} Object.
          *
          * @param message String
          * @param sqlState String
          * @param errorCode int
          * @param e {@link SQLException}
          */
-        GenericR2dbcDataException(final String message, final String sqlState, final int errorCode, final SQLException e)
+        JdbcR2dbcDataException(final String message, final String sqlState, final int errorCode, final SQLException e)
         {
             super(message, sqlState, errorCode, e);
         }
@@ -62,7 +62,7 @@ public class JdbcR2dbcExceptionFactory
     /**
      * @author Thomas Freese
      */
-    static class GenericR2dbcException extends R2dbcException
+    static class JdbcR2dbcException extends R2dbcException
     {
         /**
          *
@@ -70,14 +70,14 @@ public class JdbcR2dbcExceptionFactory
         private static final long serialVersionUID = 6607810949597270120L;
 
         /**
-         * Erstellt ein neues {@link GenericR2dbcDataException} Object.
+         * Erstellt ein neues {@link JdbcR2dbcDataException} Object.
          *
          * @param message String
          * @param sqlState String
          * @param errorCode int
          * @param e {@link SQLException}
          */
-        GenericR2dbcException(final String message, final String sqlState, final int errorCode, final SQLException e)
+        JdbcR2dbcException(final String message, final String sqlState, final int errorCode, final SQLException e)
         {
             super(message, sqlState, errorCode, e);
         }
@@ -86,7 +86,7 @@ public class JdbcR2dbcExceptionFactory
     /**
      * @author Thomas Freese
      */
-    static class GenericR2dbcNonTransientException extends R2dbcNonTransientException
+    static class JdbcR2dbcNonTransientException extends R2dbcNonTransientException
     {
         /**
          *
@@ -94,14 +94,14 @@ public class JdbcR2dbcExceptionFactory
         private static final long serialVersionUID = -4703171992215253093L;
 
         /**
-         * Erstellt ein neues {@link GenericR2dbcDataException} Object.
+         * Erstellt ein neues {@link JdbcR2dbcDataException} Object.
          *
          * @param message String
          * @param sqlState String
          * @param errorCode int
          * @param e {@link SQLException}
          */
-        GenericR2dbcNonTransientException(final String message, final String sqlState, final int errorCode, final SQLException e)
+        JdbcR2dbcNonTransientException(final String message, final String sqlState, final int errorCode, final SQLException e)
         {
             super(message, sqlState, errorCode, e);
         }
@@ -110,7 +110,7 @@ public class JdbcR2dbcExceptionFactory
     /**
      * @author Thomas Freese
      */
-    static class GenericR2dbcTransientException extends R2dbcTransientException
+    static class JdbcR2dbcTransientException extends R2dbcTransientException
     {
         /**
          *
@@ -118,14 +118,14 @@ public class JdbcR2dbcExceptionFactory
         private static final long serialVersionUID = -5814246921224867624L;
 
         /**
-         * Erstellt ein neues {@link GenericR2dbcDataException} Object.
+         * Erstellt ein neues {@link JdbcR2dbcDataException} Object.
          *
          * @param message String
          * @param sqlState String
          * @param errorCode int
          * @param e {@link SQLException}
          */
-        GenericR2dbcTransientException(final String message, final String sqlState, final int errorCode, final SQLException e)
+        JdbcR2dbcTransientException(final String message, final String sqlState, final int errorCode, final SQLException e)
         {
             super(message, sqlState, errorCode, e);
         }
@@ -139,17 +139,17 @@ public class JdbcR2dbcExceptionFactory
     {
         if (e.getClass() == SQLDataException.class)
         {
-            return new GenericR2dbcDataException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new JdbcR2dbcDataException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
         }
 
         if (e.getClass() == SQLException.class)
         {
-            return new GenericR2dbcException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new JdbcR2dbcException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
         }
 
         if (e.getClass() == SQLFeatureNotSupportedException.class)
         {
-            return new GenericR2dbcNonTransientException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new JdbcR2dbcNonTransientException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
         }
 
         if (e.getClass() == SQLIntegrityConstraintViolationException.class)
@@ -169,12 +169,12 @@ public class JdbcR2dbcExceptionFactory
 
         if (e.getClass() == SQLNonTransientException.class)
         {
-            return new GenericR2dbcNonTransientException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new JdbcR2dbcNonTransientException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
         }
 
         if (e.getClass() == SQLRecoverableException.class)
         {
-            return new GenericR2dbcNonTransientException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new JdbcR2dbcNonTransientException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
         }
 
         if (e.getClass() == SQLSyntaxErrorException.class)
@@ -199,9 +199,9 @@ public class JdbcR2dbcExceptionFactory
 
         if (e.getClass() == SQLTransientException.class)
         {
-            return new GenericR2dbcTransientException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new JdbcR2dbcTransientException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
         }
 
-        return new GenericR2dbcException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+        return new JdbcR2dbcException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
     }
 }

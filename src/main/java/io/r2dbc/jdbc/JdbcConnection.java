@@ -7,7 +7,6 @@ package io.r2dbc.jdbc;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.Objects;
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.r2dbc.spi.Batch;
@@ -149,17 +148,16 @@ public class JdbcConnection implements Connection
     @Override
     public Batch createBatch()
     {
-        return new JdbcBatch();
+        throw new UnsupportedOperationException();
     }
 
     /**
      * @see io.r2dbc.spi.Connection#createSavepoint(java.lang.String)
      */
     @Override
-    public Publisher<Void> createSavepoint(final String name)
+    public Mono<Void> createSavepoint(final String name)
     {
-        // throw new UnsupportedOperationException("not implemented");
-        return Mono.error(new SQLFeatureNotSupportedException());
+        return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
     }
 
     /**
@@ -183,9 +181,9 @@ public class JdbcConnection implements Connection
      * @see io.r2dbc.spi.Connection#releaseSavepoint(java.lang.String)
      */
     @Override
-    public Publisher<Void> releaseSavepoint(final String name)
+    public Mono<Void> releaseSavepoint(final String name)
     {
-        return Mono.error(new SQLFeatureNotSupportedException());
+        return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
     }
 
     /**
@@ -219,22 +217,22 @@ public class JdbcConnection implements Connection
      * @see io.r2dbc.spi.Connection#rollbackTransactionToSavepoint(java.lang.String)
      */
     @Override
-    public Publisher<Void> rollbackTransactionToSavepoint(final String name)
+    public Mono<Void> rollbackTransactionToSavepoint(final String name)
     {
-        return Mono.error(new SQLFeatureNotSupportedException());
+        return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
     }
 
     /**
      * @see io.r2dbc.spi.Connection#setTransactionIsolationLevel(io.r2dbc.spi.IsolationLevel)
      */
     @Override
-    public Publisher<Void> setTransactionIsolationLevel(final IsolationLevel isolationLevel)
+    public Mono<Void> setTransactionIsolationLevel(final IsolationLevel isolationLevel)
     {
-        Objects.requireNonNull(isolationLevel, "isolationLevel must not be null");
-
         return this.connection.handle((connection, sink) -> {
             try
             {
+                Objects.requireNonNull(isolationLevel, "isolationLevel must not be null");
+
                 switch (isolationLevel)
                 {
                     case READ_COMMITTED:

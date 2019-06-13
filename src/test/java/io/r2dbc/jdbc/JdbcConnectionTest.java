@@ -7,17 +7,29 @@
 
 package io.r2dbc.jdbc;
 
-import static org.mockito.Mockito.RETURNS_SMART_NULLS;
-import static org.mockito.Mockito.mock;
+import io.r2dbc.jdbc.JdbcR2dbcExceptionFactory.JdbcR2dbcNonTransientException;
+import io.r2dbc.spi.R2dbcNonTransientResourceException;
+import io.r2dbc.spi.R2dbcRollbackException;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import reactor.test.StepVerifier;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
-import io.r2dbc.jdbc.JdbcConnection;
-import io.r2dbc.spi.R2dbcNonTransientResourceException;
-import reactor.test.StepVerifier;
+import java.sql.SQLTransactionRollbackException;
+
+import static io.r2dbc.spi.IsolationLevel.READ_UNCOMMITTED;
+import static io.r2dbc.spi.IsolationLevel.REPEATABLE_READ;
+import static io.r2dbc.spi.IsolationLevel.SERIALIZABLE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.RETURNS_SMART_NULLS;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Thomas Freese
@@ -44,278 +56,252 @@ final class JdbcConnectionTest
     @Test
     void beginTransactionErrorResponse() throws SQLException
     {
-        // when(this.connection.setAutoCommit(false)).thenAnswer(invocation -> {
-        // throw new SQLNonTransientConnectionException("Unable to disable autocommits", "some state", 999);
-        // });
-
-        Mockito.doThrow(new SQLNonTransientConnectionException("Unable to disable autocommits", "some state", 999)).when(this.connection)
+        doThrow(new SQLNonTransientConnectionException("Unable to disable autocommits", "some state", 999)).when(this.connection)
                 .setAutoCommit(ArgumentMatchers.anyBoolean());
 
         new JdbcConnection(this.connection).beginTransaction().as(StepVerifier::create)
                 .verifyErrorMatches(R2dbcNonTransientResourceException.class::isInstance);
     }
 
-    // @Test
-    // void beginTransactionInTransaction()
-    // {
-    // when(this.client.inTransaction()).thenReturn(true);
-    // verifyNoMoreInteractions(this.client);
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).beginTransaction().as(StepVerifier::create).verifyComplete();
-    // }
+    /**
+     * @throws SQLException Falls was schief geht.
+     */
+    @Test
+    void beginTransactionInTransaction() throws SQLException
+    {
+        when(this.connection.getAutoCommit()).thenReturn(true);
+        verifyNoMoreInteractions(this.connection);
 
-    // @Test
-    // void close()
-    // {
-    // when(this.client.close()).thenReturn(Mono.empty());
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).close().as(StepVerifier::create).verifyComplete();
-    // }
+        new JdbcConnection(this.connection).beginTransaction().as(StepVerifier::create).verifyComplete();
+    }
 
-    // @Test
-    // void commitTransaction()
-    // {
-    // when(this.client.inTransaction()).thenReturn(true);
-    // when(this.client.execute("COMMIT")).thenReturn(Mono.empty());
-    // when(this.client.enableAutoCommit()).thenReturn(Mono.empty());
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).commitTransaction().as(StepVerifier::create).verifyComplete();
-    // }
+    /**
+     * @throws SQLException Falls was schief geht.
+     */
+    @Test
+    void close() throws SQLException
+    {
+        when(this.connection.isClosed()).thenReturn(false);
 
-    // @Test
-    // void commitTransactionErrorResponse()
-    // {
-    // when(this.client.inTransaction()).thenReturn(true);
-    // when(this.client.execute("COMMIT")).thenAnswer(arg -> {
-    // throw new SQLTransactionRollbackException("can't commit", "some state", 999);
-    // });
-    // when(this.client.enableAutoCommit()).thenReturn(Mono.empty());
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).commitTransaction().as(StepVerifier::create)
-    // .verifyErrorMatches(R2dbcRollbackException.class::isInstance);
-    // }
+        new JdbcConnection(this.connection).close().as(StepVerifier::create).verifyComplete();
+    }
 
-    // @Test
-    // void commitTransactionNonOpen()
-    // {
-    // when(this.client.inTransaction()).thenReturn(false);
-    // verifyNoMoreInteractions(this.client);
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).commitTransaction().as(StepVerifier::create).verifyComplete();
-    // }
+    /**
+     * @throws SQLException Falls was schief geht.
+     */
+    @Test
+    void closeWhenClosed() throws SQLException
+    {
+        when(this.connection.isClosed()).thenReturn(true);
+        verifyNoMoreInteractions(this.connection);
 
-    // @Test
-    // void constructorNoClient()
-    // {
-    // assertThatIllegalArgumentException().isThrownBy(() -> new H2Connection(null, MockCodecs.empty())).withMessage("client must not be null");
-    // }
+        new JdbcConnection(this.connection).close().as(StepVerifier::create).verifyComplete();
+    }
 
-    // @Test
-    // void createBatch()
-    // {
-    // assertThat(new H2Connection(this.client, MockCodecs.empty()).createBatch()).isInstanceOf(H2Batch.class);
-    // }
+    /**
+     * @throws SQLException Falls was schief geht.
+     */
+    @Test
+    void commitTransaction() throws SQLException
+    {
+        when(this.connection.getAutoCommit()).thenReturn(false);
 
-    // @Test
-    // void createSavepoint()
-    // {
-    // when(this.client.inTransaction()).thenReturn(true);
-    // when(this.client.execute("SAVEPOINT test-name")).thenReturn(Mono.empty());
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).createSavepoint("test-name").as(StepVerifier::create).verifyComplete();
-    // }
+        new JdbcConnection(this.connection).commitTransaction().as(StepVerifier::create).verifyComplete();
+    }
 
-    // @Test
-    // void createSavepointErrorResponse()
-    // {
-    // when(this.client.inTransaction()).thenReturn(true);
-    // when(this.client.execute("SAVEPOINT test-name")).thenAnswer(arg -> {
-    // throw new SQLFeatureNotSupportedException("can't savepoint", "some state", 999);
-    // });
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).createSavepoint("test-name").as(StepVerifier::create)
-    // .verifyErrorMatches(R2dbcNonTransientException.class::isInstance);
-    // }
+    /**
+     * @throws SQLException Falls was schief geht.
+     */
+    @Test
+    void commitTransactionErrorResponse() throws SQLException
+    {
+        when(this.connection.getAutoCommit()).thenReturn(false);
+        doThrow(new SQLTransactionRollbackException("can't commit", "some state", 999)).when(this.connection).commit();
 
-    // @Test
-    // void createSavepointNoName()
-    // {
-    // assertThatIllegalArgumentException().isThrownBy(() -> new H2Connection(this.client, MockCodecs.empty()).createSavepoint(null))
-    // .withMessage("name must not be null");
-    // }
+        new JdbcConnection(this.connection).commitTransaction().as(StepVerifier::create).verifyErrorMatches(R2dbcRollbackException.class::isInstance);
+    }
 
-    // @Test
-    // void createSavepointNonOpen()
-    // {
-    // when(this.client.inTransaction()).thenReturn(false);
-    // verifyNoMoreInteractions(this.client);
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).createSavepoint("test-name").as(StepVerifier::create).verifyComplete();
-    // }
+    /**
+     * @throws SQLException Falls was schief geht.
+     */
+    @Test
+    void commitTransactionNonOpen() throws SQLException
+    {
+        when(this.connection.getAutoCommit()).thenReturn(true);
+        verifyNoMoreInteractions(this.connection);
 
-    // @Test
-    // void createStatement()
-    // {
-    // assertThat(new H2Connection(this.client, MockCodecs.empty()).createStatement("test-query-?")).isInstanceOf(H2Statement.class);
-    // }
+        new JdbcConnection(this.connection).commitTransaction().as(StepVerifier::create).verifyComplete();
+    }
 
-    // @Test
-    // void releaseSavepoint()
-    // {
-    // when(this.client.inTransaction()).thenReturn(true);
-    // when(this.client.execute("RELEASE SAVEPOINT test-name")).thenReturn(Mono.empty());
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).releaseSavepoint("test-name").as(StepVerifier::create).verifyComplete();
-    // }
+    /**
+     *
+     */
+    @Test
+    void constructorNoClient()
+    {
+        assertThatNullPointerException().isThrownBy(() -> new JdbcConnection(null)).withMessage("connection must not be null");
+    }
 
-    // @Test
-    // void releaseSavepointErrorResponse()
-    // {
-    // when(this.client.inTransaction()).thenReturn(true);
-    // when(this.client.execute("RELEASE SAVEPOINT test-name")).thenAnswer(arg -> {
-    // throw new SQLFeatureNotSupportedException("can't savepoint", "some state", 999);
-    // });
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).releaseSavepoint("test-name").as(StepVerifier::create)
-    // .verifyErrorMatches(R2dbcNonTransientException.class::isInstance);
-    // }
+    /**
+     *
+     */
+    @Test
+    void createBatch()
+    {
+        JdbcConnection jdbcConnection = new JdbcConnection(this.connection);
 
-    // @Test
-    // void releaseSavepointNoName()
-    // {
-    // assertThatIllegalArgumentException().isThrownBy(() -> new H2Connection(this.client, MockCodecs.empty()).releaseSavepoint(null))
-    // .withMessage("name must not be null");
-    // }
+        // assertThat(new JdbcConnection(connection).createBatch()).isInstanceOf(JdbcBatch.class);
+        assertThatThrownBy(jdbcConnection::createBatch).isInstanceOf(UnsupportedOperationException.class);
+    }
 
-    // @Test
-    // void releaseSavepointNonOpen()
-    // {
-    // when(this.client.inTransaction()).thenReturn(false);
-    // verifyNoMoreInteractions(this.client);
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).releaseSavepoint("test-name").as(StepVerifier::create).verifyComplete();
-    // }
+    /**
+     *
+     */
+    @Test
+    void createSavepoint()
+    {
+        new JdbcConnection(this.connection).createSavepoint("test").as(StepVerifier::create)
+                .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+    }
 
-    // @Test
-    // void rollbackTransaction()
-    // {
-    // when(this.client.inTransaction()).thenReturn(true);
-    // when(this.client.execute("ROLLBACK")).thenReturn(Mono.empty());
-    // when(this.client.enableAutoCommit()).thenReturn(Mono.empty());
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).rollbackTransaction().as(StepVerifier::create).verifyComplete();
-    // }
+    /**
+     *
+     */
+    @Test
+    void createSavepointNoName()
+    {
+        new JdbcConnection(this.connection).createSavepoint(null).as(StepVerifier::create).verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+    }
 
-    // @Test
-    // void rollbackTransactionErrorResponse()
-    // {
-    // when(this.client.inTransaction()).thenReturn(true);
-    // when(this.client.execute("ROLLBACK")).thenAnswer(arg -> {
-    // throw new SQLTransactionRollbackException("can't commit", "some state", 999);
-    // });
-    // when(this.client.enableAutoCommit()).thenReturn(Mono.empty());
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).rollbackTransaction().as(StepVerifier::create)
-    // .verifyErrorMatches(R2dbcRollbackException.class::isInstance);
-    // }
+    /**
+     *
+     */
+    @Test
+    void createStatement()
+    {
+        assertThat(new JdbcConnection(this.connection).createStatement("test-query-?")).isInstanceOf(JdbcStatement.class);
+    }
 
-    // @Test
-    // void rollbackTransactionNonOpen()
-    // {
-    // when(this.client.inTransaction()).thenReturn(false);
-    // verifyNoMoreInteractions(this.client);
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).rollbackTransaction().as(StepVerifier::create).verifyComplete();
-    // }
+    /**
+     *
+     */
+    @Test
+    void releaseSavepoint()
+    {
+        new JdbcConnection(this.connection).releaseSavepoint("test").as(StepVerifier::create)
+                .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+    }
 
-    // @Test
-    // void rollbackTransactionToSavepoint()
-    // {
-    // when(this.client.inTransaction()).thenReturn(true);
-    // when(this.client.execute("ROLLBACK TO SAVEPOINT test-name")).thenReturn(Mono.empty());
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).rollbackTransactionToSavepoint("test-name").as(StepVerifier::create).verifyComplete();
-    // }
+    /**
+     *
+     */
+    @Test
+    void releaseSavepointNoName()
+    {
+        new JdbcConnection(this.connection).releaseSavepoint(null).as(StepVerifier::create)
+                .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+    }
 
-    // @Test
-    // void rollbackTransactionToSavepointErrorResponse()
-    // {
-    // when(this.client.inTransaction()).thenReturn(true);
-    // when(this.client.execute("ROLLBACK TO SAVEPOINT test-name")).thenAnswer(arg -> {
-    // throw new SQLTransactionRollbackException("can't commit", "some state", 999);
-    // });
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).rollbackTransactionToSavepoint("test-name").as(StepVerifier::create)
-    // .verifyErrorMatches(R2dbcRollbackException.class::isInstance);
-    // }
+    /**
+     * @throws SQLException Falls was schief geht.
+     */
+    @Test
+    void rollbackTransaction() throws SQLException
+    {
+        when(this.connection.getAutoCommit()).thenReturn(false);
 
-    // @Test
-    // void rollbackTransactionToSavepointNoName()
-    // {
-    // assertThatIllegalArgumentException().isThrownBy(() -> new H2Connection(this.client, MockCodecs.empty()).rollbackTransactionToSavepoint(null))
-    // .withMessage("name must not be null");
-    // }
+        new JdbcConnection(this.connection).rollbackTransaction().as(StepVerifier::create).verifyComplete();
+    }
 
-    // @Test
-    // void rollbackTransactionToSavepointNonOpen()
-    // {
-    // when(this.client.inTransaction()).thenReturn(false);
-    // verifyNoMoreInteractions(this.client);
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).rollbackTransactionToSavepoint("test-name").as(StepVerifier::create).verifyComplete();
-    // }
+    /**
+     * @throws SQLException Falls was schief geht.
+     */
+    @Test
+    void rollbackTransactionErrorResponse() throws SQLException
+    {
+        when(this.connection.getAutoCommit()).thenReturn(false);
+        doThrow(new SQLTransactionRollbackException("can't commit", "some state", 999)).when(this.connection).rollback();
 
-    // @Test
-    // void setTransactionIsolationLevel()
-    // {
-    // when(this.client.inTransaction()).thenReturn(true);
-    // when(this.client.execute("SET LOCK_MODE 3")).thenReturn(Mono.empty());
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).setTransactionIsolationLevel(READ_COMMITTED).as(StepVerifier::create).verifyComplete();
-    // }
+        new JdbcConnection(this.connection).rollbackTransaction().as(StepVerifier::create).verifyErrorMatches(R2dbcRollbackException.class::isInstance);
+    }
 
-    // @Disabled("Not yet implemented")
-    // @Test
-    // void setTransactionIsolationLevelErrorResponse()
-    // {
-    // when(this.client.inTransaction()).thenReturn(true);
-    // when(this.client.execute("SET LOCK_MODE 3")).thenThrow(DbException.get(0));
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).setTransactionIsolationLevel(READ_COMMITTED).as(StepVerifier::create)
-    // .verifyErrorMatches(R2dbcNonTransientException.class::isInstance);
-    // }
+    /**
+     * @throws SQLException Falls was schief geht.
+     */
+    @Test
+    void rollbackTransactionNonOpen() throws SQLException
+    {
+        when(this.connection.getAutoCommit()).thenReturn(true);
+        verifyNoMoreInteractions(this.connection);
 
-    // @Test
-    // void setTransactionIsolationLevelNoIsolationLevel()
-    // {
-    // assertThatIllegalArgumentException().isThrownBy(() -> new H2Connection(this.client, MockCodecs.empty()).setTransactionIsolationLevel(null))
-    // .withMessage("isolationLevel must not be null");
-    // }
+        new JdbcConnection(this.connection).rollbackTransaction().as(StepVerifier::create).verifyComplete();
+    }
 
-    // @Test
-    // void setTransactionIsolationLevelReadUncommitted()
-    // {
-    // when(this.client.inTransaction()).thenReturn(true);
-    // when(this.client.execute("SET LOCK_MODE 0")).thenReturn(Mono.empty());
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).setTransactionIsolationLevel(READ_UNCOMMITTED).as(StepVerifier::create).verifyComplete();
-    // }
+    /**
+     *
+     */
+    @Test
+    void rollbackTransactionToSavepoint()
+    {
+        new JdbcConnection(this.connection).rollbackTransactionToSavepoint("test").as(StepVerifier::create)
+                .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+    }
 
-    // @Test
-    // void setTransactionIsolationLevelRepeatableRead()
-    // {
-    // when(this.client.inTransaction()).thenReturn(true);
-    // when(this.client.execute("SET LOCK_MODE 1")).thenReturn(Mono.empty());
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).setTransactionIsolationLevel(REPEATABLE_READ).as(StepVerifier::create).verifyComplete();
-    // }
+    /**
+     *
+     */
+    @Test
+    void rollbackTransactionToSavepointNoName()
+    {
+        new JdbcConnection(this.connection).rollbackTransactionToSavepoint(null).as(StepVerifier::create)
+                .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+    }
 
-    // @Test
-    // void setTransactionIsolationLevelSerializable()
-    // {
-    // when(this.client.inTransaction()).thenReturn(true);
-    // when(this.client.execute("SET LOCK_MODE 1")).thenReturn(Mono.empty());
-    //
-    // new H2Connection(this.client, MockCodecs.empty()).setTransactionIsolationLevel(SERIALIZABLE).as(StepVerifier::create).verifyComplete();
-    // }
+    /**
+     *
+     */
+    @Test
+    void setTransactionIsolationLevelNoIsolationLevel()
+    {
+        // .expectError(NullPointerException.class)
+        // .expectNextCount(1).verifyComplete();
+        new JdbcConnection(this.connection).setTransactionIsolationLevel(null).as(StepVerifier::create)
+                .verifyErrorMatches(NullPointerException.class::isInstance);
+    }
+
+    /**
+     *
+     */
+    @Test
+    void setTransactionIsolationLevelReadUncommitted()
+    {
+        // when(this.connection.getAutoCommit()).thenReturn(false);
+        // when(this.client.execute("SET LOCK_MODE 0")).thenReturn(Mono.empty());
+
+        new JdbcConnection(this.connection).setTransactionIsolationLevel(READ_UNCOMMITTED).as(StepVerifier::create).verifyComplete();
+    }
+
+    /**
+     *
+     */
+    @Test
+    void setTransactionIsolationLevelRepeatableRead()
+    {
+        // when(this.connection.getAutoCommit()).thenReturn(false);
+        // when(this.client.execute("SET LOCK_MODE 1")).thenReturn(Mono.empty());
+
+        new JdbcConnection(this.connection).setTransactionIsolationLevel(REPEATABLE_READ).as(StepVerifier::create).verifyComplete();
+    }
+
+    /**
+     *
+     */
+    @Test
+    void setTransactionIsolationLevelSerializable()
+    {
+        // when(this.connection.getAutoCommit()).thenReturn(false);
+        // when(this.client.execute("SET LOCK_MODE 1")).thenReturn(Mono.empty());
+
+        new JdbcConnection(this.connection).setTransactionIsolationLevel(SERIALIZABLE).as(StepVerifier::create).verifyComplete();
+    }
 }
