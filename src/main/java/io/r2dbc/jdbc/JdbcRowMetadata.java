@@ -14,7 +14,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import io.r2dbc.spi.ColumnMetadata;
@@ -23,7 +22,7 @@ import io.r2dbc.spi.RowMetadata;
 
 /**
  * R2DBC Adapter for JDBC.
- * 
+ *
  * @author Thomas Freese
  */
 public class JdbcRowMetadata implements RowMetadata
@@ -40,7 +39,7 @@ public class JdbcRowMetadata implements RowMetadata
 
         for (int c = 1; c <= metaData.getColumnCount(); c++)
         {
-            String name = Optional.ofNullable(metaData.getColumnName(c)).orElse(metaData.getColumnLabel(c)).toUpperCase();
+            String name = metaData.getColumnLabel(c).toUpperCase();
             int type = metaData.getColumnType(c);
             Nullability nullability = null;
 

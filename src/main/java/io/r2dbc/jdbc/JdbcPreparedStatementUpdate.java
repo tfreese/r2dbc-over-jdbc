@@ -4,6 +4,7 @@
 
 package io.r2dbc.jdbc;
 
+import java.sql.PreparedStatement;
 import org.reactivestreams.Publisher;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Statement;
@@ -13,14 +14,16 @@ import io.r2dbc.spi.Statement;
  *
  * @author Thomas Freese
  */
-public class JdbcStatement implements Statement
+public class JdbcPreparedStatementUpdate extends AbstractJdbcStatement
 {
     /**
-     * Erstellt ein neues {@link JdbcStatement} Object.
+     * Erstellt ein neues {@link JdbcPreparedStatementUpdate} Object.
+     *
+     * @param preparedStatement {@link PreparedStatement}
      */
-    public JdbcStatement()
+    public JdbcPreparedStatementUpdate(final PreparedStatement preparedStatement)
     {
-        super();
+        super(preparedStatement);
     }
 
     /**
@@ -44,30 +47,10 @@ public class JdbcStatement implements Statement
     }
 
     /**
-     * @see io.r2dbc.spi.Statement#bind(java.lang.Object, java.lang.Object)
-     */
-    @Override
-    public Statement bind(final Object identifier, final Object value)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /**
      * @see io.r2dbc.spi.Statement#bindNull(int, java.lang.Class)
      */
     @Override
     public Statement bindNull(final int index, final Class<?> type)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /**
-     * @see io.r2dbc.spi.Statement#bindNull(java.lang.Object, java.lang.Class)
-     */
-    @Override
-    public Statement bindNull(final Object identifier, final Class<?> type)
     {
         // TODO Auto-generated method stub
         return null;

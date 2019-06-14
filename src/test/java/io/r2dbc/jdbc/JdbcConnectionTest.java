@@ -7,18 +7,6 @@
 
 package io.r2dbc.jdbc;
 
-import io.r2dbc.jdbc.JdbcR2dbcExceptionFactory.JdbcR2dbcNonTransientException;
-import io.r2dbc.spi.R2dbcNonTransientResourceException;
-import io.r2dbc.spi.R2dbcRollbackException;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import reactor.test.StepVerifier;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.SQLNonTransientConnectionException;
-import java.sql.SQLTransactionRollbackException;
-
 import static io.r2dbc.spi.IsolationLevel.READ_UNCOMMITTED;
 import static io.r2dbc.spi.IsolationLevel.REPEATABLE_READ;
 import static io.r2dbc.spi.IsolationLevel.SERIALIZABLE;
@@ -30,6 +18,15 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.SQLNonTransientConnectionException;
+import java.sql.SQLTransactionRollbackException;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import io.r2dbc.spi.R2dbcNonTransientResourceException;
+import io.r2dbc.spi.R2dbcRollbackException;
+import reactor.test.StepVerifier;
 
 /**
  * @author Thomas Freese
@@ -160,8 +157,9 @@ final class JdbcConnectionTest
     @Test
     void createSavepoint()
     {
-        new JdbcConnection(this.connection).createSavepoint("test").as(StepVerifier::create)
-                .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+        // new JdbcConnection(this.connection).createSavepoint("test").as(StepVerifier::create)
+        // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+        new JdbcConnection(this.connection).createSavepoint("test").as(StepVerifier::create).verifyComplete();
     }
 
     /**
@@ -170,7 +168,9 @@ final class JdbcConnectionTest
     @Test
     void createSavepointNoName()
     {
-        new JdbcConnection(this.connection).createSavepoint(null).as(StepVerifier::create).verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+        // new
+        // JdbcConnection(this.connection).createSavepoint(null).as(StepVerifier::create).verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+        new JdbcConnection(this.connection).createSavepoint(null).as(StepVerifier::create).verifyErrorMatches(NullPointerException.class::isInstance);
     }
 
     /**
@@ -179,7 +179,7 @@ final class JdbcConnectionTest
     @Test
     void createStatement()
     {
-        assertThat(new JdbcConnection(this.connection).createStatement("test-query-?")).isInstanceOf(JdbcStatement.class);
+        assertThat(new JdbcConnection(this.connection).createStatement("test-query-?")).isInstanceOf(AbstractJdbcStatement.class);
     }
 
     /**
@@ -188,8 +188,9 @@ final class JdbcConnectionTest
     @Test
     void releaseSavepoint()
     {
-        new JdbcConnection(this.connection).releaseSavepoint("test").as(StepVerifier::create)
-                .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+        // new JdbcConnection(this.connection).releaseSavepoint("test").as(StepVerifier::create)
+        // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+        new JdbcConnection(this.connection).releaseSavepoint("test").as(StepVerifier::create).verifyComplete();
     }
 
     /**
@@ -198,8 +199,9 @@ final class JdbcConnectionTest
     @Test
     void releaseSavepointNoName()
     {
-        new JdbcConnection(this.connection).releaseSavepoint(null).as(StepVerifier::create)
-                .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+        // new JdbcConnection(this.connection).releaseSavepoint(null).as(StepVerifier::create)
+        // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+        new JdbcConnection(this.connection).releaseSavepoint(null).as(StepVerifier::create).verifyErrorMatches(NullPointerException.class::isInstance);
     }
 
     /**
@@ -243,8 +245,9 @@ final class JdbcConnectionTest
     @Test
     void rollbackTransactionToSavepoint()
     {
-        new JdbcConnection(this.connection).rollbackTransactionToSavepoint("test").as(StepVerifier::create)
-                .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+        // new JdbcConnection(this.connection).rollbackTransactionToSavepoint("test").as(StepVerifier::create)
+        // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+        new JdbcConnection(this.connection).rollbackTransactionToSavepoint("test").as(StepVerifier::create).verifyComplete();
     }
 
     /**
@@ -253,8 +256,10 @@ final class JdbcConnectionTest
     @Test
     void rollbackTransactionToSavepointNoName()
     {
+        // new JdbcConnection(this.connection).rollbackTransactionToSavepoint(null).as(StepVerifier::create)
+        // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
         new JdbcConnection(this.connection).rollbackTransactionToSavepoint(null).as(StepVerifier::create)
-                .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
+                .verifyErrorMatches(NullPointerException.class::isInstance);
     }
 
     /**

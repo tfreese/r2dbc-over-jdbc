@@ -4,8 +4,11 @@
 
 package io.r2dbc.jdbc;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
+import java.sql.Savepoint;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +36,11 @@ public class JdbcConnection implements Connection
     private final Mono<java.sql.Connection> connection;
 
     /**
+     *
+     */
+    private final Map<String, Savepoint> savePoints = new HashMap<>();
+
+    /**
      * Erstellt ein neues {@link JdbcConnection} Object.
      *
      * @param connection {@link java.sql.Connection}
@@ -57,14 +65,17 @@ public class JdbcConnection implements Connection
             {
                 if (!connection.getAutoCommit())
                 {
+                    getLogger().debug("begin connection");
+
                     connection.setAutoCommit(false);
                 }
                 else
                 {
-                    getLogger().debug("Skipping begin transaction because already in one");
+                    getLogger().debug("Skipping begin transaction because there is one in progress.");
                 }
 
                 sink.next(Mono.empty());
+                sink.complete();
             }
             catch (SQLException sex)
             {
@@ -99,6 +110,8 @@ public class JdbcConnection implements Connection
             {
                 if (!connection.isClosed())
                 {
+                    getLogger().debug("closing connection");
+
                     connection.close();
                 }
                 else
@@ -107,6 +120,7 @@ public class JdbcConnection implements Connection
                 }
 
                 sink.next(Mono.empty());
+                sink.complete();
             }
             catch (SQLException sex)
             {
@@ -126,6 +140,8 @@ public class JdbcConnection implements Connection
             {
                 if (!connection.getAutoCommit())
                 {
+                    getLogger().debug("starting connection");
+
                     connection.commit();
                 }
                 else
@@ -134,6 +150,7 @@ public class JdbcConnection implements Connection
                 }
 
                 sink.next(Mono.empty());
+                sink.complete();
             }
             catch (SQLException sex)
             {
@@ -157,7 +174,25 @@ public class JdbcConnection implements Connection
     @Override
     public Mono<Void> createSavepoint(final String name)
     {
-        return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
+        // return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
+        return this.connection.handle((connection, sink) -> {
+            try
+            {
+                Objects.requireNonNull(name, "name must not be null");
+
+                getLogger().debug("creating savepoint");
+
+                Savepoint savepoint = connection.setSavepoint(name);
+                this.savePoints.put(name, savepoint);
+
+                sink.next(Mono.empty());
+                sink.complete();
+            }
+            catch (SQLException sex)
+            {
+                sink.error(sex);
+            }
+        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
     }
 
     /**
@@ -166,7 +201,30 @@ public class JdbcConnection implements Connection
     @Override
     public Statement createStatement(final String sql)
     {
-        return new JdbcStatement();
+        return this.connection.handle((connection, sink) -> {
+            try
+            {
+                getLogger().debug("creating statement");
+
+                @SuppressWarnings("resource")
+                PreparedStatement preparedStatement = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
+
+                if (sql.toLowerCase().startsWith("select"))
+                {
+                    sink.next(new JdbcPreparedStatementSelect(preparedStatement));
+                }
+                else
+                {
+                    sink.next(new JdbcPreparedStatementUpdate(preparedStatement));
+                }
+
+                sink.complete();
+            }
+            catch (SQLException sex)
+            {
+                sink.error(sex);
+            }
+        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(Statement.class).block();
     }
 
     /**
@@ -183,7 +241,25 @@ public class JdbcConnection implements Connection
     @Override
     public Mono<Void> releaseSavepoint(final String name)
     {
-        return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
+        // return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
+        return this.connection.handle((connection, sink) -> {
+            try
+            {
+                Objects.requireNonNull(name, "name must not be null");
+
+                getLogger().debug("releasing savepoint");
+
+                Savepoint savepoint = this.savePoints.remove(name);
+                connection.releaseSavepoint(savepoint);
+
+                sink.next(Mono.empty());
+                sink.complete();
+            }
+            catch (SQLException sex)
+            {
+                sink.error(sex);
+            }
+        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
     }
 
     /**
@@ -197,6 +273,8 @@ public class JdbcConnection implements Connection
             {
                 if (!connection.getAutoCommit())
                 {
+                    getLogger().debug("rollback transaction");
+
                     connection.rollback();
                 }
                 else
@@ -205,6 +283,7 @@ public class JdbcConnection implements Connection
                 }
 
                 sink.next(Mono.empty());
+                sink.complete();
             }
             catch (SQLException sex)
             {
@@ -219,7 +298,25 @@ public class JdbcConnection implements Connection
     @Override
     public Mono<Void> rollbackTransactionToSavepoint(final String name)
     {
-        return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
+        // return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
+        return this.connection.handle((connection, sink) -> {
+            try
+            {
+                Objects.requireNonNull(name, "name must not be null");
+
+                getLogger().debug("rollback transaction savepoint");
+
+                Savepoint savepoint = this.savePoints.remove(name);
+                connection.rollback(savepoint);
+
+                sink.next(Mono.empty());
+                sink.complete();
+            }
+            catch (SQLException sex)
+            {
+                sink.error(sex);
+            }
+        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
     }
 
     /**
@@ -232,6 +329,8 @@ public class JdbcConnection implements Connection
             try
             {
                 Objects.requireNonNull(isolationLevel, "isolationLevel must not be null");
+
+                getLogger().debug("transaction isolationLevel");
 
                 switch (isolationLevel)
                 {
@@ -257,6 +356,7 @@ public class JdbcConnection implements Connection
                 }
 
                 sink.next(Mono.empty());
+                sink.complete();
             }
             catch (SQLException sex)
             {
