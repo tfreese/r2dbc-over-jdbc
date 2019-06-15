@@ -44,6 +44,9 @@ public class JdbcPreparedStatementSelect extends AbstractJdbcStatement
     {
         return Mono.fromCallable(() -> {
             getLogger().debug("execute statement");
+
+            getBindings().prepareStatement(getStatement(), getBindings().getCurrent());
+
             return getStatement().executeQuery();
         }).handle((resultSet, sink) -> {
             try

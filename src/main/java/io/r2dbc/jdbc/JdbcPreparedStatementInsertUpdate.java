@@ -13,11 +13,11 @@ import reactor.util.function.Tuples;
 
 /**
  * R2DBC Adapter for JDBC.<br>
- * Only for INSERT, UPDATE and DELETE Statements.
+ * Only for INSERT, UPDATE Statements.
  *
  * @author Thomas Freese
  */
-public class JdbcPreparedStatementUpdate extends AbstractJdbcStatement
+public class JdbcPreparedStatementInsertUpdate extends AbstractJdbcStatement
 {
     /**
     *
@@ -25,11 +25,11 @@ public class JdbcPreparedStatementUpdate extends AbstractJdbcStatement
     private boolean returnGeneratedValues = false;
 
     /**
-     * Erstellt ein neues {@link JdbcPreparedStatementUpdate} Object.
+     * Erstellt ein neues {@link JdbcPreparedStatementInsertUpdate} Object.
      *
      * @param preparedStatement {@link PreparedStatement}
      */
-    public JdbcPreparedStatementUpdate(final PreparedStatement preparedStatement)
+    public JdbcPreparedStatementInsertUpdate(final PreparedStatement preparedStatement)
     {
         super(preparedStatement);
     }
@@ -40,16 +40,33 @@ public class JdbcPreparedStatementUpdate extends AbstractJdbcStatement
     @Override
     public Statement add()
     {
-        try
-        {
-            getStatement().addBatch();
-        }
-        catch (SQLException sex)
-        {
-            throw JdbcR2dbcExceptionFactory.create(sex);
-        }
+        // try
+        // {
+        // getStatement().addBatch();
+        // }
+        // catch (SQLException sex)
+        // {
+        // throw JdbcR2dbcExceptionFactory.create(sex);
+        // }
+
+        getBindings().finish();
 
         return this;
+    }
+
+    /**
+     * Beim DELETE hat das Array nur ein Element mit der Anzahl gelöschter Zeilen.<br>
+     * Dies muss für das reaktive Verhalten auf n-Elemente erweitert werden.<br>
+     *
+     * @see JdbcPreparedStatementDelete
+     * @param affectedRows int[]
+     * @return int[]
+     */
+    protected int[] checkAffectedRows(final int[] affectedRows)
+    {
+        int[] rows = affectedRows;
+
+        return rows;
     }
 
     /**
@@ -62,7 +79,11 @@ public class JdbcPreparedStatementUpdate extends AbstractJdbcStatement
         return Mono.fromCallable(() -> {
             getLogger().debug("execute statement");
 
+            getBindings().prepareBatch(getStatement());
+
             int[] affectedRows = getStatement().executeBatch();
+            affectedRows = checkAffectedRows(affectedRows);
+
             ResultSet resultSetGenKeys = getStatement().getGeneratedKeys();
 
             return Tuples.of(resultSetGenKeys, affectedRows);

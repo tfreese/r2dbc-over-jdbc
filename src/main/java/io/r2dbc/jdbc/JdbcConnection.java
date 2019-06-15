@@ -143,6 +143,7 @@ public class JdbcConnection implements Connection
                     getLogger().debug("commit transaction");
 
                     connection.commit();
+                    connection.setAutoCommit(true);
                 }
                 else
                 {
@@ -215,9 +216,13 @@ public class JdbcConnection implements Connection
                 {
                     sink.next(new JdbcPreparedStatementSelect(preparedStatement));
                 }
+                else if (loweredSql.startsWith("delete"))
+                {
+                    sink.next(new JdbcPreparedStatementDelete(preparedStatement));
+                }
                 else
                 {
-                    sink.next(new JdbcPreparedStatementUpdate(preparedStatement));
+                    sink.next(new JdbcPreparedStatementInsertUpdate(preparedStatement));
                 }
 
                 sink.complete();

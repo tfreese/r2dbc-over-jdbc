@@ -4,9 +4,12 @@
 
 package io.r2dbc.jdbc;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,6 +27,96 @@ import reactor.core.publisher.SynchronousSink;
  */
 public abstract class AbstractJdbcStatement implements Statement
 {
+    /**
+     * @author Thomas Freese
+     */
+    static class Bindings
+    {
+        /**
+         *
+         */
+        private final List<Map<Integer, Object>> bindings = new ArrayList<>();
+
+        /**
+         *
+         */
+        private Map<Integer, Object> current;
+
+        /**
+         * Erstellt ein neues {@link Bindings} Object.
+         */
+        public Bindings()
+        {
+            super();
+        }
+
+        /**
+         *
+         */
+        void finish()
+        {
+            this.current = null;
+        }
+
+        /**
+         * @return {@link Map}
+         */
+        Map<Integer, Object> getCurrent()
+        {
+            if (this.current == null)
+            {
+                this.current = new HashMap<>();
+                this.bindings.add(this.current);
+            }
+
+            return this.current;
+        }
+
+        /**
+         * @param preparedStatement {@link PreparedStatement}
+         * @throws SQLException Falls was schief geht.
+         */
+        void prepareBatch(final PreparedStatement preparedStatement) throws SQLException
+        {
+            if (this.bindings.isEmpty())
+            {
+                preparedStatement.addBatch();
+                return;
+            }
+
+            for (Map<Integer, Object> binding : this.bindings)
+            {
+                if (binding.isEmpty())
+                {
+                    continue;
+                }
+
+                prepareStatement(preparedStatement, binding);
+
+                preparedStatement.addBatch();
+            }
+        }
+
+        /**
+         * @param preparedStatement {@link PreparedStatement}
+         * @param binding {@link Map}
+         * @throws SQLException Falls was schief geht.
+         */
+        void prepareStatement(final PreparedStatement preparedStatement, final Map<Integer, Object> binding) throws SQLException
+        {
+            for (Integer index : binding.keySet())
+            {
+                // JDBC fängt bei 1 an !
+                preparedStatement.setObject(index + 1, binding.get(index));
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    private final Bindings bindings = new Bindings();
+
     /**
      *
      */
@@ -52,14 +145,16 @@ public abstract class AbstractJdbcStatement implements Statement
     @Override
     public Statement bind(final int index, final Object value)
     {
-        try
-        {
-            getStatement().setObject(index + 1, value);
-        }
-        catch (SQLException sex)
-        {
-            throw JdbcR2dbcExceptionFactory.create(sex);
-        }
+        // try
+        // {
+        // getStatement().setObject(index + 1, value);
+        // }
+        // catch (SQLException sex)
+        // {
+        // throw JdbcR2dbcExceptionFactory.create(sex);
+        // }
+
+        getBindings().getCurrent().put(index, value);
 
         return this;
     }
@@ -84,14 +179,15 @@ public abstract class AbstractJdbcStatement implements Statement
     @Override
     public Statement bindNull(final int index, final Class<?> type)
     {
-        try
-        {
-            getStatement().setObject(index + 1, null);
-        }
-        catch (SQLException sex)
-        {
-            throw JdbcR2dbcExceptionFactory.create(sex);
-        }
+        // try
+        // {
+        // getStatement().setObject(index + 1, null);
+        // }
+        // catch (SQLException sex)
+        // {
+        // throw JdbcR2dbcExceptionFactory.create(sex);
+        // }
+        getBindings().getCurrent().put(index, null);
 
         return this;
     }
@@ -193,6 +289,14 @@ public abstract class AbstractJdbcStatement implements Statement
         JdbcResult result = new JdbcResult(rows, Mono.just(rowMetadata), Mono.just(affectedRows.length));
 
         return result;
+    }
+
+    /**
+     * @return {@link Bindings}
+     */
+    protected Bindings getBindings()
+    {
+        return this.bindings;
     }
 
     /**

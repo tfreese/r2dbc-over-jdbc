@@ -65,6 +65,8 @@ public final class HsqldbServerExtension implements BeforeAllCallback, AfterAllC
 //                ;
         // @formatter:on
 
+        // ;MVCC=true;LOCK_MODE=0
+
         this.dataSource = new HikariDataSource();
         this.dataSource.setDriverClassName("org.hsqldb.jdbc.JDBCDriver");
         this.dataSource.setJdbcUrl("jdbc:hsqldb:mem:%d" + System.nanoTime());
@@ -73,7 +75,7 @@ public final class HsqldbServerExtension implements BeforeAllCallback, AfterAllC
         this.dataSource.setUsername("sa");
         this.dataSource.setPassword("");
 
-        this.dataSource.setMaximumPoolSize(5);
+        this.dataSource.setMaximumPoolSize(1);
 
         this.jdbcOperations = new JdbcTemplate(this.dataSource);
     }
