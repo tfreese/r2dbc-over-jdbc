@@ -5,17 +5,25 @@
 package io.r2dbc.jdbc;
 
 import java.sql.PreparedStatement;
-import org.reactivestreams.Publisher;
-import io.r2dbc.spi.Result;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import io.r2dbc.spi.Statement;
+import reactor.core.publisher.Mono;
+import reactor.util.function.Tuples;
 
 /**
- * R2DBC Adapter for JDBC.
+ * R2DBC Adapter for JDBC.<br>
+ * Only for INSERT, UPDATE and DELETE Statements.
  *
  * @author Thomas Freese
  */
 public class JdbcPreparedStatementUpdate extends AbstractJdbcStatement
 {
+    /**
+    *
+    */
+    private boolean returnGeneratedValues = false;
+
     /**
      * Erstellt ein neues {@link JdbcPreparedStatementUpdate} Object.
      *
@@ -32,37 +40,67 @@ public class JdbcPreparedStatementUpdate extends AbstractJdbcStatement
     @Override
     public Statement add()
     {
-        // TODO Auto-generated method stub
-        return null;
-    }
+        try
+        {
+            getStatement().addBatch();
+        }
+        catch (SQLException sex)
+        {
+            throw JdbcR2dbcExceptionFactory.create(sex);
+        }
 
-    /**
-     * @see io.r2dbc.spi.Statement#bind(int, java.lang.Object)
-     */
-    @Override
-    public Statement bind(final int index, final Object value)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /**
-     * @see io.r2dbc.spi.Statement#bindNull(int, java.lang.Class)
-     */
-    @Override
-    public Statement bindNull(final int index, final Class<?> type)
-    {
-        // TODO Auto-generated method stub
-        return null;
+        return this;
     }
 
     /**
      * @see io.r2dbc.spi.Statement#execute()
      */
+    @SuppressWarnings("resource")
     @Override
-    public Publisher<? extends Result> execute()
+    public Mono<JdbcResult> execute()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return Mono.fromCallable(() -> {
+            getLogger().debug("execute statement");
+
+            int[] affectedRows = getStatement().executeBatch();
+            ResultSet resultSetGenKeys = getStatement().getGeneratedKeys();
+
+            return Tuples.of(resultSetGenKeys, affectedRows);
+        }).handle((tuple, sink) -> {
+            try
+            {
+                JdbcResult result = null;
+
+                if (this.returnGeneratedValues)
+                {
+                    // Generierte Auto_Increments liefern.
+                    result = createResult(tuple.getT1(), tuple.getT2().length);
+                }
+                else
+                {
+                    // Nur die AffectedRows liefern.
+                    result = createResultAffectedRows(tuple.getT1(), tuple.getT2());
+                }
+
+                sink.next(result);
+
+                sink.complete();
+            }
+            catch (SQLException sex)
+            {
+                sink.error(sex);
+            }
+        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(JdbcResult.class);
+    }
+
+    /**
+     * @see io.r2dbc.spi.Statement#returnGeneratedValues(java.lang.String[])
+     */
+    @Override
+    public Statement returnGeneratedValues(final String...columns)
+    {
+        this.returnGeneratedValues = true;
+
+        return this;
     }
 }

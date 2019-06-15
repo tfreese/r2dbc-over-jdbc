@@ -209,7 +209,9 @@ public class JdbcConnection implements Connection
                 @SuppressWarnings("resource")
                 PreparedStatement preparedStatement = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
 
-                if (sql.toLowerCase().startsWith("select"))
+                String loweredSql = sql.toLowerCase();
+
+                if (loweredSql.startsWith("select"))
                 {
                     sink.next(new JdbcPreparedStatementSelect(preparedStatement));
                 }

@@ -4,9 +4,10 @@
 
 package io.r2dbc.jdbc;
 
+import io.r2dbc.spi.Row;
+
 import java.util.Map;
 import java.util.Objects;
-import io.r2dbc.spi.Row;
 
 /**
  * R2DBC Adapter for JDBC.
@@ -16,26 +17,30 @@ import io.r2dbc.spi.Row;
 public class JdbcRow implements Row
 {
     /**
-    *
-    */
+     *
+     */
     private Map<Object, Object> values = null;
 
     /**
      * Erstellt ein neues {@link JdbcRow} Object.
      *
-     * @param valuesByColumnName {@link Map}
+     * @param values {@link Map}
      */
-    public JdbcRow(final Map<Object, Object> valuesByColumnName)
+    public JdbcRow(final Map<Object, Object> values)
     {
         super();
 
-        this.values = Objects.requireNonNull(valuesByColumnName, "values must not be null");
+        this.values = Objects.requireNonNull(values, "values must not be null");
+
+        // if (this.values.isEmpty())
+        // {
+        //
+        // }
     }
 
     /**
      * @see io.r2dbc.spi.Row#get(java.lang.Object, java.lang.Class)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public <T> T get(final Object identifier, final Class<T> type)
     {
@@ -56,6 +61,11 @@ public class JdbcRow implements Row
         {
             throw new IllegalArgumentException(
                     String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String column name.", identifier));
+        }
+
+        if (!this.values.containsKey(key))
+        {
+            throw new IllegalArgumentException(String.format("Column identifier '%s' does not exist", key));
         }
 
         Object value = this.values.get(key);
