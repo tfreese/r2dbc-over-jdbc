@@ -7,15 +7,6 @@
 
 package io.r2dbc.jdbc;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-
 import static io.r2dbc.spi.Nullability.NULLABLE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
@@ -23,6 +14,13 @@ import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Thomas Freese
@@ -54,19 +52,16 @@ final class JdbcRowMetadataTest
     {
         when(this.resultSet.getMetaData()).thenReturn(this.resultSetMetaData);
 
-        when(this.resultSetMetaData.getColumnCount()).thenReturn(2);
+        when(this.resultSetMetaData.getColumnCount()).thenReturn(this.columnMetadatas.size());
 
-        when(this.resultSetMetaData.getColumnName(1)).thenReturn(this.columnMetadatas.get(0).getName());
-        when(this.resultSetMetaData.getColumnType(1)).thenReturn((int) this.columnMetadatas.get(0).getNativeTypeMetadata());
-        when(this.resultSetMetaData.isNullable(1)).thenReturn(ResultSetMetaData.columnNullable);
-        when(this.resultSetMetaData.getPrecision(1)).thenReturn(this.columnMetadatas.get(0).getPrecision());
-        when(this.resultSetMetaData.getScale(1)).thenReturn(this.columnMetadatas.get(0).getScale());
-
-        when(this.resultSetMetaData.getColumnName(2)).thenReturn(this.columnMetadatas.get(1).getName());
-        when(this.resultSetMetaData.getColumnType(2)).thenReturn((int) this.columnMetadatas.get(1).getNativeTypeMetadata());
-        when(this.resultSetMetaData.isNullable(2)).thenReturn(ResultSetMetaData.columnNullable);
-        when(this.resultSetMetaData.getPrecision(2)).thenReturn(this.columnMetadatas.get(1).getPrecision());
-        when(this.resultSetMetaData.getScale(2)).thenReturn(this.columnMetadatas.get(01).getScale());
+        for (int i = 0; i < this.columnMetadatas.size(); i++)
+        {
+            when(this.resultSetMetaData.getColumnLabel(i + 1)).thenReturn(this.columnMetadatas.get(i).getName());
+            when(this.resultSetMetaData.getColumnType(i + 1)).thenReturn((int) this.columnMetadatas.get(i).getNativeTypeMetadata());
+            when(this.resultSetMetaData.isNullable(i + 1)).thenReturn(ResultSetMetaData.columnNullable);
+            when(this.resultSetMetaData.getPrecision(i + 1)).thenReturn(this.columnMetadatas.get(i).getPrecision());
+            when(this.resultSetMetaData.getScale(i + 1)).thenReturn(this.columnMetadatas.get(i).getScale());
+        }
     }
 
     /**
@@ -84,7 +79,7 @@ final class JdbcRowMetadataTest
     @Test
     void getColumnMetadataIndex() throws SQLException
     {
-        assertThat(new JdbcRowMetadata(this.resultSet).getColumnMetadata(1)).isEqualTo(this.columnMetadatas.get(1));
+        assertThat(new JdbcRowMetadata(this.resultSet).getColumnMetadata(0)).isEqualTo(this.columnMetadatas.get(0));
     }
 
     /**

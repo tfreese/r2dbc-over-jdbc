@@ -54,7 +54,7 @@ public abstract class AbstractJdbcStatement implements Statement
     {
         try
         {
-            getStatement().setObject(index, value);
+            getStatement().setObject(index + 1, value);
         }
         catch (SQLException sex)
         {
@@ -86,7 +86,7 @@ public abstract class AbstractJdbcStatement implements Statement
     {
         try
         {
-            getStatement().setObject(index, null);
+            getStatement().setObject(index + 1, null);
         }
         catch (SQLException sex)
         {

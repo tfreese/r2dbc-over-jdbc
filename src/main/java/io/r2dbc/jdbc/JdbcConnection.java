@@ -63,9 +63,9 @@ public class JdbcConnection implements Connection
         return this.connection.handle((connection, sink) -> {
             try
             {
-                if (!connection.getAutoCommit())
+                if (connection.getAutoCommit())
                 {
-                    getLogger().debug("begin connection");
+                    getLogger().debug("begin transaction");
 
                     connection.setAutoCommit(false);
                 }
@@ -110,7 +110,7 @@ public class JdbcConnection implements Connection
             {
                 if (!connection.isClosed())
                 {
-                    getLogger().debug("closing connection");
+                    getLogger().debug("close connection");
 
                     connection.close();
                 }
@@ -140,7 +140,7 @@ public class JdbcConnection implements Connection
             {
                 if (!connection.getAutoCommit())
                 {
-                    getLogger().debug("starting connection");
+                    getLogger().debug("commit transaction");
 
                     connection.commit();
                 }
@@ -180,7 +180,7 @@ public class JdbcConnection implements Connection
             {
                 Objects.requireNonNull(name, "name must not be null");
 
-                getLogger().debug("creating savepoint");
+                getLogger().debug("create savepoint");
 
                 Savepoint savepoint = connection.setSavepoint(name);
                 this.savePoints.put(name, savepoint);
@@ -204,7 +204,7 @@ public class JdbcConnection implements Connection
         return this.connection.handle((connection, sink) -> {
             try
             {
-                getLogger().debug("creating statement");
+                getLogger().debug("create statement");
 
                 @SuppressWarnings("resource")
                 PreparedStatement preparedStatement = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
@@ -249,7 +249,7 @@ public class JdbcConnection implements Connection
             {
                 Objects.requireNonNull(name, "name must not be null");
 
-                getLogger().debug("releasing savepoint");
+                getLogger().debug("release savepoint");
 
                 Savepoint savepoint = this.savePoints.remove(name);
                 connection.releaseSavepoint(savepoint);
@@ -281,7 +281,7 @@ public class JdbcConnection implements Connection
                 }
                 else
                 {
-                    getLogger().debug("Skipping rollback to savepoint because no transaction in progress.");
+                    getLogger().debug("Skipping rollback because no transaction in progress.");
                 }
 
                 sink.next(Mono.empty());

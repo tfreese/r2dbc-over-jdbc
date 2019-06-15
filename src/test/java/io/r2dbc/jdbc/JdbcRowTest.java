@@ -1,26 +1,24 @@
 package io.r2dbc.jdbc;
 
-import io.r2dbc.jdbc.util.HsqldbServerExtension;
-import io.r2dbc.spi.ConnectionFactories;
-import io.r2dbc.spi.ConnectionFactory;
-import io.r2dbc.spi.ConnectionFactoryOptions;
-import io.r2dbc.spi.test.Example;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.jdbc.core.JdbcOperations;
+import io.r2dbc.jdbc.util.HsqldbServerExtension;
+import io.r2dbc.spi.ConnectionFactories;
+import io.r2dbc.spi.ConnectionFactory;
+import io.r2dbc.spi.ConnectionFactoryOptions;
+import io.r2dbc.spi.test.Example;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 /**
  * @author Thomas Freese
@@ -106,6 +104,21 @@ final class JdbcRowTest
     }
 
     /**
+     * @return {@link JdbcOperations}
+     */
+    private JdbcOperations getJdbcOperations()
+    {
+        JdbcOperations jdbcOperations = SERVER.getJdbcOperations();
+
+        if (jdbcOperations == null)
+        {
+            throw new IllegalStateException("JdbcOperations not yet initialized");
+        }
+
+        return jdbcOperations;
+    }
+
+    /**
      *
      */
     @Test
@@ -142,6 +155,25 @@ final class JdbcRowTest
      *
      */
     @Test
+    void select()
+    {
+        getJdbcOperations().execute("INSERT INTO test VALUES (100)");
+
+        // @formatter:off
+        Mono.from(this.connectionFactory.create())
+            .flatMapMany(connection -> Flux.from(connection.createStatement("SELECT value FROM test").execute())
+                .flatMap(Example::extractColumns)
+                .concatWith(Example.close(connection)))
+        .as(StepVerifier::create)
+        .expectNext(List.of(100))
+        .verifyComplete();
+        // @formatter:on
+    }
+
+    /**
+     *
+     */
+    @Test
     void selectWithAliases()
     {
         getJdbcOperations().execute("INSERT INTO test VALUES (100)");
@@ -156,42 +188,8 @@ final class JdbcRowTest
                         .collectList())
                 .concatWith(Example.close(connection)))
             .as(StepVerifier::create)
-            .expectNext(Collections.singletonList(100))
+            .expectNext(List.of(100))
             .verifyComplete();
         // @formatter:on
-    }
-
-    /**
-     *
-     */
-    @Test
-    void selectWithoutAliases()
-    {
-        getJdbcOperations().execute("INSERT INTO test VALUES (100)");
-
-        // @formatter:off
-        Mono.from(this.connectionFactory.create())
-            .flatMapMany(connection -> Flux.from(connection.createStatement("SELECT value FROM test").execute())
-                .flatMap(Example::extractColumns)
-                .concatWith(Example.close(connection)))
-        .as(StepVerifier::create)
-        .expectNext(Collections.singletonList(100))
-        .verifyComplete();
-        // @formatter:on
-    }
-
-    /**
-     * @return {@link JdbcOperations}
-     */
-    private JdbcOperations getJdbcOperations()
-    {
-        JdbcOperations jdbcOperations = SERVER.getJdbcOperations();
-
-        if (jdbcOperations == null)
-        {
-            throw new IllegalStateException("JdbcOperations not yet initialized");
-        }
-
-        return jdbcOperations;
     }
 }

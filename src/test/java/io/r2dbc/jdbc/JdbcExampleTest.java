@@ -136,7 +136,7 @@ final class JdbcExampleTest
        Mono.from(this.connectionFactory.create())
            .flatMapMany(connection -> {
                Statement statement = connection.createStatement("INSERT INTO test VALUES (?)")
-                       .bind(1, 2)
+                       .bind(0, 2)
                        .add();
 
                return Flux.from(statement.execute())
@@ -162,7 +162,7 @@ final class JdbcExampleTest
             .flatMapMany(connection -> {
                 Statement statement = connection.createStatement("INSERT INTO test VALUES (?)");
 
-                IntStream.range(0, 10).forEach(i -> statement.bind(1, i).add());
+                IntStream.range(0, 10).forEach(i -> statement.bind(0, i).add());
 
                 return Flux.from(statement.execute())
                         .concatWith(Example.close(connection))
@@ -187,7 +187,7 @@ final class JdbcExampleTest
             .flatMapMany(connection -> {
                 Statement statement = connection.createStatement("INSERT INTO test_auto (value) VALUES (?)");
 
-                IntStream.range(0, 10).forEach(i -> statement.bind(1, i).add());
+                IntStream.range(0, 10).forEach(i -> statement.bind(0, i).add());
 
                 return Flux.from(statement.returnGeneratedValues().execute())
                         .concatWith(Example.close(connection))
@@ -211,9 +211,98 @@ final class JdbcExampleTest
         Mono.from(this.connectionFactory.create()).flatMapMany(connection -> {
             Statement statement = connection.createStatement("INSERT INTO test VALUES (?)");
 
-            IntStream.range(0, 10).forEach(i -> statement.bind(1, i).add());
+            IntStream.range(0, 10).forEach(i -> statement.bind(0, i).add());
 
             return Flux.from(statement.execute()).concatWith(Example.close(connection));
         }).as(StepVerifier::create).expectNextCount(10).as("values from insertions").verifyComplete();
+    }
+
+    /**
+    *
+    */
+    @Test
+    void prepareStatementInsertBatchWithCommit()
+    {
+        getJdbcOperations().execute("INSERT INTO test VALUES (100)");
+
+        // @formatter:off
+        Mono.from(this.connectionFactory.create())
+            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
+
+                    .<Object>thenMany(Flux.from(connection.createStatement("SELECT value FROM test")
+                                .execute())
+                            .flatMap(Example::extractColumns))
+
+                    .concatWith(Flux.from(connection.createStatement("INSERT INTO test VALUES (?)")
+                                .bind(0, 200)
+                                .add()
+                                .execute())
+                            .flatMap(Example::extractRowsUpdated))
+
+                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM test")
+                                .execute())
+                            .flatMap(Example::extractColumns))
+
+                    .concatWith(connection.commitTransaction())
+
+                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM test")
+                                .execute())
+                            .flatMap(Example::extractColumns))
+
+                    .concatWith(Example.close(connection))
+
+            )
+            .as(StepVerifier::create)
+            .expectNext(List.of(100)).as("value from select")
+            .expectNext(1).as("rows inserted")
+            .expectNext(List.of(100, 200)).as("values from select")
+            .expectNext(List.of(100, 200)).as("values from select")
+            .verifyComplete()
+            ;
+       // @formatter:on
+    }
+
+    /**
+    *
+    */
+    @Test
+    void prepareStatementInsertBatchWithRollback()
+    {
+        getJdbcOperations().execute("INSERT INTO test VALUES (100)");
+
+        // @formatter:off
+        Mono.from(this.connectionFactory.create())
+            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
+
+                    .<Object>thenMany(Flux.from(connection.createStatement("SELECT value FROM test")
+                                .execute())
+                            .flatMap(Example::extractColumns))
+
+                    .concatWith(Flux.from(connection.createStatement("INSERT INTO test VALUES (?)")
+                                .bind(0, 200)
+                                .add()
+                                .execute())
+                            .flatMap(Example::extractRowsUpdated))
+
+                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM test")
+                                .execute())
+                            .flatMap(Example::extractColumns))
+
+                    .concatWith(connection.rollbackTransaction())
+
+                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM test")
+                                .execute())
+                            .flatMap(Example::extractColumns))
+
+                    .concatWith(Example.close(connection))
+            )
+            .as(StepVerifier::create)
+            .expectNext(List.of(100)).as("value from select")
+            .expectNext(1).as("rows inserted")
+            .expectNext(List.of(100, 200)).as("values from select")
+            .expectNext(List.of(100)).as("value from select")
+            .verifyComplete()
+            ;
+       // @formatter:on
     }
 }
