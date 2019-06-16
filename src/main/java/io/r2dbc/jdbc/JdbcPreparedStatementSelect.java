@@ -5,9 +5,11 @@
 package io.r2dbc.jdbc;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.ResultSet;
 import io.r2dbc.spi.Statement;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 /**
  * R2DBC Adapter for JDBC.<br>
@@ -37,38 +39,20 @@ public class JdbcPreparedStatementSelect extends AbstractJdbcStatement
     }
 
     /**
-     * @see io.r2dbc.spi.Statement#execute()
+     * @see io.r2dbc.jdbc.AbstractJdbcStatement#createExecuteMono()
      */
+    @SuppressWarnings("resource")
     @Override
-    public Mono<JdbcResult> execute()
+    protected Mono<Tuple2<ResultSet, int[]>> createExecuteMono()
     {
         return Mono.fromCallable(() -> {
             getLogger().debug("execute statement");
 
             getBindings().prepareStatement(getStatement(), getBindings().getCurrent());
 
-            return getStatement().executeQuery();
-        }).handle((resultSet, sink) -> {
-            try
-            {
-                JdbcResult result = createResult(resultSet, 0);
-                sink.next(result);
+            ResultSet resultSet = getStatement().executeQuery();
 
-                sink.complete();
-            }
-            catch (SQLException sex)
-            {
-                sink.error(sex);
-            }
-        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(JdbcResult.class);
-    }
-
-    /**
-     * @see io.r2dbc.jdbc.AbstractJdbcStatement#returnGeneratedValues(java.lang.String[])
-     */
-    @Override
-    public Statement returnGeneratedValues(final String...columns)
-    {
-        throw new UnsupportedOperationException();
+            return Tuples.of(resultSet, new int[] {});
+        });
     }
 }

@@ -180,7 +180,10 @@ final class JdbcConnectionTest
     @Test
     void createStatement()
     {
-        assertThat(new JdbcConnection(this.connection).createStatement("test-query-?")).isInstanceOf(AbstractJdbcStatement.class);
+        assertThat(new JdbcConnection(this.connection).createStatement("select-query-?")).isInstanceOf(JdbcPreparedStatementSelect.class);
+        assertThat(new JdbcConnection(this.connection).createStatement("insert-query-?")).isInstanceOf(JdbcPreparedStatementInsert.class);
+        assertThat(new JdbcConnection(this.connection).createStatement("update-query-?")).isInstanceOf(JdbcPreparedStatementUpdate.class);
+        assertThat(new JdbcConnection(this.connection).createStatement("delete-query-?")).isInstanceOf(JdbcPreparedStatementDelete.class);
     }
 
     /**

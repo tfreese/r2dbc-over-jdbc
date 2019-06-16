@@ -282,6 +282,40 @@ final class JdbcExampleTest
     *
     */
     @Test
+    void prepareStatementDeleteBatch()
+    {
+        getJdbcOperations().execute("INSERT INTO tbl VALUES (100, 200, 300, 400, 500)");
+
+        // @formatter:off
+        Mono.from(this.connectionFactory.create())
+            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
+
+                    .<Object>thenMany(Flux.from(connection.createStatement("DELETE from tbl where value < ?")
+                                .bind(0, 300)
+                                .add().bind(0, 400)
+                                .execute())
+                            .flatMap(Example::extractRowsUpdated))
+
+                    .concatWith(connection.commitTransaction())
+
+                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+                                .execute())
+                            .flatMap(Example::extractColumns))
+
+                    .concatWith(Example.close(connection))
+            )
+            .as(StepVerifier::create)
+            .expectNext(3).as("rows deleted")
+            .expectNext(List.of(400, 500)).as("values from select after delete after commit")
+            .verifyComplete()
+            ;
+       // @formatter:on
+    }
+
+    /**
+    *
+    */
+    @Test
     void prepareStatementDeleteSimple()
     {
         getJdbcOperations().execute("INSERT INTO tbl VALUES (100, 200, 300, 400)");

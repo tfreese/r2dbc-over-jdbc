@@ -4,10 +4,9 @@
 
 package io.r2dbc.jdbc;
 
-import io.r2dbc.spi.Row;
-
 import java.util.Map;
 import java.util.Objects;
+import io.r2dbc.spi.Row;
 
 /**
  * R2DBC Adapter for JDBC.
@@ -41,6 +40,7 @@ public class JdbcRow implements Row
     /**
      * @see io.r2dbc.spi.Row#get(java.lang.Object, java.lang.Class)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T get(final Object identifier, final Class<T> type)
     {

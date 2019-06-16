@@ -10,18 +10,18 @@ import java.sql.SQLException;
 
 /**
  * R2DBC Adapter for JDBC.<br>
- * Only for DELETE Statements.
+ * Only for UPDATE Statements.
  *
  * @author Thomas Freese
  */
-public class JdbcPreparedStatementDelete extends AbstractJdbcStatement
+public class JdbcPreparedStatementUpdate extends AbstractJdbcStatement
 {
     /**
-     * Erstellt ein neues {@link JdbcPreparedStatementDelete} Object.
+     * Erstellt ein neues {@link JdbcPreparedStatementUpdate} Object.
      *
      * @param preparedStatement {@link PreparedStatement}
      */
-    public JdbcPreparedStatementDelete(final PreparedStatement preparedStatement)
+    public JdbcPreparedStatementUpdate(final PreparedStatement preparedStatement)
     {
         super(preparedStatement);
     }

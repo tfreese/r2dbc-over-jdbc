@@ -6,6 +6,7 @@ package io.r2dbc.jdbc;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
 import java.sql.Savepoint;
 import java.util.HashMap;
 import java.util.Map;
@@ -220,9 +221,17 @@ public class JdbcConnection implements Connection
                 {
                     sink.next(new JdbcPreparedStatementDelete(preparedStatement));
                 }
+                else if (loweredSql.startsWith("update"))
+                {
+                    sink.next(new JdbcPreparedStatementUpdate(preparedStatement));
+                }
+                else if (loweredSql.startsWith("insert"))
+                {
+                    sink.next(new JdbcPreparedStatementInsert(preparedStatement));
+                }
                 else
                 {
-                    sink.next(new JdbcPreparedStatementInsertUpdate(preparedStatement));
+                    sink.error(new SQLSyntaxErrorException("unknown SQL operation"));
                 }
 
                 sink.complete();
