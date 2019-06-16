@@ -4,53 +4,22 @@
 
 package io.r2dbc.jdbc;
 
-import java.sql.JDBCType;
-import java.sql.Types;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
+import io.r2dbc.jdbc.codec.Codec;
 import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Nullability;
 
 /**
  * R2DBC Adapter for JDBC.
- * 
+ *
  * @author Thomas Freese
  */
 public class JdbcColumnMetadata implements ColumnMetadata
 {
     /**
-    *
-    */
-    private static final Map<Integer, Class<?>> SQL_TO_JAVATYPE_MAP;
-
-    /**
-     * {@link JDBCType}, {@link Types}
+     *
      */
-    static
-    {
-        SQL_TO_JAVATYPE_MAP = new HashMap<>();
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.BIGINT.getVendorTypeNumber(), Long.class);
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.BINARY.getVendorTypeNumber(), byte[].class);
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.BIT.getVendorTypeNumber(), Boolean.class);
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.BLOB.getVendorTypeNumber(), byte[].class);
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.BOOLEAN.getVendorTypeNumber(), Boolean.class);
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.CHAR.getVendorTypeNumber(), Character.class);
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.CLOB.getVendorTypeNumber(), String.class);
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.DATE.getVendorTypeNumber(), LocalDate.class);
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.DECIMAL.getVendorTypeNumber(), Long.class);
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.DOUBLE.getVendorTypeNumber(), Double.class);
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.FLOAT.getVendorTypeNumber(), Float.class);
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.INTEGER.getVendorTypeNumber(), Integer.class);
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.NUMERIC.getVendorTypeNumber(), Double.class);
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.SMALLINT.getVendorTypeNumber(), Short.class);
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.TIME.getVendorTypeNumber(), LocalTime.class);
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.TIMESTAMP.getVendorTypeNumber(), LocalDateTime.class);
-        SQL_TO_JAVATYPE_MAP.put(JDBCType.VARCHAR.getVendorTypeNumber(), String.class);
-    }
+    private final Codec<?> codec;
 
     /**
      *
@@ -61,11 +30,6 @@ public class JdbcColumnMetadata implements ColumnMetadata
      *
      */
     private final String name;
-
-    /**
-     *
-     */
-    private final int nativeType;
 
     /**
      *
@@ -83,23 +47,27 @@ public class JdbcColumnMetadata implements ColumnMetadata
     private final int scale;
 
     /**
+     *
+     */
+    private final int sqlType;
+
+    /**
      * Erstellt ein neues {@link JdbcColumnMetadata} Object.
      *
-     * @param javaType Class
+     * @param codec {@link Codec}
      * @param name String
-     * @param nativeType int
      * @param nullability {@link Nullability}
      * @param precision int
      * @param scale int
      */
-    public JdbcColumnMetadata(final Class<?> javaType, final String name, final int nativeType, final Nullability nullability, final int precision,
-            final int scale)
+    public JdbcColumnMetadata(final Codec<?> codec, final String name, final Nullability nullability, final int precision, final int scale)
     {
         super();
 
-        this.javaType = javaType != null ? javaType : SQL_TO_JAVATYPE_MAP.get(nativeType);
+        this.codec = Objects.requireNonNull(codec, "codec must not be null");
+        this.javaType = this.codec.getJavaType();
         this.name = Objects.requireNonNull(name, "name must not be null");
-        this.nativeType = nativeType;
+        this.sqlType = this.codec.getSqlType();
         this.nullability = Objects.requireNonNull(nullability, "nullability must not be null");
         this.precision = precision;
         this.scale = scale;
@@ -128,17 +96,17 @@ public class JdbcColumnMetadata implements ColumnMetadata
 
         JdbcColumnMetadata other = (JdbcColumnMetadata) obj;
 
-        // if (this.javaType == null)
-        // {
-        // if (other.javaType != null)
-        // {
-        // return false;
-        // }
-        // }
-        // else if (!this.javaType.equals(other.javaType))
-        // {
-        // return false;
-        // }
+        if (this.javaType == null)
+        {
+            if (other.javaType != null)
+            {
+                return false;
+            }
+        }
+        else if (!this.javaType.equals(other.javaType))
+        {
+            return false;
+        }
 
         if (this.name == null)
         {
@@ -152,7 +120,7 @@ public class JdbcColumnMetadata implements ColumnMetadata
             return false;
         }
 
-        if (this.nativeType != other.nativeType)
+        if (this.sqlType != other.sqlType)
         {
             return false;
         }
@@ -173,6 +141,14 @@ public class JdbcColumnMetadata implements ColumnMetadata
         }
 
         return true;
+    }
+
+    /**
+     * @return {@link Codec}
+     */
+    public Codec<?> getCodec()
+    {
+        return this.codec;
     }
 
     /**
@@ -199,7 +175,7 @@ public class JdbcColumnMetadata implements ColumnMetadata
     @Override
     public Object getNativeTypeMetadata()
     {
-        return this.nativeType;
+        return this.sqlType;
     }
 
     /**
@@ -238,9 +214,9 @@ public class JdbcColumnMetadata implements ColumnMetadata
         final int prime = 31;
         int result = 1;
 
-        // result = prime * result + ((this.javaType == null) ? 0 : this.javaType.hashCode());
+        result = (prime * result) + ((this.javaType == null) ? 0 : this.javaType.hashCode());
         result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
-        result = (prime * result) + this.nativeType;
+        result = (prime * result) + this.sqlType;
         result = (prime * result) + ((this.nullability == null) ? 0 : this.nullability.hashCode());
         result = (prime * result) + this.precision;
         result = (prime * result) + this.scale;

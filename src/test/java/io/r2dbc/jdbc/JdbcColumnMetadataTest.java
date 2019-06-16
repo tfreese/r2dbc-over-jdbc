@@ -3,7 +3,7 @@ package io.r2dbc.jdbc;
 import static io.r2dbc.spi.Nullability.NULLABLE;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import org.junit.jupiter.api.Test;
-import io.r2dbc.jdbc.JdbcColumnMetadata;
+import io.r2dbc.jdbc.codec.Codecs;
 
 /**
  * @author Thomas Freese
@@ -16,7 +16,7 @@ final class JdbcColumnMetadataTest
     @Test
     void constructorNoName()
     {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcColumnMetadata(String.class, null, 200, NULLABLE, 100, 500))
+        assertThatNullPointerException().isThrownBy(() -> new JdbcColumnMetadata(Codecs.FALLBACK_OBJECT_CODEC, null, NULLABLE, 100, 500))
                 .withMessage("name must not be null");
     }
 
@@ -26,7 +26,7 @@ final class JdbcColumnMetadataTest
     @Test
     void constructorNoNullability()
     {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcColumnMetadata(String.class, "test-name", 200, null, 100, 500))
+        assertThatNullPointerException().isThrownBy(() -> new JdbcColumnMetadata(Codecs.FALLBACK_OBJECT_CODEC, "test-name", null, 100, 500))
                 .withMessage("nullability must not be null");
     }
 }

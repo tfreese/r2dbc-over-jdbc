@@ -17,6 +17,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.r2dbc.jdbc.codec.Codec;
+import io.r2dbc.jdbc.codec.Codecs;
 import io.r2dbc.spi.Statement;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -106,12 +108,26 @@ public abstract class AbstractJdbcStatement implements Statement
          * @param binding {@link Map}
          * @throws SQLException Falls was schief geht.
          */
+        @SuppressWarnings("unchecked")
         void prepareStatement(final PreparedStatement preparedStatement, final Map<Integer, Object> binding) throws SQLException
         {
             for (Integer index : binding.keySet())
             {
                 // JDBC fängt bei 1 an !
-                preparedStatement.setObject(index + 1, binding.get(index));
+                int parameterIndex = index + 1;
+
+                Object value = binding.get(index);
+
+                if (value == null)
+                {
+                    preparedStatement.setObject(parameterIndex, null);
+                }
+                else
+                {
+                    ((Codec<Object>) Codecs.getCodec(value.getClass())).encode(preparedStatement, parameterIndex, value);
+                }
+
+                // preparedStatement.setObject(parameterIndex, value);
             }
         }
     }
@@ -259,6 +275,7 @@ public abstract class AbstractJdbcStatement implements Statement
     protected JdbcResult createResult(final ResultSet resultSet, final int[] affectedRows) throws SQLException
     {
         JdbcRowMetadata rowMetadata = new JdbcRowMetadata(resultSet);
+        List<JdbcColumnMetadata> columnMetaDatas = rowMetadata.getColumnMetadatas();
 
         Flux<JdbcRow> rows = Flux.generate((final SynchronousSink<Map<Object, Object>> sink) -> {
             try
@@ -269,10 +286,14 @@ public abstract class AbstractJdbcStatement implements Statement
 
                     int index = 0;
 
-                    for (String columnName : rowMetadata.getColumnNames())
+                    for (JdbcColumnMetadata columnMetaData : columnMetaDatas)
                     {
-                        row.put(columnName, resultSet.getObject(columnName));
-                        row.put(index, resultSet.getObject(columnName));
+                        Codec<?> codec = columnMetaData.getCodec();
+                        String columnLabel = columnMetaData.getName();
+                        Object value = codec.decode(resultSet, columnLabel);
+
+                        row.put(columnLabel, value);
+                        row.put(index, value);
                         index++;
                     }
 

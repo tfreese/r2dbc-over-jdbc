@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import io.r2dbc.jdbc.codec.Codecs;
 
 /**
  * @author Thomas Freese
@@ -31,8 +32,9 @@ final class JdbcRowMetadataTest
     /**
      *
      */
-    private final List<JdbcColumnMetadata> columnMetadatas = Arrays.asList(new JdbcColumnMetadata(String.class, "TEST-NAME-1", 200, NULLABLE, 100, 500),
-            new JdbcColumnMetadata(Integer.class, "TEST-NAME-2", 400, NULLABLE, 300, 600));
+    private final List<JdbcColumnMetadata> columnMetadatas =
+            Arrays.asList(new JdbcColumnMetadata(Codecs.FALLBACK_OBJECT_CODEC, "TEST-NAME-1", NULLABLE, 100, 500),
+                    new JdbcColumnMetadata(Codecs.FALLBACK_OBJECT_CODEC, "TEST-NAME-2", NULLABLE, 300, 600));
 
     /**
      *

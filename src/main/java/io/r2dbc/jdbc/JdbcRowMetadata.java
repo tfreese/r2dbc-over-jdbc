@@ -16,7 +16,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import io.r2dbc.spi.ColumnMetadata;
+import io.r2dbc.jdbc.codec.Codec;
+import io.r2dbc.jdbc.codec.Codecs;
 import io.r2dbc.spi.Nullability;
 import io.r2dbc.spi.RowMetadata;
 
@@ -32,15 +33,15 @@ public class JdbcRowMetadata implements RowMetadata
      * @return {@link List}
      * @throws SQLException Falls was schief geht.
      */
-    private static List<ColumnMetadata> extractColumnMetaData(final ResultSet resultSet) throws SQLException
+    private static List<JdbcColumnMetadata> extractColumnMetaData(final ResultSet resultSet) throws SQLException
     {
         ResultSetMetaData metaData = resultSet.getMetaData();
-        List<ColumnMetadata> list = new ArrayList<>();
+        List<JdbcColumnMetadata> list = new ArrayList<>();
 
         for (int c = 1; c <= metaData.getColumnCount(); c++)
         {
             String name = metaData.getColumnLabel(c).toUpperCase();
-            int type = metaData.getColumnType(c);
+            int sqlType = metaData.getColumnType(c);
             Nullability nullability = null;
 
             switch (metaData.isNullable(c))
@@ -60,8 +61,9 @@ public class JdbcRowMetadata implements RowMetadata
 
             int precision = metaData.getPrecision(c);
             int scale = metaData.getScale(c);
+            Codec<?> codec = Codecs.getCodec(sqlType);
 
-            list.add(new JdbcColumnMetadata(null, name, type, nullability, precision, scale));
+            list.add(new JdbcColumnMetadata(codec, name, nullability, precision, scale));
         }
 
         return list;
@@ -70,12 +72,12 @@ public class JdbcRowMetadata implements RowMetadata
     /**
     *
     */
-    private final Map<String, ColumnMetadata> columnMetaDataByName;
+    private final Map<String, JdbcColumnMetadata> columnMetaDataByName;
 
     /**
      *
      */
-    private final List<ColumnMetadata> columnMetaDatas;
+    private final List<JdbcColumnMetadata> columnMetaDatas;
 
     /**
      * Erstellt ein neues {@link JdbcRowMetadata} Object.
@@ -99,7 +101,7 @@ public class JdbcRowMetadata implements RowMetadata
      * @see io.r2dbc.spi.RowMetadata#getColumnMetadata(java.lang.Object)
      */
     @Override
-    public ColumnMetadata getColumnMetadata(final Object identifier)
+    public JdbcColumnMetadata getColumnMetadata(final Object identifier)
     {
         Objects.requireNonNull(identifier, "identifier must not be null");
 
@@ -120,7 +122,7 @@ public class JdbcRowMetadata implements RowMetadata
      * @see io.r2dbc.spi.RowMetadata#getColumnMetadatas()
      */
     @Override
-    public Iterable<? extends ColumnMetadata> getColumnMetadatas()
+    public List<JdbcColumnMetadata> getColumnMetadatas()
     {
         return List.copyOf(this.columnMetaDatas);
     }

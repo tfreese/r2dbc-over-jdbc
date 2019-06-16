@@ -200,6 +200,7 @@ public class JdbcConnection implements Connection
     /**
      * @see io.r2dbc.spi.Connection#createStatement(java.lang.String)
      */
+    @SuppressWarnings("resource")
     @Override
     public Statement createStatement(final String sql)
     {
@@ -208,7 +209,6 @@ public class JdbcConnection implements Connection
             {
                 getLogger().debug("create statement");
 
-                @SuppressWarnings("resource")
                 PreparedStatement preparedStatement = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
 
                 String loweredSql = sql.toLowerCase();
@@ -231,7 +231,7 @@ public class JdbcConnection implements Connection
                 }
                 else
                 {
-                    sink.error(new SQLSyntaxErrorException("unknown SQL operation"));
+                    throw new SQLSyntaxErrorException("unknown SQL operation");
                 }
 
                 sink.complete();
