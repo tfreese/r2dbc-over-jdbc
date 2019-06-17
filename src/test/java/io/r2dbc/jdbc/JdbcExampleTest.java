@@ -7,6 +7,7 @@
 
 package io.r2dbc.jdbc;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterEach;
@@ -17,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.jdbc.core.JdbcOperations;
 import io.r2dbc.jdbc.util.HsqldbServerExtension;
+import io.r2dbc.spi.Blob;
+import io.r2dbc.spi.Clob;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
@@ -53,32 +56,25 @@ final class JdbcExampleTest
          */
         @Override
         @Test
-        @Disabled
+        // @Disabled
         public void blobInsert()
         {
-            Example.super.blobInsert();
-        }
+            // Example.super.blobInsert();
 
-        /**
-         * @see io.r2dbc.spi.test.Example#blobSelect()
-         */
-        @Override
-        @Test
-        @Disabled
-        public void blobSelect()
-        {
-            Example.super.blobSelect();
-        }
+            // @formatter:off
+            Mono.from(getConnectionFactory().create())
+                .flatMapMany(connection -> Flux.from(connection
 
-        /**
-         * @see io.r2dbc.spi.test.Example#blobType()
-         */
-        @Override
-        @Test
-        @Disabled
-        public String blobType()
-        {
-            return Example.super.blobType();
+                    .createStatement(String.format("INSERT INTO blob_test VALUES (%s)", getPlaceholder(0)))
+                    .bind(getIdentifier(0), Blob.from(Mono.just(StandardCharsets.UTF_8.encode("test-value"))))
+                    .execute())
+
+                    .concatWith(Example.close(connection)))
+                .as(StepVerifier::create)
+                .expectNextCount(1).as("rows inserted")
+                .verifyComplete()
+                ;
+            // @formatter:on
         }
 
         /**
@@ -86,32 +82,25 @@ final class JdbcExampleTest
          */
         @Override
         @Test
-        @Disabled
+        // @Disabled
         public void clobInsert()
         {
-            Example.super.clobInsert();
-        }
+            // Example.super.clobInsert();
 
-        /**
-         * @see io.r2dbc.spi.test.Example#clobSelect()
-         */
-        @Override
-        @Test
-        @Disabled
-        public void clobSelect()
-        {
-            Example.super.clobSelect();
-        }
+            // @formatter:off
+            Mono.from(getConnectionFactory().create())
+                .flatMapMany(connection -> Flux.from(connection
 
-        /**
-         * @see io.r2dbc.spi.test.Example#clobType()
-         */
-        @Override
-        @Test
-        @Disabled
-        public String clobType()
-        {
-            return Example.super.clobType();
+                    .createStatement(String.format("INSERT INTO clob_test VALUES (%s)", getPlaceholder(0)))
+                    .bind(getIdentifier(0), Clob.from(Mono.just("test-value")))
+                    .execute())
+
+                    .concatWith(Example.close(connection)))
+                .as(StepVerifier::create)
+                .expectNextCount(1).as("rows inserted")
+                .verifyComplete()
+                ;
+         // @formatter:on
         }
 
         /**
@@ -626,7 +615,7 @@ final class JdbcExampleTest
             .expectNext(3).as("rows inserted")
             .expectNext(List.of(100, 200, 300, 400)).as("values from select before commit")
             .expectNext(List.of(100, 200, 300, 400)).as("values from select after commit")
-            //.expectNext(4).as("rows updated")
+            //.expectNextCount(4).as("rows updated")
             .expectNext(List.of(1, 1, 1, 1)).as("values from update")
             .expectNext(List.of(199, 299, 399, 499)).as("values from select after update after commit")
             .verifyComplete()

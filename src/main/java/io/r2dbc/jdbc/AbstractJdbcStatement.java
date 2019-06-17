@@ -209,6 +209,10 @@ public abstract class AbstractJdbcStatement implements Statement
         {
             return bind(((Integer) identifier).intValue(), value);
         }
+        else if (identifier instanceof String)
+        {
+            return bind(Integer.parseInt((String) identifier), value);
+        }
 
         throw new UnsupportedOperationException();
     }

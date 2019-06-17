@@ -17,19 +17,9 @@ public class BitCodec extends AbstractCodec<Boolean>
     /**
      * Erstellt ein neues {@link BitCodec} Object.
      */
-    public BitCodec()
+    protected BitCodec()
     {
-        this(JDBCType.BIT.getVendorTypeNumber());
-    }
-
-    /**
-     * Erstellt ein neues {@link BitCodec} Object.
-     * 
-     * @param sqlType int
-     */
-    protected BitCodec(final int sqlType)
-    {
-        super(Boolean.class, sqlType);
+        super(Boolean.class, JDBCType.BIT.getVendorTypeNumber());
     }
 
     /**
