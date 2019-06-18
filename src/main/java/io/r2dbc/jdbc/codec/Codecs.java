@@ -7,10 +7,38 @@ package io.r2dbc.jdbc.codec;
 import java.sql.JDBCType;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.r2dbc.spi.Blob;
-import io.r2dbc.spi.Clob;
+import io.r2dbc.jdbc.codec.decoder.BigIntDecoder;
+import io.r2dbc.jdbc.codec.decoder.BinaryDecoder;
+import io.r2dbc.jdbc.codec.decoder.BitDecoder;
+import io.r2dbc.jdbc.codec.decoder.BlobDecoder;
+import io.r2dbc.jdbc.codec.decoder.BooleanDecoder;
+import io.r2dbc.jdbc.codec.decoder.CharDecoder;
+import io.r2dbc.jdbc.codec.decoder.ClobDecoder;
+import io.r2dbc.jdbc.codec.decoder.DateDecoder;
+import io.r2dbc.jdbc.codec.decoder.DecimalDecoder;
+import io.r2dbc.jdbc.codec.decoder.Decoder;
+import io.r2dbc.jdbc.codec.decoder.DoubleDecoder;
+import io.r2dbc.jdbc.codec.decoder.FloatDecoder;
+import io.r2dbc.jdbc.codec.decoder.IntegerDecoder;
+import io.r2dbc.jdbc.codec.decoder.NumericDecoder;
+import io.r2dbc.jdbc.codec.decoder.ObjectDecoder;
+import io.r2dbc.jdbc.codec.decoder.SmallIntDecoder;
+import io.r2dbc.jdbc.codec.decoder.TimeDecoder;
+import io.r2dbc.jdbc.codec.decoder.TimestampDecoder;
+import io.r2dbc.jdbc.codec.decoder.VarCharDecoder;
+import io.r2dbc.jdbc.codec.encoder.BlobEncoder;
+import io.r2dbc.jdbc.codec.encoder.BooleanEncoder;
+import io.r2dbc.jdbc.codec.encoder.ClobEncoder;
+import io.r2dbc.jdbc.codec.encoder.DateEncoder;
+import io.r2dbc.jdbc.codec.encoder.DoubleEncoder;
+import io.r2dbc.jdbc.codec.encoder.Encoder;
+import io.r2dbc.jdbc.codec.encoder.IntegerEncoder;
+import io.r2dbc.jdbc.codec.encoder.LongEncoder;
+import io.r2dbc.jdbc.codec.encoder.ObjectEncoder;
+import io.r2dbc.jdbc.codec.encoder.StringEncoder;
 
 /**
  * Encodes and decodes objects.
@@ -22,7 +50,12 @@ public final class Codecs
     /**
      *
      */
-    public static final Codec<?> FALLBACK_OBJECT_CODEC = new FallbackObjectCodec();
+    public static final Decoder<?> FALLBACK_OBJECT_DECODER = ObjectDecoder.INSTANCE;
+
+    /**
+    *
+    */
+    public static final Encoder<?> FALLBACK_OBJECT_ENCODER = ObjectEncoder.INSTANCE;
 
     /**
      *
@@ -35,42 +68,52 @@ public final class Codecs
     private static final Logger LOGGER = LoggerFactory.getLogger(Codecs.class);
 
     /**
-     * @param javaType {@link Class}
-     * @param <T> Type
-     * @return {@link Codec}
-     */
-    public static <T> Codec<T> getCodec(final Class<T> javaType)
-    {
-        return INSTANCE.get(javaType);
-    }
-
-    /**
      * @param sqlType int
      * @param <T> Type
-     * @return {@link Codec}
+     * @return {@link Decoder}
      */
-    public static <T> Codec<T> getCodec(final int sqlType)
+    public static <T> Decoder<T> getDecoder(final int sqlType)
     {
         return INSTANCE.get(sqlType);
     }
 
     /**
-     * @param codec {@link Codec}
+     * @param javaType {@link Class}
+     * @param <T> Type
+     * @return {@link Encoder}
      */
-    public static void registerCodec(final Codec<?> codec)
+    public static <T> Encoder<T> getEncoder(final Class<?> javaType)
     {
-        INSTANCE.register(codec);
+        return INSTANCE.get(javaType);
+    }
+
+    /**
+     * Register a new {@link Decoder} for a {@link JDBCType}.
+     *
+     * @param decoder {@link Decoder}
+     */
+    public static void registerDecoder(final Decoder<?> decoder)
+    {
+        INSTANCE.register(decoder);
+    }
+
+    /**
+     * @param encoder {@link Encoder}
+     */
+    public static void registerEncoder(final Encoder<?> encoder)
+    {
+        INSTANCE.register(encoder);
     }
 
     /**
      *
      */
-    private final Map<Class<?>, Codec<?>> codecsByJavaType = new HashMap<>();
+    private final Map<Integer, Decoder<?>> decoderMap = new HashMap<>();
 
     /**
-     *
-     */
-    private final Map<Integer, Codec<?>> codecsBySqlType = new HashMap<>();
+    *
+    */
+    private final Map<Class<?>, Encoder<?>> encoderMap = new HashMap<>();
 
     /**
      * Erstellt ein neues {@link Codecs} Object.
@@ -79,87 +122,109 @@ public final class Codecs
     {
         super();
 
-        register(new BigIntCodec());
-        register(new BitCodec());
-        register(new BooleanCodec());
-        register(new BinaryCodec());
-        register(new BlobCodec());
-        register(new CharCodec());
-        register(new ClobCodec());
-        register(new DateCodec());
-        register(new DecimalCodec());
-        register(new DoubleCodec());
-        register(new FloatCodec());
-        register(new IntegerCodec());
-        register(new NumericCodec());
-        register(new SmallIntCodec());
-        register(new TimeCodec());
-        register(new TimestampCodec());
-        register(new VarCharCodec());
+        // Default-Decoder
+        register(new BigIntDecoder());
+        register(new BitDecoder());
+        register(new BooleanDecoder());
+        register(new BinaryDecoder());
+        register(new BlobDecoder());
+        register(new CharDecoder());
+        register(new ClobDecoder());
+        register(new DateDecoder());
+        register(new DecimalDecoder());
+        register(new DoubleDecoder());
+        register(new FloatDecoder());
+        register(new IntegerDecoder());
+        register(new NumericDecoder());
+        register(new SmallIntDecoder());
+        register(new TimeDecoder());
+        register(new TimestampDecoder());
+        register(new VarCharDecoder());
+
+        // Default-Encoder
+        register(new BlobEncoder());
+        register(new BooleanEncoder());
+        register(new ClobEncoder());
+        register(new DateEncoder());
+        register(new DoubleEncoder());
+        register(new IntegerEncoder());
+        register(new LongEncoder());
+        register(new StringEncoder());
     }
 
     /**
      * @param <T> Type
      * @param javaType {@link Class}
-     * @return {@link Codec}
+     * @return {@link Encoder}
      */
     @SuppressWarnings("unchecked")
-    public <T> Codec<T> get(final Class<T> javaType)
+    public <T> Encoder<T> get(final Class<?> javaType)
     {
-        // javaType.isAssignableFrom(this.type)
-        // this.type.isInstance(value)
+        Encoder<?> encoder = this.encoderMap.get(javaType);
 
-        // Codec<T> codec = this.codecsByJavaType.getOrDefault(javaType, FALLBACK_OBJECT_CODEC);
-        Codec<T> codec = (Codec<T>) this.codecsByJavaType.get(javaType);
-
-        if ((codec == null) && Blob.class.isAssignableFrom(javaType))
+        if (encoder == null)
         {
-            codec = (Codec<T>) this.codecsByJavaType.get(Blob.class);
+            // May be an anonymous implementation.
+            Optional<Encoder<?>> optional = this.encoderMap.values().stream().filter(e -> e.getJavaType().isAssignableFrom(javaType)).findFirst();
+
+            if (optional.isPresent())
+            {
+                encoder = optional.get();
+                this.encoderMap.put(javaType, encoder);
+            }
         }
 
-        if ((codec == null) && Clob.class.isAssignableFrom(javaType))
+        if (encoder == null)
         {
-            codec = (Codec<T>) this.codecsByJavaType.get(Clob.class);
+            LOGGER.warn("Class '{}' not mapped, using {} as default", javaType, FALLBACK_OBJECT_ENCODER.getClass().getSimpleName());
+
+            encoder = FALLBACK_OBJECT_ENCODER;
         }
 
-        if (codec == null)
-        {
-            LOGGER.warn("Class '{}' not mapped, using {} as default", javaType, FALLBACK_OBJECT_CODEC.getClass().getSimpleName());
-
-            codec = (Codec<T>) FALLBACK_OBJECT_CODEC;
-        }
-
-        return codec;
+        return (Encoder<T>) encoder;
     }
 
     /**
      * @param <T> Type
      * @param sqlType int
-     * @return {@link Codec}
+     * @return {@link Decoder}
      */
     @SuppressWarnings("unchecked")
-    public <T> Codec<T> get(final int sqlType)
+    public <T> Decoder<T> get(final int sqlType)
     {
-        // Codec<T> codec = this.codecsByJavaType.codecsBySqlType(sqlType, FALLBACK_OBJECT_CODEC);
-        Codec<T> codec = (Codec<T>) this.codecsBySqlType.get(sqlType);
+        Decoder<?> codec = this.decoderMap.get(sqlType);
 
         if (codec == null)
         {
-            LOGGER.warn("sqlType '{}/{}' not mapped, using {} as default", sqlType, JDBCType.valueOf(sqlType).getName(),
-                    FALLBACK_OBJECT_CODEC.getClass().getSimpleName());
+            if (sqlType != FALLBACK_OBJECT_DECODER.getSqlType())
+            {
+                LOGGER.warn("sqlType '{}/{}' not mapped, using {} as default", sqlType, JDBCType.valueOf(sqlType).getName(),
+                        FALLBACK_OBJECT_DECODER.getClass().getSimpleName());
+            }
 
-            codec = (Codec<T>) FALLBACK_OBJECT_CODEC;
+            codec = FALLBACK_OBJECT_DECODER;
         }
 
-        return codec;
+        return (Decoder<T>) codec;
     }
 
     /**
-     * @param codec {@link Codec}
+     * Register a new {@link Decoder} for a {@link JDBCType}.
+     *
+     * @param decoder {@link Decoder}
      */
-    public void register(final Codec<?> codec)
+    public void register(final Decoder<?> decoder)
     {
-        this.codecsByJavaType.put(codec.getJavaType(), codec);
-        this.codecsBySqlType.put(codec.getSqlType(), codec);
+        this.decoderMap.put(decoder.getSqlType(), decoder);
+    }
+
+    /**
+     * Register a new {@link Encoder} for a Java-Class.
+     *
+     * @param encoder {@link Encoder}
+     */
+    public void register(final Encoder<?> encoder)
+    {
+        this.encoderMap.put(encoder.getJavaType(), encoder);
     }
 }

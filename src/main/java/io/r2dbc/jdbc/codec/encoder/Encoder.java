@@ -1,31 +1,22 @@
 /**
- * Created: 16.06.2019
+ * Created: 18.06.2019
  */
 
-package io.r2dbc.jdbc.codec;
+package io.r2dbc.jdbc.codec.encoder;
 
 import java.sql.JDBCType;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
 /**
- * Encodes and decodes an object.
+ * Encodes a Java-Object for a {@link PreparedStatement}.
  *
  * @author Thomas Freese
  * @param <T> Type
  */
-public interface Codec<T>
+public interface Encoder<T>
 {
-    /**
-     * @param resultSet {@link ResultSet}
-     * @param columnLabel String
-     * @return Object
-     * @throws SQLException Falls was schief geht.
-     */
-    public T decode(ResultSet resultSet, String columnLabel) throws SQLException;
-
     /**
      * @param preparedStatement {@link PreparedStatement}
      * @param parameterIndex int, ONE-Based

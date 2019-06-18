@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -21,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import io.r2dbc.jdbc.codec.Codecs;
 
 /**
  * @author Thomas Freese
@@ -33,8 +33,8 @@ final class JdbcRowMetadataTest
      *
      */
     private final List<JdbcColumnMetadata> columnMetadatas =
-            Arrays.asList(new JdbcColumnMetadata(Codecs.FALLBACK_OBJECT_CODEC, "TEST-NAME-1", NULLABLE, 100, 500),
-                    new JdbcColumnMetadata(Codecs.FALLBACK_OBJECT_CODEC, "TEST-NAME-2", NULLABLE, 300, 600));
+            Arrays.asList(new JdbcColumnMetadata("TEST-NAME-1", JDBCType.OTHER.getVendorTypeNumber(), NULLABLE, 100, 500),
+                    new JdbcColumnMetadata("TEST-NAME-2", JDBCType.OTHER.getVendorTypeNumber(), NULLABLE, 300, 600));
 
     /**
      *

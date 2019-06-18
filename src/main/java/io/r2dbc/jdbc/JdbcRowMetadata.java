@@ -4,6 +4,9 @@
 
 package io.r2dbc.jdbc;
 
+import io.r2dbc.spi.Nullability;
+import io.r2dbc.spi.RowMetadata;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -16,10 +19,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import io.r2dbc.jdbc.codec.Codec;
-import io.r2dbc.jdbc.codec.Codecs;
-import io.r2dbc.spi.Nullability;
-import io.r2dbc.spi.RowMetadata;
 
 /**
  * R2DBC Adapter for JDBC.
@@ -30,7 +29,9 @@ public class JdbcRowMetadata implements RowMetadata
 {
     /**
      * @param resultSet {@link ResultSet}
+     *
      * @return {@link List}
+     *
      * @throws SQLException Falls was schief geht.
      */
     private static List<JdbcColumnMetadata> extractColumnMetaData(final ResultSet resultSet) throws SQLException
@@ -61,17 +62,16 @@ public class JdbcRowMetadata implements RowMetadata
 
             int precision = metaData.getPrecision(c);
             int scale = metaData.getScale(c);
-            Codec<?> codec = Codecs.getCodec(sqlType);
 
-            list.add(new JdbcColumnMetadata(codec, name, nullability, precision, scale));
+            list.add(new JdbcColumnMetadata(name, sqlType, nullability, precision, scale));
         }
 
         return list;
     }
 
     /**
-    *
-    */
+     *
+     */
     private final Map<String, JdbcColumnMetadata> columnMetaDataByName;
 
     /**
@@ -83,6 +83,7 @@ public class JdbcRowMetadata implements RowMetadata
      * Erstellt ein neues {@link JdbcRowMetadata} Object.
      *
      * @param resultSet {@link ResultSet}
+     *
      * @throws SQLException Falls was schief geht.
      */
     public JdbcRowMetadata(final ResultSet resultSet) throws SQLException

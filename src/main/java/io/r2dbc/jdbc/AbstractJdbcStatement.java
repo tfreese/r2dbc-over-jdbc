@@ -17,8 +17,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.r2dbc.jdbc.codec.Codec;
 import io.r2dbc.jdbc.codec.Codecs;
+import io.r2dbc.jdbc.codec.decoder.Decoder;
+import io.r2dbc.jdbc.codec.encoder.Encoder;
 import io.r2dbc.spi.Statement;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -108,7 +109,6 @@ public abstract class AbstractJdbcStatement implements Statement
          * @param binding {@link Map}
          * @throws SQLException Falls was schief geht.
          */
-        @SuppressWarnings("unchecked")
         void prepareStatement(final PreparedStatement preparedStatement, final Map<Integer, Object> binding) throws SQLException
         {
             for (Integer index : binding.keySet())
@@ -124,10 +124,10 @@ public abstract class AbstractJdbcStatement implements Statement
                 }
                 else
                 {
-                    ((Codec<Object>) Codecs.getCodec(value.getClass())).encode(preparedStatement, parameterIndex, value);
-                }
+                    Encoder<Object> encoder = Codecs.getEncoder(value.getClass());
 
-                // preparedStatement.setObject(parameterIndex, value);
+                    encoder.encode(preparedStatement, parameterIndex, value);
+                }
             }
         }
     }
@@ -214,7 +214,8 @@ public abstract class AbstractJdbcStatement implements Statement
             return bind(Integer.parseInt((String) identifier), value);
         }
 
-        throw new UnsupportedOperationException();
+        throw new IllegalArgumentException(
+                String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String represented integer.", identifier));
     }
 
     /**
@@ -292,9 +293,11 @@ public abstract class AbstractJdbcStatement implements Statement
 
                     for (JdbcColumnMetadata columnMetaData : columnMetaDatas)
                     {
-                        Codec<?> codec = columnMetaData.getCodec();
                         String columnLabel = columnMetaData.getName();
-                        Object value = codec.decode(resultSet, columnLabel);
+                        int sqlType = (int) columnMetaData.getNativeTypeMetadata();
+
+                        Decoder<?> decoder = Codecs.getDecoder(sqlType);
+                        Object value = decoder.decode(resultSet, columnLabel);
 
                         row.put(columnLabel, value);
                         row.put(index, value);
@@ -318,7 +321,7 @@ public abstract class AbstractJdbcStatement implements Statement
             {
                 sink.error(sex);
             }
-        }).map(row -> new JdbcRow(row)).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create);
+        }).map(JdbcRow::new).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create);
 
         JdbcResult result = new JdbcResult(rows, Mono.just(rowMetadata), Mono.just(affectedRows.length));
 
@@ -353,7 +356,7 @@ public abstract class AbstractJdbcStatement implements Statement
             {
                 sink.complete();
             }
-        }).map(row -> new JdbcRow(row));
+        }).map(JdbcRow::new);
 
         JdbcResult result = new JdbcResult(rows, Mono.just(rowMetadata), Mono.just(affectedRows.length));
 
@@ -415,9 +418,9 @@ public abstract class AbstractJdbcStatement implements Statement
      * Dies muss für das reaktive Verhalten auf n-Elemente erweitert werden.<br>
      * [2, 1] -> [1, 1, 1]
      *
-     * @see JdbcPreparedStatementDelete
      * @param affectedRows int[]
      * @return int[]
+     * @see JdbcPreparedStatementDelete
      */
     protected int[] normalizeAffectedRowsForReactive(final int[] affectedRows)
     {

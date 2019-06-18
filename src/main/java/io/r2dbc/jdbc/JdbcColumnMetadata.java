@@ -5,7 +5,6 @@
 package io.r2dbc.jdbc;
 
 import java.util.Objects;
-import io.r2dbc.jdbc.codec.Codec;
 import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Nullability;
 
@@ -16,16 +15,6 @@ import io.r2dbc.spi.Nullability;
  */
 public class JdbcColumnMetadata implements ColumnMetadata
 {
-    /**
-     *
-     */
-    private final Codec<?> codec;
-
-    /**
-     *
-     */
-    private final Class<?> javaType;
-
     /**
      *
      */
@@ -54,20 +43,18 @@ public class JdbcColumnMetadata implements ColumnMetadata
     /**
      * Erstellt ein neues {@link JdbcColumnMetadata} Object.
      *
-     * @param codec {@link Codec}
      * @param name String
+     * @param sqlType int
      * @param nullability {@link Nullability}
      * @param precision int
      * @param scale int
      */
-    public JdbcColumnMetadata(final Codec<?> codec, final String name, final Nullability nullability, final int precision, final int scale)
+    public JdbcColumnMetadata(final String name, final int sqlType, final Nullability nullability, final int precision, final int scale)
     {
         super();
 
-        this.codec = Objects.requireNonNull(codec, "codec must not be null");
-        this.javaType = this.codec.getJavaType();
         this.name = Objects.requireNonNull(name, "name must not be null");
-        this.sqlType = this.codec.getSqlType();
+        this.sqlType = sqlType;
         this.nullability = Objects.requireNonNull(nullability, "nullability must not be null");
         this.precision = precision;
         this.scale = scale;
@@ -95,18 +82,6 @@ public class JdbcColumnMetadata implements ColumnMetadata
         }
 
         JdbcColumnMetadata other = (JdbcColumnMetadata) obj;
-
-        if (this.javaType == null)
-        {
-            if (other.javaType != null)
-            {
-                return false;
-            }
-        }
-        else if (!this.javaType.equals(other.javaType))
-        {
-            return false;
-        }
 
         if (this.name == null)
         {
@@ -141,23 +116,6 @@ public class JdbcColumnMetadata implements ColumnMetadata
         }
 
         return true;
-    }
-
-    /**
-     * @return {@link Codec}
-     */
-    public Codec<?> getCodec()
-    {
-        return this.codec;
-    }
-
-    /**
-     * @see io.r2dbc.spi.ColumnMetadata#getJavaType()
-     */
-    @Override
-    public Class<?> getJavaType()
-    {
-        return this.javaType;
     }
 
     /**
@@ -214,7 +172,7 @@ public class JdbcColumnMetadata implements ColumnMetadata
         final int prime = 31;
         int result = 1;
 
-        result = (prime * result) + ((this.javaType == null) ? 0 : this.javaType.hashCode());
+        // result = (prime * result) + ((this.javaType == null) ? 0 : this.javaType.hashCode());
         result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
         result = (prime * result) + this.sqlType;
         result = (prime * result) + ((this.nullability == null) ? 0 : this.nullability.hashCode());

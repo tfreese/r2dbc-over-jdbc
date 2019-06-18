@@ -4,9 +4,10 @@
 
 package io.r2dbc.jdbc;
 
+import io.r2dbc.spi.Row;
+
 import java.util.Map;
 import java.util.Objects;
-import io.r2dbc.spi.Row;
 
 /**
  * R2DBC Adapter for JDBC.
@@ -40,22 +41,21 @@ public class JdbcRow implements Row
     /**
      * @see io.r2dbc.spi.Row#get(java.lang.Object, java.lang.Class)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public <T> T get(final Object identifier, final Class<T> type)
     {
         Objects.requireNonNull(identifier, "identifier must not be null");
         Objects.requireNonNull(type, "type must not be null");
 
-        Object key = identifier;
+        final Object key;
 
-        if (key instanceof String)
+        if (identifier instanceof String)
         {
             key = ((String) identifier).toUpperCase();
         }
         else if (identifier instanceof Integer)
         {
-            // NO OP
+            key = identifier;
         }
         else
         {
