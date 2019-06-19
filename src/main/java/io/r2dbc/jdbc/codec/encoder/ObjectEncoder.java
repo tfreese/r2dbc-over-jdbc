@@ -9,13 +9,15 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
+ * Fallback-Encoder.
+ *
  * @author Thomas Freese
  */
 public class ObjectEncoder extends AbstractEncoder<Object>
 {
     /**
-    *
-    */
+     * Fallback-Encoder.
+     */
     public static final Encoder<Object> INSTANCE = new ObjectEncoder();
 
     /**

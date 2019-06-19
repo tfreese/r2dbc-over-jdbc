@@ -4,10 +4,8 @@
 
 package io.r2dbc.jdbc.codec.encoder;
 
-import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Types;
 
 /**
  * Encodes a Java-Object for a {@link PreparedStatement}.
@@ -29,11 +27,4 @@ public interface Encoder<T>
      * @return {@link Class}
      */
     public Class<T> getJavaType();
-
-    /**
-     * @see Types
-     * @see JDBCType
-     * @return int
-     */
-    public int getSqlType();
 }

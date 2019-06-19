@@ -185,15 +185,6 @@ public abstract class AbstractJdbcStatement implements Statement
     @Override
     public Statement bind(final int index, final Object value)
     {
-        // try
-        // {
-        // getStatement().setObject(index + 1, value);
-        // }
-        // catch (SQLException sex)
-        // {
-        // throw JdbcR2dbcExceptionFactory.create(sex);
-        // }
-
         getBindings().getCurrent().put(index, value);
 
         return this;
@@ -224,14 +215,6 @@ public abstract class AbstractJdbcStatement implements Statement
     @Override
     public Statement bindNull(final int index, final Class<?> type)
     {
-        // try
-        // {
-        // getStatement().setObject(index + 1, null);
-        // }
-        // catch (SQLException sex)
-        // {
-        // throw JdbcR2dbcExceptionFactory.create(sex);
-        // }
         getBindings().getCurrent().put(index, null);
 
         return this;

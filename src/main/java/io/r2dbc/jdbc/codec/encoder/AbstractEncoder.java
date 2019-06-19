@@ -4,8 +4,10 @@
 
 package io.r2dbc.jdbc.codec.encoder;
 
+import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Objects;
 
 /**
@@ -74,9 +76,10 @@ public abstract class AbstractEncoder<T> implements Encoder<T>
     }
 
     /**
-     * @see io.r2dbc.jdbc.codec.encoder.Encoder#getSqlType()
+     * @see Types
+     * @see JDBCType
+     * @return int
      */
-    @Override
     public int getSqlType()
     {
         return this.sqlType;

@@ -4,10 +4,11 @@
 
 package io.r2dbc.jdbc;
 
-import io.r2dbc.spi.Row;
-
 import java.util.Map;
 import java.util.Objects;
+import io.r2dbc.jdbc.codec.Codecs;
+import io.r2dbc.jdbc.codec.converter.Converter;
+import io.r2dbc.spi.Row;
 
 /**
  * R2DBC Adapter for JDBC.
@@ -70,6 +71,8 @@ public class JdbcRow implements Row
 
         Object value = this.values.get(key);
 
-        return (T) value;
+        Converter<T> converter = Codecs.getConverter(type);
+
+        return converter.convert(value);
     }
 }

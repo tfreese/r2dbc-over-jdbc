@@ -10,6 +10,16 @@ import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.r2dbc.jdbc.codec.converter.ByteConverter;
+import io.r2dbc.jdbc.codec.converter.Converter;
+import io.r2dbc.jdbc.codec.converter.DoubleConverter;
+import io.r2dbc.jdbc.codec.converter.IntegerConverter;
+import io.r2dbc.jdbc.codec.converter.LocalDateConverter;
+import io.r2dbc.jdbc.codec.converter.LocalDateTimeConverter;
+import io.r2dbc.jdbc.codec.converter.LocalTimeConverter;
+import io.r2dbc.jdbc.codec.converter.LongConverter;
+import io.r2dbc.jdbc.codec.converter.ObjectConverter;
+import io.r2dbc.jdbc.codec.converter.StringConverter;
 import io.r2dbc.jdbc.codec.decoder.BigIntDecoder;
 import io.r2dbc.jdbc.codec.decoder.BinaryDecoder;
 import io.r2dbc.jdbc.codec.decoder.BitDecoder;
@@ -48,13 +58,18 @@ import io.r2dbc.jdbc.codec.encoder.StringEncoder;
 public final class Codecs
 {
     /**
-     *
+     * Fallback-Converter.
+     */
+    public static final Converter<?> FALLBACK_OBJECT_CONVERTER = ObjectConverter.INSTANCE;
+
+    /**
+     * Fallback-Decoder.
      */
     public static final Decoder<?> FALLBACK_OBJECT_DECODER = ObjectDecoder.INSTANCE;
 
     /**
-    *
-    */
+     * Fallback-Encoder.
+     */
     public static final Encoder<?> FALLBACK_OBJECT_ENCODER = ObjectEncoder.INSTANCE;
 
     /**
@@ -68,13 +83,23 @@ public final class Codecs
     private static final Logger LOGGER = LoggerFactory.getLogger(Codecs.class);
 
     /**
+     * @param javaType {@link Class}
+     * @param <T> Type
+     * @return {@link Converter}
+     */
+    public static <T> Converter<T> getConverter(final Class<?> javaType)
+    {
+        return INSTANCE.findConverter(javaType);
+    }
+
+    /**
      * @param sqlType int
      * @param <T> Type
      * @return {@link Decoder}
      */
     public static <T> Decoder<T> getDecoder(final int sqlType)
     {
-        return INSTANCE.get(sqlType);
+        return INSTANCE.findDecoder(sqlType);
     }
 
     /**
@@ -84,7 +109,15 @@ public final class Codecs
      */
     public static <T> Encoder<T> getEncoder(final Class<?> javaType)
     {
-        return INSTANCE.get(javaType);
+        return INSTANCE.findEncoder(javaType);
+    }
+
+    /**
+     * @param converter {@link Converter}
+     */
+    public static void registerConverter(final Converter<?> converter)
+    {
+        INSTANCE.register(converter);
     }
 
     /**
@@ -104,6 +137,11 @@ public final class Codecs
     {
         INSTANCE.register(encoder);
     }
+
+    /**
+    *
+    */
+    private final Map<Class<?>, Converter<?>> converterMap = new HashMap<>();
 
     /**
      *
@@ -150,6 +188,74 @@ public final class Codecs
         register(new IntegerEncoder());
         register(new LongEncoder());
         register(new StringEncoder());
+
+        // Default-Converter
+        register(new ByteConverter());
+        register(new DoubleConverter());
+        register(new IntegerConverter());
+        register(new LocalDateConverter());
+        register(new LocalDateTimeConverter());
+        register(new LocalTimeConverter());
+        register(new LongConverter());
+        register(new StringConverter());
+    }
+
+    /**
+     * @param <T> Type
+     * @param javaType {@link Class}
+     * @return {@link Converter}
+     */
+    @SuppressWarnings("unchecked")
+    public <T> Converter<T> findConverter(final Class<?> javaType)
+    {
+        Converter<?> converter = this.converterMap.get(javaType);
+
+        if (converter == null)
+        {
+            // May be an anonymous implementation.
+            Optional<Converter<?>> optional = this.converterMap.values().stream().filter(e -> e.getJavaType().isAssignableFrom(javaType)).findFirst();
+
+            if (optional.isPresent())
+            {
+                converter = optional.get();
+                this.converterMap.put(javaType, converter);
+            }
+        }
+
+        if (converter == null)
+        {
+            LOGGER.warn("Class '{}' not mapped, using {} as default", javaType, FALLBACK_OBJECT_CONVERTER.getClass().getSimpleName());
+
+            converter = FALLBACK_OBJECT_CONVERTER;
+            this.converterMap.put(javaType, converter);
+        }
+
+        return (Converter<T>) converter;
+    }
+
+    /**
+     * @param <T> Type
+     * @param sqlType int
+     * @return {@link Decoder}
+     */
+    @SuppressWarnings("unchecked")
+    public <T> Decoder<T> findDecoder(final int sqlType)
+    {
+        Decoder<?> decoder = this.decoderMap.get(sqlType);
+
+        if (decoder == null)
+        {
+            if (sqlType != FALLBACK_OBJECT_DECODER.getSqlType())
+            {
+                LOGGER.warn("sqlType '{}/{}' not mapped, using {} as default", sqlType, JDBCType.valueOf(sqlType).getName(),
+                        FALLBACK_OBJECT_DECODER.getClass().getSimpleName());
+            }
+
+            decoder = FALLBACK_OBJECT_DECODER;
+            this.decoderMap.put(sqlType, decoder);
+        }
+
+        return (Decoder<T>) decoder;
     }
 
     /**
@@ -158,7 +264,7 @@ public final class Codecs
      * @return {@link Encoder}
      */
     @SuppressWarnings("unchecked")
-    public <T> Encoder<T> get(final Class<?> javaType)
+    public <T> Encoder<T> findEncoder(final Class<?> javaType)
     {
         Encoder<?> encoder = this.encoderMap.get(javaType);
 
@@ -179,33 +285,20 @@ public final class Codecs
             LOGGER.warn("Class '{}' not mapped, using {} as default", javaType, FALLBACK_OBJECT_ENCODER.getClass().getSimpleName());
 
             encoder = FALLBACK_OBJECT_ENCODER;
+            this.encoderMap.put(javaType, encoder);
         }
 
         return (Encoder<T>) encoder;
     }
 
     /**
-     * @param <T> Type
-     * @param sqlType int
-     * @return {@link Decoder}
+     * Register a new {@link Converter} for a Java-Class.
+     *
+     * @param converter {@link Converter}
      */
-    @SuppressWarnings("unchecked")
-    public <T> Decoder<T> get(final int sqlType)
+    public void register(final Converter<?> converter)
     {
-        Decoder<?> codec = this.decoderMap.get(sqlType);
-
-        if (codec == null)
-        {
-            if (sqlType != FALLBACK_OBJECT_DECODER.getSqlType())
-            {
-                LOGGER.warn("sqlType '{}/{}' not mapped, using {} as default", sqlType, JDBCType.valueOf(sqlType).getName(),
-                        FALLBACK_OBJECT_DECODER.getClass().getSimpleName());
-            }
-
-            codec = FALLBACK_OBJECT_DECODER;
-        }
-
-        return (Decoder<T>) codec;
+        this.converterMap.put(converter.getJavaType(), converter);
     }
 
     /**

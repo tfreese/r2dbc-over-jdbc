@@ -16,7 +16,7 @@ import java.sql.SQLException;
 public class ObjectDecoder extends AbstractDecoder<Object>
 {
     /**
-     *
+     * Fallback-Decoder.
      */
     public static final Decoder<Object> INSTANCE = new ObjectDecoder();
 
