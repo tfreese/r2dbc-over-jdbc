@@ -31,8 +31,13 @@ public class LocalDateTimeConverter extends AbstractConverter<LocalDateTime>
         {
             java.sql.Date date = (java.sql.Date) value;
 
-//            return new java.sql.Timestamp(date.getTime()).toLocalDateTime();
             return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
+        }
+        else if (value instanceof java.sql.Timestamp)
+        {
+            java.sql.Timestamp timestamp = (java.sql.Timestamp) value;
+
+            return timestamp.toLocalDateTime();
         }
         else if (value instanceof java.util.Date)
         {

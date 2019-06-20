@@ -10,7 +10,7 @@ An experimental and research Project ... but it works !
 	Decodes a Value from the java.sql.ResultSet to a Java-Object, based on the Column SQL-Type.
 
 * `io.r2dbc.jdbc.codec.converter.Converter`
-	Convert an Object to a required Type for Method io.r2dbc.spi.Row.get(Object, Class<T>).
+	Convert an Object to the required Type for Method io.r2dbc.spi.Row.get(Object, Class<T>).
 
 * `io.r2dbc.jdbc.codec.encoder.Encoder`
 	Encodes a Java-Object to a SQL-Value for java.sql.PreparedStatement, based on the Column SQL-Type.

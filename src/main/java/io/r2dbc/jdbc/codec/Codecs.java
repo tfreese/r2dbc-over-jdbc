@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.r2dbc.jdbc.codec.converter.ByteConverter;
 import io.r2dbc.jdbc.codec.converter.Converter;
+import io.r2dbc.jdbc.codec.converter.DateConverter;
 import io.r2dbc.jdbc.codec.converter.DoubleConverter;
 import io.r2dbc.jdbc.codec.converter.IntegerConverter;
 import io.r2dbc.jdbc.codec.converter.LocalDateConverter;
@@ -191,6 +192,7 @@ public final class Codecs
 
         // Default-Converter
         register(new ByteConverter());
+        register(new DateConverter());
         register(new DoubleConverter());
         register(new IntegerConverter());
         register(new LocalDateConverter());

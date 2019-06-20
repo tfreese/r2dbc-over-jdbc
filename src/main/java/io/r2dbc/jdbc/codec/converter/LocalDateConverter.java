@@ -33,6 +33,12 @@ public class LocalDateConverter extends AbstractConverter<LocalDate>
 
             return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
         }
+        else if (value instanceof java.sql.Timestamp)
+        {
+            java.sql.Timestamp timestamp = (java.sql.Timestamp) value;
+
+            return timestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        }
         else if (value instanceof java.util.Date)
         {
             java.util.Date date = (java.util.Date) value;

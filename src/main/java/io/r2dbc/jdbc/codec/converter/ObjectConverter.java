@@ -5,14 +5,14 @@
 package io.r2dbc.jdbc.codec.converter;
 
 /**
- * Fallback-Converter.
+ * Fallback-Converter, returns the same Object.
  *
  * @author Thomas Freese
  */
 public class ObjectConverter extends AbstractConverter<Object>
 {
     /**
-     * Fallback-Converter.
+     * Fallback-Converter, returns the same Object.
      */
     public static final Converter<Object> INSTANCE = new ObjectConverter();
 
