@@ -76,6 +76,7 @@ public final class HsqldbServerExtension implements BeforeAllCallback, AfterAllC
         this.dataSource.setPassword("");
 
         this.dataSource.setMaximumPoolSize(1);
+        // this.dataSource.setConnectionTimeout(TimeUnit.MINUTES.toMillis(5));
 
         this.jdbcOperations = new JdbcTemplate(this.dataSource);
     }

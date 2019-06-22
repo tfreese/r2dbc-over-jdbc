@@ -7,38 +7,38 @@
 
 package io.r2dbc.jdbc.util;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.springframework.jdbc.core.JdbcOperations;
 import io.r2dbc.jdbc.JdbcConnection;
 import io.r2dbc.jdbc.JdbcConnectionFactory;
 import io.r2dbc.jdbc.JdbcConnectionFactoryProvider;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactoryOptions;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.extension.RegisterExtension;
-
 
 /**
  * Support class for integration tests.
  *
  * @author Thomas Freese
  */
-public abstract class IntegrationTestSupport
+public abstract class AbstractIntegrationTestSupport
 {
     /**
      *
      */
+    private static JdbcConnection connection;
+
+    /**
+     *
+     */
+    private static JdbcConnectionFactory connectionFactory;
+
+    /**
+     *
+     */
     @RegisterExtension
-    protected static final HsqldbServerExtension SERVER = new HsqldbServerExtension();
-
-    /**
-     *
-     */
-    protected static JdbcConnection connection;
-
-    /**
-     *
-     */
-    protected static JdbcConnectionFactory connectionFactory;
+    static final HsqldbServerExtension SERVER = new HsqldbServerExtension();
 
     /**
      *
@@ -62,5 +62,28 @@ public abstract class IntegrationTestSupport
 
         connectionFactory = (JdbcConnectionFactory) ConnectionFactories.get(options);
         connection = connectionFactory.create().block();
+    }
+
+    /**
+     * @return {@link JdbcConnection}
+     */
+    protected static JdbcConnection getConnection()
+    {
+        return connection;
+    }
+
+    /**
+     * @return {@link JdbcOperations}
+     */
+    protected JdbcOperations getJdbcOperations()
+    {
+        JdbcOperations jdbcOperations = SERVER.getJdbcOperations();
+
+        if (jdbcOperations == null)
+        {
+            throw new IllegalStateException("JdbcOperations not yet initialized.");
+        }
+
+        return jdbcOperations;
     }
 }

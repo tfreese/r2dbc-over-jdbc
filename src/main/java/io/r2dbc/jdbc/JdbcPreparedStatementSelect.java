@@ -6,7 +6,6 @@ package io.r2dbc.jdbc;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import io.r2dbc.spi.Statement;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -29,14 +28,14 @@ public class JdbcPreparedStatementSelect extends AbstractJdbcStatement
         super(preparedStatement);
     }
 
-    /**
-     * @see io.r2dbc.spi.Statement#add()
-     */
-    @Override
-    public Statement add()
-    {
-        throw new UnsupportedOperationException();
-    }
+    // /**
+    // * @see io.r2dbc.spi.Statement#add()
+    // */
+    // @Override
+    // public Statement add()
+    // {
+    // throw new UnsupportedOperationException();
+    // }
 
     /**
      * @see io.r2dbc.jdbc.AbstractJdbcStatement#createExecuteMono()

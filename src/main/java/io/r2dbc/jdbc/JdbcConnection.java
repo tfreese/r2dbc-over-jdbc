@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.IsolationLevel;
-import io.r2dbc.spi.Statement;
 import reactor.core.publisher.Mono;
 
 /**
@@ -202,7 +201,7 @@ public class JdbcConnection implements Connection
      */
     @SuppressWarnings("resource")
     @Override
-    public Statement createStatement(final String sql)
+    public AbstractJdbcStatement createStatement(final String sql)
     {
         return this.connection.handle((connection, sink) -> {
             try
@@ -229,8 +228,17 @@ public class JdbcConnection implements Connection
                 {
                     sink.next(new JdbcPreparedStatementInsert(preparedStatement));
                 }
+                else if (loweredSql.startsWith("drop"))
+                {
+                    sink.next(new JdbcPreparedStatementExecute(preparedStatement));
+                }
+                else if (loweredSql.startsWith("create"))
+                {
+                    sink.next(new JdbcPreparedStatementExecute(preparedStatement));
+                }
                 else
                 {
+                    // sink.next(new JdbcPreparedStatementExecute(preparedStatement));
                     throw new SQLSyntaxErrorException("unknown SQL operation");
                 }
 
@@ -240,7 +248,7 @@ public class JdbcConnection implements Connection
             {
                 sink.error(sex);
             }
-        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(Statement.class).block();
+        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(AbstractJdbcStatement.class).block();
     }
 
     /**
