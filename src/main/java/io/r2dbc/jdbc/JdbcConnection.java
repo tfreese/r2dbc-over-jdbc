@@ -4,9 +4,7 @@
 
 package io.r2dbc.jdbc;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.SQLSyntaxErrorException;
 import java.sql.Savepoint;
 import java.util.HashMap;
 import java.util.Map;
@@ -199,56 +197,56 @@ public class JdbcConnection implements Connection
     /**
      * @see io.r2dbc.spi.Connection#createStatement(java.lang.String)
      */
-    @SuppressWarnings("resource")
     @Override
-    public AbstractJdbcStatement createStatement(final String sql)
+    public JdbcStatement createStatement(final String sql)
     {
         return this.connection.handle((connection, sink) -> {
             try
             {
                 getLogger().debug("create statement");
+                sink.next(new JdbcStatement(connection, sql));
 
-                PreparedStatement preparedStatement = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
-
-                String loweredSql = sql.toLowerCase();
-
-                if (loweredSql.startsWith("select"))
-                {
-                    sink.next(new JdbcPreparedStatementSelect(preparedStatement));
-                }
-                else if (loweredSql.startsWith("delete"))
-                {
-                    sink.next(new JdbcPreparedStatementDelete(preparedStatement));
-                }
-                else if (loweredSql.startsWith("update"))
-                {
-                    sink.next(new JdbcPreparedStatementUpdate(preparedStatement));
-                }
-                else if (loweredSql.startsWith("insert"))
-                {
-                    sink.next(new JdbcPreparedStatementInsert(preparedStatement));
-                }
-                else if (loweredSql.startsWith("drop"))
-                {
-                    sink.next(new JdbcPreparedStatementExecute(preparedStatement));
-                }
-                else if (loweredSql.startsWith("create"))
-                {
-                    sink.next(new JdbcPreparedStatementExecute(preparedStatement));
-                }
-                else
-                {
-                    // sink.next(new JdbcPreparedStatementExecute(preparedStatement));
-                    throw new SQLSyntaxErrorException("unknown SQL operation");
-                }
+                // PreparedStatement preparedStatement = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
+                //
+                // String loweredSql = sql.toLowerCase();
+                //
+                // if (loweredSql.startsWith("select"))
+                // {
+                // sink.next(new JdbcPreparedStatementSelect(preparedStatement));
+                // }
+                // else if (loweredSql.startsWith("delete"))
+                // {
+                // sink.next(new JdbcPreparedStatementDelete(preparedStatement));
+                // }
+                // else if (loweredSql.startsWith("update"))
+                // {
+                // sink.next(new JdbcPreparedStatementUpdate(preparedStatement));
+                // }
+                // else if (loweredSql.startsWith("insert"))
+                // {
+                // sink.next(new JdbcPreparedStatementInsert(preparedStatement));
+                // }
+                // else if (loweredSql.startsWith("drop"))
+                // {
+                // sink.next(new JdbcPreparedStatementExecute(preparedStatement));
+                // }
+                // else if (loweredSql.startsWith("create"))
+                // {
+                // sink.next(new JdbcPreparedStatementExecute(preparedStatement));
+                // }
+                // else
+                // {
+                // // sink.next(new JdbcPreparedStatementExecute(preparedStatement));
+                // throw new SQLSyntaxErrorException("unknown SQL operation");
+                // }
 
                 sink.complete();
             }
-            catch (SQLException sex)
+            catch (Exception sex)
             {
                 sink.error(sex);
             }
-        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(AbstractJdbcStatement.class).block();
+        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(JdbcStatement.class).block();
     }
 
     /**

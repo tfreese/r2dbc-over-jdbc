@@ -7,6 +7,16 @@
 
 package io.r2dbc.jdbc;
 
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.stream.IntStream;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.springframework.jdbc.core.JdbcOperations;
 import io.r2dbc.jdbc.util.HsqldbServerExtension;
 import io.r2dbc.spi.Blob;
 import io.r2dbc.spi.Clob;
@@ -15,20 +25,9 @@ import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
 import io.r2dbc.spi.Statement;
 import io.r2dbc.spi.test.Example;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.springframework.jdbc.core.JdbcOperations;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.stream.IntStream;
 
 /**
  * @author Thomas Freese
@@ -104,16 +103,16 @@ final class JdbcExampleTest
          // @formatter:on
         }
 
-        /**
-         * @see io.r2dbc.spi.test.Example#compoundStatement()
-         */
-        @Override
-        @Test
-        @Disabled
-        public void compoundStatement()
-        {
-            Example.super.compoundStatement();
-        }
+        // /**
+        // * @see io.r2dbc.spi.test.Example#compoundStatement()
+        // */
+        // @Override
+        // @Test
+        // @Disabled
+        // public void compoundStatement()
+        // {
+        // Example.super.compoundStatement();
+        // }
 
         /**
          * @see io.r2dbc.spi.test.Example#getConnectionFactory()
@@ -177,21 +176,6 @@ final class JdbcExampleTest
             ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, SERVER.getDataSource()).build());
 
     /**
-     * @return {@link JdbcOperations}
-     */
-    public JdbcOperations getJdbcOperations()
-    {
-        JdbcOperations jdbcOperations = SERVER.getJdbcOperations();
-
-        if (jdbcOperations == null)
-        {
-            throw new IllegalStateException("JdbcOperations not yet initialized.");
-        }
-
-        return jdbcOperations;
-    }
-
-    /**
      *
      */
     @BeforeEach
@@ -211,6 +195,21 @@ final class JdbcExampleTest
     {
         getJdbcOperations().execute("DROP TABLE tbl");
         getJdbcOperations().execute("DROP TABLE tbl_auto");
+    }
+
+    /**
+     * @return {@link JdbcOperations}
+     */
+    public JdbcOperations getJdbcOperations()
+    {
+        JdbcOperations jdbcOperations = SERVER.getJdbcOperations();
+
+        if (jdbcOperations == null)
+        {
+            throw new IllegalStateException("JdbcOperations not yet initialized.");
+        }
+
+        return jdbcOperations;
     }
 
     /**
@@ -352,12 +351,11 @@ final class JdbcExampleTest
                        ;
 
                return Flux.from(statement.execute())
-                       .concatWith(Example.close(connection))
-                       .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Integer.class)))
-                               .collectList());
+                       .flatMap(Example::extractRowsUpdated)
+                       .concatWith(Example.close(connection));
            })
            .as(StepVerifier::create)
-           .expectNext(List.of(1)).as("value from insertion")
+           .expectNext(1).as("value from insertion")
            .verifyComplete();
        // @formatter:on
     }
@@ -376,12 +374,11 @@ final class JdbcExampleTest
                 IntStream.range(0, 10).forEach(i -> statement.bind(0, i).add());
 
                 return Flux.from(statement.execute())
-                        .concatWith(Example.close(connection))
-                        .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Integer.class)))
-                                .collectList());
+                        .flatMap(Example::extractRowsUpdated)
+                        .concatWith(Example.close(connection));
             })
             .as(StepVerifier::create)
-            .expectNext(List.of(1, 1, 1, 1, 1, 1, 1, 1, 1, 1)).as("values from insertions")
+            .expectNext(10).as("values from insertions")
             .verifyComplete();
         // @formatter:on
     }
@@ -400,9 +397,9 @@ final class JdbcExampleTest
                 IntStream.range(0, 10).forEach(i -> statement.bind(0, i).add());
 
                 return Flux.from(statement.returnGeneratedValues().execute())
-                        .concatWith(Example.close(connection))
                         .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Integer.class)))
-                                .collectList());
+                                .collectList())
+                        .concatWith(Example.close(connection));
             })
             .as(StepVerifier::create)
             .expectNext(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).as("values from insertions")
@@ -417,8 +414,7 @@ final class JdbcExampleTest
     @Disabled
     void prepareStatementInsertBatchExpectNextCount()
     {
-        Mono.from(this.connectionFactory.create()).flatMapMany(connection ->
-        {
+        Mono.from(this.connectionFactory.create()).flatMapMany(connection -> {
             Statement statement = connection.createStatement("INSERT INTO tbl VALUES (?)");
 
             IntStream.range(0, 10).forEach(i -> statement.bind(0, i).add());
@@ -641,7 +637,7 @@ final class JdbcExampleTest
                                 .add().bind(0, 399).bind(1, 300)
                                 .add().bind(0, 499).bind(1, 400)
                                 .execute())
-                            .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Integer.class)))).collectList())
+                            .flatMap(Example::extractRowsUpdated))
 
                     .concatWith(connection.commitTransaction())
 
@@ -655,8 +651,7 @@ final class JdbcExampleTest
             .expectNext(3).as("rows inserted")
             .expectNext(List.of(100, 200, 300, 400)).as("values from select before commit")
             .expectNext(List.of(100, 200, 300, 400)).as("values from select after commit")
-            //.expectNextCount(4).as("rows updated")
-            .expectNext(List.of(1, 1, 1, 1)).as("values from update")
+            .expectNext(4).as("rows updated")
             .expectNext(List.of(199, 299, 399, 499)).as("values from select after update after commit")
             .verifyComplete()
             ;

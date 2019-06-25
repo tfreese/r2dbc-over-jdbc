@@ -23,4 +23,3 @@ For custom Decoder, Converter and Encoder use
 
 ## Limitations
 * No support for `io.r2dbc.spi.Batch` like: `insert ...; select ... `
-* No support for Compound Statements  like: `select ...; select ...`

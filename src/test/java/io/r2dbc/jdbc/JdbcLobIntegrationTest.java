@@ -17,14 +17,14 @@ import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-/**
- * Integration tests for {@link Codecs} testing all known codecs with pre-defined values and {@code null} values.
+/***
+ * Integration tests for{@link Codecs} testing all known codecs with pre-defined values and {@code null} values.
  */
 class JdbcLobIntegrationTest extends AbstractIntegrationTestSupport
 {
     /**
-     *
-     */
+    *
+    */
     static byte[] ALL_BYTES = new byte[-(-128) + 127];
 
     static
@@ -59,8 +59,8 @@ class JdbcLobIntegrationTest extends AbstractIntegrationTestSupport
     }
 
     /**
-     *
-     */
+    *
+    */
     @Test
     @Disabled
     void testBigBlob()
@@ -85,7 +85,7 @@ class JdbcLobIntegrationTest extends AbstractIntegrationTestSupport
 
         getConnection().createStatement("SELECT my_col FROM lob_test")
             .execute()
-            .flatMapMany(result -> result.map((row, rowMetadata) -> row.get("my_col", Blob.class))
+            .flatMap(result -> result.map((row, rowMetadata) -> row.get("my_col", Blob.class))
                     )
             .flatMap(Blob::stream)
             .doOnNext(it -> System.out.println(it.remaining()))
@@ -126,7 +126,7 @@ class JdbcLobIntegrationTest extends AbstractIntegrationTestSupport
 
         getConnection().createStatement("SELECT my_col FROM lob_test")
                 .execute()
-                .flatMapMany(it -> it.map((row, rowMetadata) -> row.get("my_col", Clob.class)))
+                .flatMap(it -> it.map((row, rowMetadata) -> row.get("my_col", Clob.class)))
                 .flatMap(Clob::stream)
                 .doOnNext(it -> System.out.println(it.toString()))
                 .map(CharSequence::length)

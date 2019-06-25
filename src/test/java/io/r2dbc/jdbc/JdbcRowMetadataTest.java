@@ -72,7 +72,7 @@ final class JdbcRowMetadataTest
     @Test
     void constructorNoColumnMetadata()
     {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcRowMetadata(null)).withMessage("resultSet must not be null");
+        assertThatNullPointerException().isThrownBy(() -> new JdbcRowMetadata(null)).withMessage("columnMetaDatas must not be null");
     }
 
     /**
@@ -81,7 +81,7 @@ final class JdbcRowMetadataTest
     @Test
     void getColumnMetadataIndex() throws SQLException
     {
-        assertThat(new JdbcRowMetadata(this.resultSet).getColumnMetadata(0)).isEqualTo(this.columnMetadatas.get(0));
+        assertThat(JdbcRowMetadata.of(this.resultSet).block().getColumnMetadata(0)).isEqualTo(this.columnMetadatas.get(0));
     }
 
     /**
@@ -90,7 +90,7 @@ final class JdbcRowMetadataTest
     @Test
     void getColumnMetadataInvalidName() throws SQLException
     {
-        assertThat(new JdbcRowMetadata(this.resultSet).getColumnMetadata("test-name-3")).isEqualTo(null);
+        assertThat(JdbcRowMetadata.of(this.resultSet).block().getColumnMetadata("test-name-3")).isEqualTo(null);
     }
 
     /**
@@ -99,7 +99,7 @@ final class JdbcRowMetadataTest
     @Test
     void getColumnMetadataName() throws SQLException
     {
-        assertThat(new JdbcRowMetadata(this.resultSet).getColumnMetadata("TEST-NAME-2")).isEqualTo(this.columnMetadatas.get(1));
+        assertThat(JdbcRowMetadata.of(this.resultSet).block().getColumnMetadata("TEST-NAME-2")).isEqualTo(this.columnMetadatas.get(1));
     }
 
     /**
@@ -108,7 +108,7 @@ final class JdbcRowMetadataTest
     @Test
     void getColumnMetadataNoIdentifier()
     {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcRowMetadata(this.resultSet).getColumnMetadata(null))
+        assertThatNullPointerException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).block().getColumnMetadata(null))
                 .withMessage("identifier must not be null");
     }
 
@@ -120,7 +120,7 @@ final class JdbcRowMetadataTest
     {
         Object identifier = new Object();
 
-        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcRowMetadata(this.resultSet).getColumnMetadata(identifier))
+        assertThatIllegalArgumentException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).block().getColumnMetadata(identifier))
                 .withMessage("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String column name.", identifier.toString());
     }
 
@@ -130,6 +130,6 @@ final class JdbcRowMetadataTest
     @Test
     void toRowMetadataNoResultSet()
     {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcRowMetadata(null)).withMessage("resultSet must not be null");
+        assertThatNullPointerException().isThrownBy(() -> new JdbcRowMetadata(null)).withMessage("columnMetaDatas must not be null");
     }
 }
