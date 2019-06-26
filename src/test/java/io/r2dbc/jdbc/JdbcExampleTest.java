@@ -541,6 +541,8 @@ final class JdbcExampleTest
 
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl where value < ?")
                                 .bind(0, 250)
+                                .add()
+                                .add()
                                 .execute())
                             .flatMap(Example::extractColumns))
 

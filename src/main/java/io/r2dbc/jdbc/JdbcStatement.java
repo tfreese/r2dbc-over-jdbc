@@ -52,7 +52,7 @@ public class JdbcStatement extends AbstractJdbcStatement
                 }
 
                 PreparedStatement stmt = connection.prepareStatement(sql);
-                getBindings().prepareStatement(stmt, getBindings().getCurrent());
+                getBindings().prepareStatement(stmt, getBindings().getLast());
 
                 if (getLogger().isDebugEnabled())
                 {

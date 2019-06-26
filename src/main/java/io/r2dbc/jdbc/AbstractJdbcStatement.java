@@ -70,6 +70,19 @@ public abstract class AbstractJdbcStatement implements Statement
         }
 
         /**
+         * @return
+         */
+        Map<Integer, Object> getLast()
+        {
+            if (this.bindings.isEmpty())
+            {
+                return getCurrent();
+            }
+
+            return this.bindings.get(this.bindings.size() - 1);
+        }
+
+        /**
          * @param preparedStatement {@link java.sql.PreparedStatement}
          * @throws java.sql.SQLException Falls was schief geht.
          */

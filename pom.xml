@@ -12,6 +12,7 @@
 
 	<artifactId>r2dbc-over-jdbc</artifactId>
 	<packaging>jar</packaging>
+	<version>0.0.1-SNAPSHOT</version>
 
 	<name>${project.groupId} - ${project.artifactId}</name>
 	<description>Reactive Relational Database Connectivity over JDBC Implementation</description>
@@ -25,7 +26,6 @@
 		<dependency>
 			<groupId>io.r2dbc</groupId>
 			<artifactId>r2dbc-spi</artifactId>
-			<version>${version_io.r2dbc}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -54,13 +54,11 @@
 		<dependency>
 			<groupId>io.r2dbc</groupId>
 			<artifactId>r2dbc-client</artifactId>
-			<version>${version_io.r2dbc}</version>
 			<scope>test</scope>
 		</dependency>		
 		<dependency>
 			<groupId>io.r2dbc</groupId>
 			<artifactId>r2dbc-spi-test</artifactId>
-			<version>${version_io.r2dbc}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
