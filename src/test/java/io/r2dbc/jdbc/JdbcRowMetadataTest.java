@@ -81,7 +81,7 @@ final class JdbcRowMetadataTest
     @Test
     void getColumnMetadataIndex() throws SQLException
     {
-        assertThat(JdbcRowMetadata.of(this.resultSet).block().getColumnMetadata(0)).isEqualTo(this.columnMetadatas.get(0));
+        assertThat(JdbcRowMetadata.of(this.resultSet).getColumnMetadata(0)).isEqualTo(this.columnMetadatas.get(0));
     }
 
     /**
@@ -90,7 +90,7 @@ final class JdbcRowMetadataTest
     @Test
     void getColumnMetadataInvalidName() throws SQLException
     {
-        assertThat(JdbcRowMetadata.of(this.resultSet).block().getColumnMetadata("test-name-3")).isEqualTo(null);
+        assertThat(JdbcRowMetadata.of(this.resultSet).getColumnMetadata("test-name-3")).isEqualTo(null);
     }
 
     /**
@@ -99,7 +99,7 @@ final class JdbcRowMetadataTest
     @Test
     void getColumnMetadataName() throws SQLException
     {
-        assertThat(JdbcRowMetadata.of(this.resultSet).block().getColumnMetadata("TEST-NAME-2")).isEqualTo(this.columnMetadatas.get(1));
+        assertThat(JdbcRowMetadata.of(this.resultSet).getColumnMetadata("TEST-NAME-2")).isEqualTo(this.columnMetadatas.get(1));
     }
 
     /**
@@ -108,7 +108,7 @@ final class JdbcRowMetadataTest
     @Test
     void getColumnMetadataNoIdentifier()
     {
-        assertThatNullPointerException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).block().getColumnMetadata(null))
+        assertThatNullPointerException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata(null))
                 .withMessage("identifier must not be null");
     }
 
@@ -120,7 +120,7 @@ final class JdbcRowMetadataTest
     {
         Object identifier = new Object();
 
-        assertThatIllegalArgumentException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).block().getColumnMetadata(identifier))
+        assertThatIllegalArgumentException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata(identifier))
                 .withMessage("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String column name.", identifier.toString());
     }
 

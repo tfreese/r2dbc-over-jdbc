@@ -118,8 +118,8 @@ public class JdbcStatement extends AbstractJdbcStatement
      */
     protected JdbcResult createResult(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows) throws SQLException
     {
-        Mono<JdbcRowMetadata> rowMetadata = JdbcRowMetadata.of(resultSet);
-        List<JdbcColumnMetadata> columnMetaDatas = rowMetadata.map(JdbcRowMetadata::getColumnMetadatas).block();
+        JdbcRowMetadata rowMetadata = JdbcRowMetadata.of(resultSet);
+        List<JdbcColumnMetadata> columnMetaDatas = rowMetadata.getColumnMetadatas();
 
         Flux<JdbcRow> rows = Flux.generate((final SynchronousSink<Map<Object, Object>> sink) -> {
             try
@@ -167,7 +167,7 @@ public class JdbcStatement extends AbstractJdbcStatement
 
         Mono<Integer> rowsUpdated = affectedRows != null ? Mono.just(IntStream.of(affectedRows).sum()) : Mono.empty();
 
-        JdbcResult result = new JdbcResult(rows, rowMetadata, rowsUpdated);
+        JdbcResult result = new JdbcResult(rows, Mono.just(rowMetadata), rowsUpdated);
 
         return result;
     }

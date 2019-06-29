@@ -9,6 +9,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -18,7 +19,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import io.r2dbc.spi.Nullability;
 import io.r2dbc.spi.RowMetadata;
-import reactor.core.publisher.Mono;
 
 /**
  * R2DBC Adapter for JDBC.
@@ -32,11 +32,11 @@ public class JdbcRowMetadata implements RowMetadata
      * @return {@link List}
      * @throws SQLException Falls was schief geht.
      */
-    public static Mono<JdbcRowMetadata> of(final ResultSet resultSet) throws SQLException
+    public static JdbcRowMetadata of(final ResultSet resultSet) throws SQLException
     {
         if (resultSet == null)
         {
-            return Mono.empty();
+            return new JdbcRowMetadata(Collections.emptyList());
         }
 
         ResultSetMetaData metaData = resultSet.getMetaData();
@@ -69,7 +69,7 @@ public class JdbcRowMetadata implements RowMetadata
             list.add(new JdbcColumnMetadata(name, sqlType, nullability, precision, scale));
         }
 
-        return Mono.just(new JdbcRowMetadata(list));
+        return new JdbcRowMetadata(list);
     }
 
     /**

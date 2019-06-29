@@ -29,9 +29,14 @@ public class JdbcConnection implements Connection
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcConnection.class);
 
     /**
+    *
+    */
+    private final java.sql.Connection connection;
+
+    /**
      *
      */
-    private final Mono<java.sql.Connection> connection;
+    private final Mono<java.sql.Connection> connectionMono;
 
     /**
      *
@@ -47,9 +52,9 @@ public class JdbcConnection implements Connection
     {
         super();
 
-        Objects.requireNonNull(connection, "connection must not be null");
+        this.connection = Objects.requireNonNull(connection, "connection must not be null");
 
-        this.connection = Mono.just(connection);
+        this.connectionMono = Mono.just(this.connection);
     }
 
     /**
@@ -58,7 +63,7 @@ public class JdbcConnection implements Connection
     @Override
     public Mono<Void> beginTransaction()
     {
-        return this.connection.handle((connection, sink) -> {
+        return this.connectionMono.handle((connection, sink) -> {
             try
             {
                 if (connection.getAutoCommit())
@@ -103,7 +108,7 @@ public class JdbcConnection implements Connection
     @Override
     public Mono<Void> close()
     {
-        return this.connection.handle((connection, sink) -> {
+        return this.connectionMono.handle((connection, sink) -> {
             try
             {
                 if (!connection.isClosed())
@@ -133,7 +138,7 @@ public class JdbcConnection implements Connection
     @Override
     public Mono<Void> commitTransaction()
     {
-        return this.connection.handle((connection, sink) -> {
+        return this.connectionMono.handle((connection, sink) -> {
             try
             {
                 if (!connection.getAutoCommit())
@@ -174,7 +179,7 @@ public class JdbcConnection implements Connection
     public Mono<Void> createSavepoint(final String name)
     {
         // return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
-        return this.connection.handle((connection, sink) -> {
+        return this.connectionMono.handle((connection, sink) -> {
             try
             {
                 Objects.requireNonNull(name, "name must not be null");
@@ -200,53 +205,20 @@ public class JdbcConnection implements Connection
     @Override
     public JdbcStatement createStatement(final String sql)
     {
-        return this.connection.handle((connection, sink) -> {
-            try
-            {
-                getLogger().debug("create statement");
-                sink.next(new JdbcStatement(connection, sql));
-
-                // PreparedStatement preparedStatement = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
-                //
-                // String loweredSql = sql.toLowerCase();
-                //
-                // if (loweredSql.startsWith("select"))
-                // {
-                // sink.next(new JdbcPreparedStatementSelect(preparedStatement));
-                // }
-                // else if (loweredSql.startsWith("delete"))
-                // {
-                // sink.next(new JdbcPreparedStatementDelete(preparedStatement));
-                // }
-                // else if (loweredSql.startsWith("update"))
-                // {
-                // sink.next(new JdbcPreparedStatementUpdate(preparedStatement));
-                // }
-                // else if (loweredSql.startsWith("insert"))
-                // {
-                // sink.next(new JdbcPreparedStatementInsert(preparedStatement));
-                // }
-                // else if (loweredSql.startsWith("drop"))
-                // {
-                // sink.next(new JdbcPreparedStatementExecute(preparedStatement));
-                // }
-                // else if (loweredSql.startsWith("create"))
-                // {
-                // sink.next(new JdbcPreparedStatementExecute(preparedStatement));
-                // }
-                // else
-                // {
-                // // sink.next(new JdbcPreparedStatementExecute(preparedStatement));
-                // throw new SQLSyntaxErrorException("unknown SQL operation");
-                // }
-
-                sink.complete();
-            }
-            catch (Exception sex)
-            {
-                sink.error(sex);
-            }
-        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(JdbcStatement.class).block();
+        return new JdbcStatement(this.connection, sql);
+        // return this.connectionMono.handle((connection, sink) -> {
+        // try
+        // {
+        // getLogger().debug("create statement");
+        // sink.next(new JdbcStatement(connection, sql));
+        //
+        // sink.complete();
+        // }
+        // catch (Exception sex)
+        // {
+        // sink.error(sex);
+        // }
+        // }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(JdbcStatement.class).block();
     }
 
     /**
@@ -264,7 +236,7 @@ public class JdbcConnection implements Connection
     public Mono<Void> releaseSavepoint(final String name)
     {
         // return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
-        return this.connection.handle((connection, sink) -> {
+        return this.connectionMono.handle((connection, sink) -> {
             try
             {
                 Objects.requireNonNull(name, "name must not be null");
@@ -290,7 +262,7 @@ public class JdbcConnection implements Connection
     @Override
     public Mono<Void> rollbackTransaction()
     {
-        return this.connection.handle((connection, sink) -> {
+        return this.connectionMono.handle((connection, sink) -> {
             try
             {
                 if (!connection.getAutoCommit())
@@ -321,7 +293,7 @@ public class JdbcConnection implements Connection
     public Mono<Void> rollbackTransactionToSavepoint(final String name)
     {
         // return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
-        return this.connection.handle((connection, sink) -> {
+        return this.connectionMono.handle((connection, sink) -> {
             try
             {
                 Objects.requireNonNull(name, "name must not be null");
@@ -347,7 +319,7 @@ public class JdbcConnection implements Connection
     @Override
     public Mono<Void> setTransactionIsolationLevel(final IsolationLevel isolationLevel)
     {
-        return this.connection.handle((connection, sink) -> {
+        return this.connectionMono.handle((connection, sink) -> {
             try
             {
                 Objects.requireNonNull(isolationLevel, "isolationLevel must not be null");
