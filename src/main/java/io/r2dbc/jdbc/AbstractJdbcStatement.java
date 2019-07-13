@@ -70,7 +70,7 @@ public abstract class AbstractJdbcStatement implements Statement
         }
 
         /**
-         * @return
+         * @return {@link Map}
          */
         Map<Integer, Object> getLast()
         {
