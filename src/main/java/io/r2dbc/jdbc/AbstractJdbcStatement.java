@@ -313,23 +313,40 @@ public abstract class AbstractJdbcStatement implements Statement
     }
 
     /**
-     * @see io.r2dbc.spi.Statement#bind(java.lang.Object, java.lang.Object)
+     * @see io.r2dbc.spi.Statement#bind(java.lang.String, java.lang.Object)
      */
     @Override
-    public Statement bind(final Object identifier, final Object value)
+    public Statement bind(final String name, final Object value)
     {
-        if (identifier instanceof Integer)
+        try
         {
-            return bind(((Integer) identifier).intValue(), value);
+            return bind(Integer.parseInt(name), value);
         }
-        else if (identifier instanceof String)
+        catch (Exception ex)
         {
-            return bind(Integer.parseInt((String) identifier), value);
+            throw new IllegalArgumentException(
+                    String.format("Name '%s' is not valid. Should either be an Integer index or a String represented integer.", name));
         }
-
-        throw new IllegalArgumentException(
-                String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String represented integer.", identifier));
     }
+
+    // /**
+    // * @see io.r2dbc.spi.Statement#bind(java.lang.Object, java.lang.Object)
+    // */
+    // @Override
+    // public Statement bind(final Object identifier, final Object value)
+    // {
+    // if (identifier instanceof Integer)
+    // {
+    // return bind(((Integer) identifier).intValue(), value);
+    // }
+    // else if (identifier instanceof String)
+    // {
+    // return bind(Integer.parseInt((String) identifier), value);
+    // }
+    //
+    // throw new IllegalArgumentException(
+    // String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String represented integer.", identifier));
+    // }
 
     /**
      * @see io.r2dbc.spi.Statement#bindNull(int, java.lang.Class)
@@ -342,23 +359,40 @@ public abstract class AbstractJdbcStatement implements Statement
         return this;
     }
 
+    // /**
+    // * @see io.r2dbc.spi.Statement#bindNull(java.lang.Object, java.lang.Class)
+    // */
+    // @Override
+    // public Statement bindNull(final Object identifier, final Class<?> type)
+    // {
+    // if (identifier instanceof Integer)
+    // {
+    // return bindNull(((Integer) identifier).intValue(), type);
+    // }
+    // else if (identifier instanceof String)
+    // {
+    // return bindNull(Integer.parseInt((String) identifier), type);
+    // }
+    //
+    // throw new IllegalArgumentException(
+    // String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String represented integer.", identifier));
+    // }
+
     /**
-     * @see io.r2dbc.spi.Statement#bindNull(java.lang.Object, java.lang.Class)
+     * @see io.r2dbc.spi.Statement#bindNull(java.lang.String, java.lang.Class)
      */
     @Override
-    public Statement bindNull(final Object identifier, final Class<?> type)
+    public Statement bindNull(final String name, final Class<?> type)
     {
-        if (identifier instanceof Integer)
+        try
         {
-            return bindNull(((Integer) identifier).intValue(), type);
+            return bind(Integer.parseInt(name), type);
         }
-        else if (identifier instanceof String)
+        catch (Exception ex)
         {
-            return bindNull(Integer.parseInt((String) identifier), type);
+            throw new IllegalArgumentException(
+                    String.format("Name '%s' is not valid. Should either be an Integer index or a String represented integer.", name));
         }
-
-        throw new IllegalArgumentException(
-                String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String represented integer.", identifier));
     }
 
     /**

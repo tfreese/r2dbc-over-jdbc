@@ -4,6 +4,7 @@
 
 package io.r2dbc.jdbc;
 
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.util.HashMap;
@@ -13,7 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
+import io.r2dbc.spi.ConnectionMetadata;
 import io.r2dbc.spi.IsolationLevel;
+import io.r2dbc.spi.ValidationDepth;
 import reactor.core.publisher.Mono;
 
 /**
@@ -184,7 +187,7 @@ public class JdbcConnection implements Connection
             {
                 Objects.requireNonNull(name, "name must not be null");
 
-                getLogger().debug("create savepoint");
+                getLogger().debug("create savepoint: {}", name);
 
                 Savepoint savepoint = connection.setSavepoint(name);
                 this.savePoints.put(name, savepoint);
@@ -230,6 +233,135 @@ public class JdbcConnection implements Connection
     }
 
     /**
+     * @see io.r2dbc.spi.Connection#getMetadata()
+     */
+    @Override
+    public ConnectionMetadata getMetadata()
+    {
+        return this.connectionMono.handle((connection, sink) -> {
+            try
+            {
+                getLogger().debug("get Metadata");
+
+                DatabaseMetaData databaseMetaData = connection.getMetaData();
+
+                ConnectionMetadata connectionMetadata = new JdbcConnectionMetadata(databaseMetaData);
+
+                sink.next(connectionMetadata);
+                sink.complete();
+            }
+            catch (SQLException sex)
+            {
+                sink.error(sex);
+            }
+        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(ConnectionMetadata.class).block();
+    }
+
+    /**
+     * @see io.r2dbc.spi.Connection#getTransactionIsolationLevel()
+     */
+    @Override
+    public IsolationLevel getTransactionIsolationLevel()
+    {
+        try
+        {
+            getLogger().debug("get transaction isolationLevel");
+
+            int transactionIsolation = this.connection.getTransactionIsolation();
+            IsolationLevel isolationLevel = null;
+
+            if (transactionIsolation == java.sql.Connection.TRANSACTION_READ_COMMITTED)
+            {
+                isolationLevel = IsolationLevel.READ_COMMITTED;
+            }
+            else if (transactionIsolation == java.sql.Connection.TRANSACTION_READ_UNCOMMITTED)
+            {
+                isolationLevel = IsolationLevel.READ_UNCOMMITTED;
+            }
+            else if (transactionIsolation == java.sql.Connection.TRANSACTION_REPEATABLE_READ)
+            {
+                isolationLevel = IsolationLevel.REPEATABLE_READ;
+            }
+            else if (transactionIsolation == java.sql.Connection.TRANSACTION_SERIALIZABLE)
+            {
+                isolationLevel = IsolationLevel.SERIALIZABLE;
+            }
+
+            return isolationLevel;
+        }
+        catch (SQLException sex)
+        {
+            throw JdbcR2dbcExceptionFactory.create(sex);
+        }
+
+        // return this.connectionMono.handle((connection, sink) -> {
+        // try
+        // {
+        // getLogger().debug("get transaction isolationLevel");
+        //
+        // int transactionIsolation = connection.getTransactionIsolation();
+        // IsolationLevel isolationLevel = null;
+        //
+        // if (transactionIsolation == java.sql.Connection.TRANSACTION_READ_COMMITTED)
+        // {
+        // isolationLevel = IsolationLevel.READ_COMMITTED;
+        // }
+        // else if (transactionIsolation == java.sql.Connection.TRANSACTION_READ_UNCOMMITTED)
+        // {
+        // isolationLevel = IsolationLevel.READ_UNCOMMITTED;
+        // }
+        // else if (transactionIsolation == java.sql.Connection.TRANSACTION_REPEATABLE_READ)
+        // {
+        // isolationLevel = IsolationLevel.REPEATABLE_READ;
+        // }
+        // else if (transactionIsolation == java.sql.Connection.TRANSACTION_SERIALIZABLE)
+        // {
+        // isolationLevel = IsolationLevel.SERIALIZABLE;
+        // }
+        //
+        // sink.next(isolationLevel);
+        // sink.complete();
+        // }
+        // catch (SQLException sex)
+        // {
+        // sink.error(sex);
+        // }
+        // }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(IsolationLevel.class).block();
+    }
+
+    /**
+     * @see io.r2dbc.spi.Connection#isAutoCommit()
+     */
+    @Override
+    public boolean isAutoCommit()
+    {
+        try
+        {
+            getLogger().debug("is autocommit");
+
+            return this.connection.getAutoCommit();
+        }
+        catch (SQLException sex)
+        {
+            throw JdbcR2dbcExceptionFactory.create(sex);
+        }
+
+        // return this.connectionMono.handle((connection, sink) -> {
+        // try
+        // {
+        // getLogger().debug("is autocommit");
+        //
+        // sink.next(connection.getAutoCommit());
+        // sink.complete();
+        // }
+        // catch (SQLException sex)
+        // {
+        // sink.error(sex);
+        // }
+        // }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(Boolean.class).block();
+    }
+
+    /**
      * @see io.r2dbc.spi.Connection#releaseSavepoint(java.lang.String)
      */
     @Override
@@ -241,7 +373,7 @@ public class JdbcConnection implements Connection
             {
                 Objects.requireNonNull(name, "name must not be null");
 
-                getLogger().debug("release savepoint");
+                getLogger().debug("release savepoint: {}", name);
 
                 Savepoint savepoint = this.savePoints.remove(name);
                 connection.releaseSavepoint(savepoint);
@@ -298,10 +430,33 @@ public class JdbcConnection implements Connection
             {
                 Objects.requireNonNull(name, "name must not be null");
 
-                getLogger().debug("rollback transaction savepoint");
+                getLogger().debug("rollback transaction savepoint: {}", name);
 
                 Savepoint savepoint = this.savePoints.remove(name);
                 connection.rollback(savepoint);
+
+                sink.next(Mono.empty());
+                sink.complete();
+            }
+            catch (SQLException sex)
+            {
+                sink.error(sex);
+            }
+        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
+    }
+
+    /**
+     * @see io.r2dbc.spi.Connection#setAutoCommit(boolean)
+     */
+    @Override
+    public Mono<Void> setAutoCommit(final boolean autoCommit)
+    {
+        return this.connectionMono.handle((connection, sink) -> {
+            try
+            {
+                getLogger().debug("autoCommit: {}", autoCommit);
+
+                connection.setAutoCommit(autoCommit);
 
                 sink.next(Mono.empty());
                 sink.complete();
@@ -324,29 +479,27 @@ public class JdbcConnection implements Connection
             {
                 Objects.requireNonNull(isolationLevel, "isolationLevel must not be null");
 
-                getLogger().debug("transaction isolationLevel");
+                getLogger().debug("set transaction isolationLevel: {}", isolationLevel);
 
-                switch (isolationLevel)
+                if (IsolationLevel.READ_COMMITTED.equals(isolationLevel))
                 {
-                    case READ_COMMITTED:
-                        connection.setTransactionIsolation(java.sql.Connection.TRANSACTION_READ_COMMITTED);
-                        break;
-
-                    case READ_UNCOMMITTED:
-                        connection.setTransactionIsolation(java.sql.Connection.TRANSACTION_READ_UNCOMMITTED);
-                        break;
-
-                    case REPEATABLE_READ:
-                        connection.setTransactionIsolation(java.sql.Connection.TRANSACTION_REPEATABLE_READ);
-                        break;
-
-                    case SERIALIZABLE:
-                        connection.setTransactionIsolation(java.sql.Connection.TRANSACTION_SERIALIZABLE);
-                        break;
-
-                    default:
-                        connection.setTransactionIsolation(java.sql.Connection.TRANSACTION_NONE);
-                        break;
+                    connection.setTransactionIsolation(java.sql.Connection.TRANSACTION_READ_COMMITTED);
+                }
+                else if (IsolationLevel.READ_UNCOMMITTED.equals(isolationLevel))
+                {
+                    connection.setTransactionIsolation(java.sql.Connection.TRANSACTION_READ_UNCOMMITTED);
+                }
+                else if (IsolationLevel.REPEATABLE_READ.equals(isolationLevel))
+                {
+                    connection.setTransactionIsolation(java.sql.Connection.TRANSACTION_REPEATABLE_READ);
+                }
+                else if (IsolationLevel.SERIALIZABLE.equals(isolationLevel))
+                {
+                    connection.setTransactionIsolation(java.sql.Connection.TRANSACTION_SERIALIZABLE);
+                }
+                else
+                {
+                    connection.setTransactionIsolation(java.sql.Connection.TRANSACTION_NONE);
                 }
 
                 sink.next(Mono.empty());
@@ -357,5 +510,27 @@ public class JdbcConnection implements Connection
                 sink.error(sex);
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
+    }
+
+    /**
+     * @see io.r2dbc.spi.Connection#validate(io.r2dbc.spi.ValidationDepth)
+     */
+    @Override
+    public Mono<Boolean> validate(final ValidationDepth depth)
+    {
+        return this.connectionMono.handle((connection, sink) -> {
+            try
+            {
+                getLogger().debug("validate");
+
+                sink.next(!connection.isClosed());
+
+                sink.complete();
+            }
+            catch (SQLException sex)
+            {
+                sink.error(sex);
+            }
+        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(Boolean.class);
     }
 }

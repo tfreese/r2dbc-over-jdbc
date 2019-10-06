@@ -15,7 +15,7 @@ import io.r2dbc.jdbc.util.HsqldbServerExtension;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
-import io.r2dbc.spi.test.Example;
+import io.r2dbc.spi.test.TestKit;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -145,29 +145,10 @@ final class JdbcRowTest
     @Test
     void getWrongIdentifierType()
     {
-        Object identifier = new Object();
+        String identifier = "-";
 
         assertThatIllegalArgumentException().isThrownBy(() -> new JdbcRow(new HashMap<>()).get(identifier, Object.class))
-                .withMessage("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String column name.", identifier);
-    }
-
-    /**
-     *
-     */
-    @Test
-    void select()
-    {
-        getJdbcOperations().execute("INSERT INTO test VALUES (100)");
-
-        // @formatter:off
-        Mono.from(this.connectionFactory.create())
-            .flatMapMany(connection -> Flux.from(connection.createStatement("SELECT value FROM test").execute())
-                .flatMap(Example::extractColumns)
-                .concatWith(Example.close(connection)))
-        .as(StepVerifier::create)
-        .expectNext(List.of(100))
-        .verifyComplete();
-        // @formatter:on
+                .withMessage("Column identifier '%s' does not exist", identifier);
     }
 
     /**
@@ -186,10 +167,29 @@ final class JdbcRowTest
                             )
                         )
                         .collectList())
-                .concatWith(Example.close(connection)))
+                .concatWith(TestKit.close(connection)))
             .as(StepVerifier::create)
             .expectNext(List.of(100))
             .verifyComplete();
+        // @formatter:on
+    }
+
+    /**
+     *
+     */
+    @Test
+    void selectWithoutAliases()
+    {
+        getJdbcOperations().execute("INSERT INTO test VALUES (100)");
+
+        // @formatter:off
+        Mono.from(this.connectionFactory.create())
+            .flatMapMany(connection -> Flux.from(connection.createStatement("SELECT value FROM test").execute())
+                .flatMap(TestKit::extractColumns)
+                .concatWith(TestKit.close(connection)))
+        .as(StepVerifier::create)
+        .expectNext(List.of(100))
+        .verifyComplete();
         // @formatter:on
     }
 }

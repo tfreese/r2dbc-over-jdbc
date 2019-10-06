@@ -9,7 +9,8 @@ import io.r2dbc.spi.Row;
 /**
  * Convertes an Object into another one.
  *
- * @see Row#get(Object, Class)
+ * @see Row#get(int, Class)
+ * @see Row#get(String, Class)
  * @author Thomas Freese
  * @param <T> Type
  */

@@ -9,8 +9,8 @@ package io.r2dbc.jdbc;
 
 import static io.r2dbc.spi.Nullability.NULLABLE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import io.r2dbc.spi.ColumnMetadata;
 
 /**
  * @author Thomas Freese
@@ -108,20 +109,22 @@ final class JdbcRowMetadataTest
     @Test
     void getColumnMetadataNoIdentifier()
     {
-        assertThatNullPointerException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata(null))
-                .withMessage("identifier must not be null");
+        assertThatNullPointerException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata(null)).withMessage("name required");
     }
 
     /**
-     *
+     * @throws SQLException Falls was schief geht.
      */
     @Test
-    void getColumnMetadataWrongIdentifierType()
+    void getColumnMetadataWrongIdentifierType() throws SQLException
     {
-        Object identifier = new Object();
+        String identifier = "-";
 
-        assertThatIllegalArgumentException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata(identifier))
-                .withMessage("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String column name.", identifier.toString());
+        // assertThatIllegalArgumentException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata(identifier))
+        // .withMessage("Column identifier '%s' does not exist", identifier.toString());
+
+        ColumnMetadata columnMetadata = JdbcRowMetadata.of(this.resultSet).getColumnMetadata(identifier);
+        assertNull(columnMetadata);
     }
 
     /**

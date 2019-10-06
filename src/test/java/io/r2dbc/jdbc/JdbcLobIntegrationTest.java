@@ -11,7 +11,7 @@ import io.r2dbc.jdbc.util.AbstractIntegrationTestSupport;
 import io.r2dbc.spi.Blob;
 import io.r2dbc.spi.Clob;
 import io.r2dbc.spi.Result;
-import io.r2dbc.spi.test.Example;
+import io.r2dbc.spi.test.TestKit;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
@@ -77,7 +77,7 @@ class JdbcLobIntegrationTest extends AbstractIntegrationTestSupport
                 .execute()
                 )
                 .flatMap(Result::getRowsUpdated)
-                .concatWith(Example.close(getConnection()))
+                .concatWith(TestKit.close(getConnection()))
                 .as(StepVerifier::create)
                 //.expectNext(1)
                 .expectNextCount(1).as("blobs inserted")
@@ -91,7 +91,7 @@ class JdbcLobIntegrationTest extends AbstractIntegrationTestSupport
             .doOnNext(it -> System.out.println(it.remaining()))
             .map(Buffer::remaining)
             .collect(Collectors.summingInt(value -> value))
-            .concatWith(Example.close(getConnection()))
+            .concatWith(TestKit.close(getConnection()))
             .as(StepVerifier::create)
             .expectNext(i * ALL_BYTES.length)
             .verifyComplete();
@@ -118,7 +118,7 @@ class JdbcLobIntegrationTest extends AbstractIntegrationTestSupport
                 .bind(0, Clob.from(Flux.range(0, i).map(it -> TEST_STRING)))
                 .execute())
                 .flatMap(Result::getRowsUpdated)
-                .concatWith(Example.close(getConnection()))
+                .concatWith(TestKit.close(getConnection()))
                 .as(StepVerifier::create)
                 //.expectNext(1)
                 .expectNextCount(1).as("clobs inserted")
@@ -131,7 +131,7 @@ class JdbcLobIntegrationTest extends AbstractIntegrationTestSupport
                 .doOnNext(it -> System.out.println(it.toString()))
                 .map(CharSequence::length)
                 .collect(Collectors.summingInt(value -> value))
-                .concatWith(Example.close(getConnection()))
+                .concatWith(TestKit.close(getConnection()))
                 .as(StepVerifier::create)
                 .expectNext(i * TEST_STRING.length())
                 .verifyComplete();

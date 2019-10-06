@@ -40,10 +40,30 @@ public class JdbcRow implements Row
     }
 
     /**
-     * @see io.r2dbc.spi.Row#get(java.lang.Object, java.lang.Class)
+     * @see io.r2dbc.spi.Row#get(int, java.lang.Class)
      */
     @Override
-    public <T> T get(final Object identifier, final Class<T> type)
+    public <T> T get(final int index, final Class<T> type)
+    {
+        return getByIdentifier(index, type);
+    }
+
+    /**
+     * @see io.r2dbc.spi.Row#get(java.lang.String, java.lang.Class)
+     */
+    @Override
+    public <T> T get(final String name, final Class<T> type)
+    {
+        return getByIdentifier(name, type);
+    }
+
+    /**
+     * @param <T> Value Type
+     * @param identifier Object
+     * @param type Class
+     * @return OBject
+     */
+    private <T> T getByIdentifier(final Object identifier, final Class<T> type)
     {
         Objects.requireNonNull(identifier, "identifier must not be null");
         Objects.requireNonNull(type, "type must not be null");

@@ -16,6 +16,7 @@ import io.r2dbc.jdbc.JdbcConnectionFactory;
 import io.r2dbc.jdbc.JdbcConnectionFactoryProvider;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactoryOptions;
+import io.r2dbc.spi.test.TestKit;
 
 /**
  * Support class for integration tests.
@@ -48,7 +49,7 @@ public abstract class AbstractIntegrationTestSupport
     {
         if (connection != null)
         {
-            connection.close().subscribe();
+            TestKit.close(connection);
         }
     }
 

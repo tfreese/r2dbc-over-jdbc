@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Nullability;
 import io.r2dbc.spi.RowMetadata;
 
@@ -98,25 +99,45 @@ public class JdbcRowMetadata implements RowMetadata
     }
 
     /**
-     * @see io.r2dbc.spi.RowMetadata#getColumnMetadata(java.lang.Object)
+     * @see io.r2dbc.spi.RowMetadata#getColumnMetadata(int)
      */
     @Override
-    public JdbcColumnMetadata getColumnMetadata(final Object identifier)
+    public ColumnMetadata getColumnMetadata(final int index)
     {
-        Objects.requireNonNull(identifier, "identifier must not be null");
-
-        if (identifier instanceof Integer)
-        {
-            return this.columnMetaDatas.get((Integer) identifier);
-        }
-        else if (identifier instanceof String)
-        {
-            return this.columnMetaDataByName.get(((String) identifier).toUpperCase());
-        }
-
-        throw new IllegalArgumentException(
-                String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String column name.", identifier));
+        return this.columnMetaDatas.get(index);
     }
+
+    /**
+     * @see io.r2dbc.spi.RowMetadata#getColumnMetadata(java.lang.String)
+     */
+    @Override
+    public ColumnMetadata getColumnMetadata(final String name)
+    {
+        Objects.requireNonNull(name, "name required");
+
+        return this.columnMetaDataByName.get(name.toUpperCase());
+    }
+
+    // /**
+    // * @see io.r2dbc.spi.RowMetadata#getColumnMetadata(java.lang.Object)
+    // */
+    // @Override
+    // public JdbcColumnMetadata getColumnMetadata(final Object identifier)
+    // {
+    // Objects.requireNonNull(identifier, "identifier must not be null");
+    //
+    // if (identifier instanceof Integer)
+    // {
+    // return this.columnMetaDatas.get((Integer) identifier);
+    // }
+    // else if (identifier instanceof String)
+    // {
+    // return this.columnMetaDataByName.get(((String) identifier).toUpperCase());
+    // }
+    //
+    // throw new IllegalArgumentException(
+    // String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String column name.", identifier));
+    // }
 
     /**
      * @see io.r2dbc.spi.RowMetadata#getColumnMetadatas()
