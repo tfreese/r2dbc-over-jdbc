@@ -63,10 +63,10 @@ public class JdbcResult implements Result
      * @see io.r2dbc.spi.Result#map(java.util.function.BiFunction)
      */
     @Override
-    public <T> Flux<T> map(final BiFunction<Row, RowMetadata, ? extends T> f)
+    public <T> Flux<T> map(final BiFunction<Row, RowMetadata, ? extends T> function)
     {
-        Objects.requireNonNull(f, "f must not be null");
+        Objects.requireNonNull(function, "function must not be null");
 
-        return this.rows.zipWith(this.rowMetadata.repeat()).map(tuple -> f.apply(tuple.getT1(), tuple.getT2()));
+        return this.rows.zipWith(this.rowMetadata.repeat()).map(tuple -> function.apply(tuple.getT1(), tuple.getT2()));
     }
 }
