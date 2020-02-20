@@ -4,13 +4,12 @@
 
 package io.r2dbc.jdbc.codec.encoder;
 
-import io.r2dbc.spi.Clob;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import io.r2dbc.spi.Clob;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Thomas Freese
@@ -28,6 +27,7 @@ public class ClobEncoder extends AbstractEncoder<Clob>
     /**
      * @see AbstractEncoder#encodeNullSafe(PreparedStatement, int, Object)
      */
+    @SuppressWarnings("resource")
     @Override
     protected void encodeNullSafe(final PreparedStatement preparedStatement, final int parameterIndex, final Clob value) throws SQLException
     {

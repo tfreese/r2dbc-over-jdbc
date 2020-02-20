@@ -4,14 +4,13 @@
 
 package io.r2dbc.jdbc.codec.encoder;
 
-import io.r2dbc.spi.Blob;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.nio.ByteBuffer;
 import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import io.r2dbc.spi.Blob;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Thomas Freese
@@ -29,6 +28,7 @@ public class BlobEncoder extends AbstractEncoder<Blob>
     /**
      * @see AbstractEncoder#encodeNullSafe(PreparedStatement, int, Object)
      */
+    @SuppressWarnings("resource")
     @Override
     protected void encodeNullSafe(final PreparedStatement preparedStatement, final int parameterIndex, final Blob value) throws SQLException
     {

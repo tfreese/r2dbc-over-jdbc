@@ -50,6 +50,7 @@ final class JdbcConnectionTest
     /**
      * @throws SQLException Falls was schief geht.
      */
+    @SuppressWarnings("resource")
     @Test
     void beginTransactionErrorResponse() throws SQLException
     {
@@ -110,6 +111,7 @@ final class JdbcConnectionTest
     /**
      * @throws SQLException Falls was schief geht.
      */
+    @SuppressWarnings("resource")
     @Test
     void commitTransactionErrorResponse() throws SQLException
     {
@@ -224,6 +226,7 @@ final class JdbcConnectionTest
     /**
      * @throws SQLException Falls was schief geht.
      */
+    @SuppressWarnings("resource")
     @Test
     void rollbackTransactionErrorResponse() throws SQLException
     {
