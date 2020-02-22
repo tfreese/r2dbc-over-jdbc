@@ -14,7 +14,7 @@ public class DoubleConverter extends AbstractConverter<Double>
      */
     public DoubleConverter()
     {
-        super(Double.class);
+        super();
     }
 
     /**

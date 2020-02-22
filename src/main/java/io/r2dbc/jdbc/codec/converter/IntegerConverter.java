@@ -14,7 +14,7 @@ public class IntegerConverter extends AbstractConverter<Integer>
      */
     public IntegerConverter()
     {
-        super(Integer.class);
+        super();
     }
 
     /**

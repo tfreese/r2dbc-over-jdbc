@@ -7,7 +7,6 @@
 
 package io.r2dbc.jdbc;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterEach;
@@ -18,8 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.jdbc.core.JdbcOperations;
 import io.r2dbc.jdbc.util.HsqldbServerExtension;
-import io.r2dbc.spi.Blob;
-import io.r2dbc.spi.Clob;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
@@ -44,7 +41,6 @@ final class JdbcExampleTest
          * @see io.r2dbc.spi.test.TestKit#batch()
          */
         @Override
-        @Disabled
         public void batch()
         {
             TestKit.super.batch();
@@ -54,7 +50,6 @@ final class JdbcExampleTest
          * @see io.r2dbc.spi.test.TestKit#bindFails()
          */
         @Override
-        @Disabled
         public void bindFails()
         {
             TestKit.super.bindFails();
@@ -64,65 +59,65 @@ final class JdbcExampleTest
          * @see io.r2dbc.spi.test.TestKit#bindNullFails()
          */
         @Override
-        @Disabled
         public void bindNullFails()
         {
             TestKit.super.bindNullFails();
         }
 
-        /**
-         * @see io.r2dbc.spi.test.TestKit#blobInsert()
-         */
-        @Override
-        public void blobInsert()
-        {
-            // Example.super.blobInsert();
+        // /**
+        // * @see io.r2dbc.spi.test.TestKit#blobInsert()
+        // */
+        // @Override
+        // @Test
+        // public void blobInsert()
+        // {
+        // // Example.super.blobInsert();
+        //
+//            // @formatter:off
+//            Mono.from(getConnectionFactory().create())
+//                .flatMapMany(connection -> Flux.from(connection
+//
+//                    .createStatement(String.format("INSERT INTO blob_test VALUES (%s)", getPlaceholder(0)))
+//                    .bind(getIdentifier(0), Blob.from(Mono.just(StandardCharsets.UTF_8.encode("test-value"))))
+//                    .execute())
+//
+//                    .concatWith(TestKit.close(connection)))
+//                .as(StepVerifier::create)
+//                .expectNextCount(1).as("rows inserted")
+//                .verifyComplete()
+//                ;
+//            // @formatter:on
+        // }
 
-            // @formatter:off
-            Mono.from(getConnectionFactory().create())
-                .flatMapMany(connection -> Flux.from(connection
-
-                    .createStatement(String.format("INSERT INTO blob_test VALUES (%s)", getPlaceholder(0)))
-                    .bind(getIdentifier(0), Blob.from(Mono.just(StandardCharsets.UTF_8.encode("test-value"))))
-                    .execute())
-
-                    .concatWith(TestKit.close(connection)))
-                .as(StepVerifier::create)
-                .expectNextCount(1).as("rows inserted")
-                .verifyComplete()
-                ;
-            // @formatter:on
-        }
-
-        /**
-         * @see io.r2dbc.spi.test.TestKit#clobInsert()
-         */
-        @Override
-        public void clobInsert()
-        {
-            // Example.super.clobInsert();
-
-            // @formatter:off
-            Mono.from(getConnectionFactory().create())
-                .flatMapMany(connection -> Flux.from(connection
-
-                    .createStatement(String.format("INSERT INTO clob_test VALUES (%s)", getPlaceholder(0)))
-                    .bind(getIdentifier(0), Clob.from(Mono.just("test-value")))
-                    .execute())
-
-                    .concatWith(TestKit.close(connection)))
-                .as(StepVerifier::create)
-                .expectNextCount(1).as("rows inserted")
-                .verifyComplete()
-                ;
-         // @formatter:on
-        }
+        // /**
+        // * @see io.r2dbc.spi.test.TestKit#clobInsert()
+        // */
+        // @Override
+        // @Test
+        // public void clobInsert()
+        // {
+        // // Example.super.clobInsert();
+        //
+//            // @formatter:off
+//            Mono.from(getConnectionFactory().create())
+//                .flatMapMany(connection -> Flux.from(connection
+//
+//                    .createStatement(String.format("INSERT INTO clob_test VALUES (%s)", getPlaceholder(0)))
+//                    .bind(getIdentifier(0), Clob.from(Mono.just("test-value")))
+//                    .execute())
+//
+//                    .concatWith(TestKit.close(connection)))
+//                .as(StepVerifier::create)
+//                .expectNextCount(1).as("rows inserted")
+//                .verifyComplete()
+//                ;
+//         // @formatter:on
+        // }
 
         /**
          * @see io.r2dbc.spi.test.TestKit#columnMetadata()
          */
         @Override
-        @Disabled
         public void columnMetadata()
         {
             TestKit.super.columnMetadata();
@@ -132,7 +127,6 @@ final class JdbcExampleTest
          * @see io.r2dbc.spi.test.TestKit#createStatementFails()
          */
         @Override
-        @Disabled
         public void createStatementFails()
         {
             TestKit.super.createStatementFails();
@@ -142,7 +136,6 @@ final class JdbcExampleTest
          * @see io.r2dbc.spi.test.TestKit#duplicateColumnNames()
          */
         @Override
-        @Disabled
         public void duplicateColumnNames()
         {
             TestKit.super.duplicateColumnNames();
@@ -198,7 +191,6 @@ final class JdbcExampleTest
          * @see io.r2dbc.spi.test.TestKit#prepareStatement()
          */
         @Override
-        @Disabled
         public void prepareStatement()
         {
             TestKit.super.prepareStatement();
@@ -208,7 +200,6 @@ final class JdbcExampleTest
          * @see io.r2dbc.spi.test.TestKit#prepareStatementWithIncompleteBatchFails()
          */
         @Override
-        @Disabled
         public void prepareStatementWithIncompleteBatchFails()
         {
             TestKit.super.prepareStatementWithIncompleteBatchFails();
@@ -218,7 +209,6 @@ final class JdbcExampleTest
          * @see io.r2dbc.spi.test.TestKit#prepareStatementWithIncompleteBindingFails()
          */
         @Override
-        @Disabled
         public void prepareStatementWithIncompleteBindingFails()
         {
             TestKit.super.prepareStatementWithIncompleteBindingFails();
@@ -228,7 +218,7 @@ final class JdbcExampleTest
          * @see io.r2dbc.spi.test.TestKit#returnGeneratedValues()
          */
         @Override
-        @Disabled
+        // @Disabled
         public void returnGeneratedValues()
         {
             TestKit.super.returnGeneratedValues();
@@ -238,7 +228,6 @@ final class JdbcExampleTest
          * @see io.r2dbc.spi.test.TestKit#savePointStartsTransaction()
          */
         @Override
-        @Disabled
         public void savePointStartsTransaction()
         {
             TestKit.super.savePointStartsTransaction();

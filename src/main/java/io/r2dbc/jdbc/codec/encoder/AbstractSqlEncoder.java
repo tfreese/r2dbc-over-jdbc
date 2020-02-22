@@ -9,6 +9,7 @@ import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Objects;
 
 /**
  * Encodes a Java-Object for a {@link PreparedStatement}.
@@ -39,9 +40,21 @@ public abstract class AbstractSqlEncoder<T> implements SqlEncoder<T>
         super();
 
         this.sqlType = sqlType;
-
-        // this.javaType = Objects.requireNonNull(javaType, "javaType must not be null");
         this.javaType = (Class<T>) ((ParameterizedType) (getClass().getGenericSuperclass())).getActualTypeArguments()[0];
+    }
+
+    /**
+     * Erstellt ein neues {@link AbstractSqlEncoder} Object.
+     *
+     * @param sqlType int
+     * @param javaType Class
+     */
+    protected AbstractSqlEncoder(final int sqlType, final Class<T> javaType)
+    {
+        super();
+
+        this.sqlType = sqlType;
+        this.javaType = Objects.requireNonNull(javaType, "javaType required");
     }
 
     /**

@@ -4,6 +4,7 @@
 
 package io.r2dbc.jdbc.codec.converter;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Objects;
 import io.r2dbc.spi.Row;
 
@@ -24,14 +25,25 @@ public abstract class AbstractConverter<T> implements Converter<T>
 
     /**
      * Erstellt ein neues {@link AbstractConverter} Object.
-     *
-     * @param javaType {@link Class}
      */
-    public AbstractConverter(final Class<T> javaType)
+    @SuppressWarnings("unchecked")
+    public AbstractConverter()
     {
         super();
 
-        this.javaType = Objects.requireNonNull(javaType, "javaType must not be null");
+        this.javaType = (Class<T>) ((ParameterizedType) (getClass().getGenericSuperclass())).getActualTypeArguments()[0];
+    }
+
+    /**
+     * Erstellt ein neues {@link AbstractConverter} Object.
+     *
+     * @param javaType {@link Class}
+     */
+    protected AbstractConverter(final Class<T> javaType)
+    {
+        super();
+
+        this.javaType = Objects.requireNonNull(javaType, "javaType required");
     }
 
     /**

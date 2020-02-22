@@ -18,7 +18,7 @@ public class DateConverter extends AbstractConverter<Date>
      */
     public DateConverter()
     {
-        super(Date.class);
+        super();
     }
 
     /**

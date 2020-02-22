@@ -14,7 +14,7 @@ public class LongConverter extends AbstractConverter<Long>
      */
     public LongConverter()
     {
-        super(Long.class);
+        super();
     }
 
     /**

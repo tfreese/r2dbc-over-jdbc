@@ -14,7 +14,7 @@ public class ByteConverter extends AbstractConverter<Byte>
      */
     public ByteConverter()
     {
-        super(Byte.class);
+        super();
     }
 
     /**

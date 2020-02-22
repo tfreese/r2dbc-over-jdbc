@@ -18,7 +18,7 @@ public class LocalDateTimeConverter extends AbstractConverter<LocalDateTime>
      */
     public LocalDateTimeConverter()
     {
-        super(LocalDateTime.class);
+        super();
     }
 
     /**

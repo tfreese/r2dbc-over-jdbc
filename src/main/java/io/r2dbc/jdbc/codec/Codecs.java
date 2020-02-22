@@ -10,7 +10,9 @@ import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.r2dbc.jdbc.codec.converter.BlobConverter;
 import io.r2dbc.jdbc.codec.converter.ByteConverter;
+import io.r2dbc.jdbc.codec.converter.ClobConverter;
 import io.r2dbc.jdbc.codec.converter.Converter;
 import io.r2dbc.jdbc.codec.converter.DateConverter;
 import io.r2dbc.jdbc.codec.converter.DoubleConverter;
@@ -192,14 +194,16 @@ public final class Codecs
 
         // Default-Converter
         register(new ByteConverter());
+        register(new BlobConverter());
+        register(new ClobConverter());
         register(new DateConverter());
         register(new DoubleConverter());
         register(new IntegerConverter());
         register(new LocalDateConverter());
         register(new LocalDateTimeConverter());
         register(new LocalTimeConverter());
-        register(new LongConverter());
         register(new StringConverter());
+        register(new LongConverter());
     }
 
     /**
