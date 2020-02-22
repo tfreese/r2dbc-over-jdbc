@@ -4,11 +4,11 @@
 
 package io.r2dbc.jdbc.codec.encoder;
 
+import java.lang.reflect.ParameterizedType;
 import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Objects;
 
 /**
  * Encodes a Java-Object for a {@link PreparedStatement}.
@@ -16,7 +16,7 @@ import java.util.Objects;
  * @param <T> Type
  * @author Thomas Freese
  */
-public abstract class AbstractEncoder<T> implements Encoder<T>
+public abstract class AbstractSqlEncoder<T> implements SqlEncoder<T>
 {
     /**
      *
@@ -29,21 +29,23 @@ public abstract class AbstractEncoder<T> implements Encoder<T>
     private final int sqlType;
 
     /**
-     * Erstellt ein neues {@link AbstractEncoder} Object.
+     * Erstellt ein neues {@link AbstractSqlEncoder} Object.
      *
-     * @param javaType {@link Class}
      * @param sqlType int
      */
-    public AbstractEncoder(final Class<T> javaType, final int sqlType)
+    @SuppressWarnings("unchecked")
+    public AbstractSqlEncoder(final int sqlType)
     {
         super();
 
-        this.javaType = Objects.requireNonNull(javaType, "javaType must not be null");
         this.sqlType = sqlType;
+
+        // this.javaType = Objects.requireNonNull(javaType, "javaType must not be null");
+        this.javaType = (Class<T>) ((ParameterizedType) (getClass().getGenericSuperclass())).getActualTypeArguments()[0];
     }
 
     /**
-     * @see io.r2dbc.jdbc.codec.encoder.Encoder#encode(java.sql.PreparedStatement, int, java.lang.Object)
+     * @see io.r2dbc.jdbc.codec.encoder.SqlEncoder#encode(java.sql.PreparedStatement, int, java.lang.Object)
      */
     @Override
     public final void encode(final PreparedStatement preparedStatement, final int parameterIndex, final T value) throws SQLException
@@ -67,7 +69,7 @@ public abstract class AbstractEncoder<T> implements Encoder<T>
     protected abstract void encodeNullSafe(PreparedStatement preparedStatement, int parameterIndex, T value) throws SQLException;
 
     /**
-     * @see io.r2dbc.jdbc.codec.encoder.Encoder#getJavaType()
+     * @see io.r2dbc.jdbc.codec.encoder.SqlEncoder#getJavaType()
      */
     @Override
     public Class<T> getJavaType()

@@ -11,33 +11,29 @@ import java.sql.SQLException;
 /**
  * @author Thomas Freese
  */
-public class BigIntDecoder extends AbstractDecoder<Long>
+public class BigIntDecoder extends AbstractSqlDecoder<Long>
 {
     /**
      * Erstellt ein neues {@link BigIntDecoder} Object.
      */
     public BigIntDecoder()
     {
-        super();
+        super(JDBCType.BIGINT.getVendorTypeNumber());
     }
 
     /**
-     * @see io.r2dbc.jdbc.codec.decoder.AbstractDecoder#doDecode(java.sql.ResultSet, java.lang.String)
+     * @see io.r2dbc.jdbc.codec.decoder.SqlDecoder#decode(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    protected Long doDecode(final ResultSet resultSet, final String columnLabel) throws SQLException
+    public Long decode(final ResultSet resultSet, final String columnLabel) throws SQLException
     {
         long value = resultSet.getLong(columnLabel);
 
-        return value;
-    }
+        if (resultSet.wasNull())
+        {
+            return null;
+        }
 
-    /**
-     * @see io.r2dbc.jdbc.codec.decoder.Decoder#getSqlType()
-     */
-    @Override
-    public int getSqlType()
-    {
-        return JDBCType.BIGINT.getVendorTypeNumber();
+        return value;
     }
 }

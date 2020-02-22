@@ -15,7 +15,7 @@ import java.sql.Types;
  * @author Thomas Freese
  * @param <T> Type
  */
-public interface Decoder<T>
+public interface SqlDecoder<T>
 {
     /**
      * @param resultSet {@link ResultSet}

@@ -11,32 +11,28 @@ import java.sql.SQLException;
 /**
  * @author Thomas Freese
  */
-public class DoubleDecoder extends AbstractDecoder<Double>
+public class DoubleDecoder extends AbstractSqlDecoder<Double>
 {
     /**
      * Erstellt ein neues {@link DoubleDecoder} Object.
      */
     public DoubleDecoder()
     {
-        super();
+        super(JDBCType.DOUBLE.getVendorTypeNumber());
     }
 
     /**
-     * @see io.r2dbc.jdbc.codec.decoder.Decoder#getSqlType()
+     * @see io.r2dbc.jdbc.codec.decoder.SqlDecoder#decode(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    public int getSqlType()
-    {
-        return JDBCType.DOUBLE.getVendorTypeNumber();
-    }
-
-    /**
-     * @see io.r2dbc.jdbc.codec.decoder.AbstractDecoder#doDecode(java.sql.ResultSet, java.lang.String)
-     */
-    @Override
-    protected Double doDecode(final ResultSet resultSet, final String columnLabel) throws SQLException
+    public Double decode(final ResultSet resultSet, final String columnLabel) throws SQLException
     {
         double value = resultSet.getDouble(columnLabel);
+
+        if (resultSet.wasNull())
+        {
+            return null;
+        }
 
         return value;
     }

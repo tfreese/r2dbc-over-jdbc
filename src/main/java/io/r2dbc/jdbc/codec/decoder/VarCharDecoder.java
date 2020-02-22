@@ -11,33 +11,29 @@ import java.sql.SQLException;
 /**
  * @author Thomas Freese
  */
-public class VarCharDecoder extends AbstractDecoder<String>
+public class VarCharDecoder extends AbstractSqlDecoder<String>
 {
     /**
      * Erstellt ein neues {@link VarCharDecoder} Object.
      */
     public VarCharDecoder()
     {
-        super();
+        super(JDBCType.VARCHAR.getVendorTypeNumber());
     }
 
     /**
-     * @see io.r2dbc.jdbc.codec.decoder.AbstractDecoder#doDecode(java.sql.ResultSet, java.lang.String)
+     * @see io.r2dbc.jdbc.codec.decoder.SqlDecoder#decode(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    protected String doDecode(final ResultSet resultSet, final String columnLabel) throws SQLException
+    public String decode(final ResultSet resultSet, final String columnLabel) throws SQLException
     {
         String value = resultSet.getString(columnLabel);
 
-        return value;
-    }
+        if (resultSet.wasNull())
+        {
+            return null;
+        }
 
-    /**
-     * @see io.r2dbc.jdbc.codec.decoder.Decoder#getSqlType()
-     */
-    @Override
-    public int getSqlType()
-    {
-        return JDBCType.VARCHAR.getVendorTypeNumber();
+        return value;
     }
 }

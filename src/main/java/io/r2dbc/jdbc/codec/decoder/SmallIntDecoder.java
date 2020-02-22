@@ -11,32 +11,28 @@ import java.sql.SQLException;
 /**
  * @author Thomas Freese
  */
-public class SmallIntDecoder extends AbstractDecoder<Short>
+public class SmallIntDecoder extends AbstractSqlDecoder<Short>
 {
     /**
      * Erstellt ein neues {@link SmallIntDecoder} Object.
      */
     public SmallIntDecoder()
     {
-        super();
+        super(JDBCType.SMALLINT.getVendorTypeNumber());
     }
 
     /**
-     * @see io.r2dbc.jdbc.codec.decoder.Decoder#getSqlType()
+     * @see io.r2dbc.jdbc.codec.decoder.SqlDecoder#decode(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    public int getSqlType()
-    {
-        return JDBCType.SMALLINT.getVendorTypeNumber();
-    }
-
-    /**
-     * @see io.r2dbc.jdbc.codec.decoder.AbstractDecoder#doDecode(java.sql.ResultSet, java.lang.String)
-     */
-    @Override
-    protected Short doDecode(final ResultSet resultSet, final String columnLabel) throws SQLException
+    public Short decode(final ResultSet resultSet, final String columnLabel) throws SQLException
     {
         short value = resultSet.getShort(columnLabel);
+
+        if (resultSet.wasNull())
+        {
+            return null;
+        }
 
         return value;
     }

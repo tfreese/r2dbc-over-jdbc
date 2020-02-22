@@ -17,30 +17,21 @@ import reactor.core.publisher.Mono;
 /**
  * @author Thomas Freese
  */
-public class BlobDecoder extends AbstractDecoder<Blob>
+public class BlobDecoder extends AbstractSqlDecoder<Blob>
 {
     /**
      * Erstellt ein neues {@link BlobDecoder} Object.
      */
     public BlobDecoder()
     {
-        super();
+        super(JDBCType.BLOB.getVendorTypeNumber());
     }
 
     /**
-     * @see io.r2dbc.jdbc.codec.decoder.AbstractDecoder#checkWasNull(java.sql.ResultSet, java.lang.Object)
+     * @see io.r2dbc.jdbc.codec.decoder.SqlDecoder#decode(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    protected Blob checkWasNull(final ResultSet resultSet, final Blob value) throws SQLException
-    {
-        return value;
-    }
-
-    /**
-     * @see io.r2dbc.jdbc.codec.decoder.AbstractDecoder#doDecode(java.sql.ResultSet, java.lang.String)
-     */
-    @Override
-    protected Blob doDecode(final ResultSet resultSet, final String columnLabel) throws SQLException
+    public Blob decode(final ResultSet resultSet, final String columnLabel) throws SQLException
     {
         java.sql.Blob value = resultSet.getBlob(columnLabel);
 
@@ -65,14 +56,5 @@ public class BlobDecoder extends AbstractDecoder<Blob>
         byteBuffer.flip();
 
         return Blob.from((Mono.just(byteBuffer)));
-    }
-
-    /**
-     * @see io.r2dbc.jdbc.codec.decoder.Decoder#getSqlType()
-     */
-    @Override
-    public int getSqlType()
-    {
-        return JDBCType.BLOB.getVendorTypeNumber();
     }
 }

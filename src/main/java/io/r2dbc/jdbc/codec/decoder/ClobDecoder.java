@@ -16,30 +16,21 @@ import reactor.core.publisher.Mono;
 /**
  * @author Thomas Freese
  */
-public class ClobDecoder extends AbstractDecoder<Clob>
+public class ClobDecoder extends AbstractSqlDecoder<Clob>
 {
     /**
      * Erstellt ein neues {@link BlobDecoder} Object.
      */
     public ClobDecoder()
     {
-        super();
+        super(JDBCType.CLOB.getVendorTypeNumber());
     }
 
     /**
-     * @see io.r2dbc.jdbc.codec.decoder.AbstractDecoder#checkWasNull(java.sql.ResultSet, java.lang.Object)
+     * @see io.r2dbc.jdbc.codec.decoder.SqlDecoder#decode(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    protected Clob checkWasNull(final ResultSet resultSet, final Clob value) throws SQLException
-    {
-        return value;
-    }
-
-    /**
-     * @see io.r2dbc.jdbc.codec.decoder.AbstractDecoder#doDecode(java.sql.ResultSet, java.lang.String)
-     */
-    @Override
-    protected Clob doDecode(final ResultSet resultSet, final String columnLabel) throws SQLException
+    public Clob decode(final ResultSet resultSet, final String columnLabel) throws SQLException
     {
         java.sql.Clob value = resultSet.getClob(columnLabel);
 
@@ -60,14 +51,5 @@ public class ClobDecoder extends AbstractDecoder<Clob>
         }
 
         return Clob.from((Mono.just(string)));
-    }
-
-    /**
-     * @see io.r2dbc.jdbc.codec.decoder.Decoder#getSqlType()
-     */
-    @Override
-    public int getSqlType()
-    {
-        return JDBCType.CLOB.getVendorTypeNumber();
     }
 }

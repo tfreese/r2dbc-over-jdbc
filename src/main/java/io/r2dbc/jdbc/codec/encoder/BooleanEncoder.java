@@ -11,18 +11,18 @@ import java.sql.SQLException;
 /**
  * @author Thomas Freese
  */
-public class BooleanEncoder extends AbstractEncoder<Boolean>
+public class BooleanEncoder extends AbstractSqlEncoder<Boolean>
 {
     /**
      * Erstellt ein neues {@link BooleanEncoder} Object.
      */
     public BooleanEncoder()
     {
-        super(Boolean.class, JDBCType.BOOLEAN.getVendorTypeNumber());
+        super(JDBCType.BOOLEAN.getVendorTypeNumber());
     }
 
     /**
-     * @see AbstractEncoder#encodeNullSafe(PreparedStatement, int, Object)
+     * @see AbstractSqlEncoder#encodeNullSafe(PreparedStatement, int, Object)
      */
     @Override
     protected void encodeNullSafe(final PreparedStatement preparedStatement, final int parameterIndex, final Boolean value) throws SQLException

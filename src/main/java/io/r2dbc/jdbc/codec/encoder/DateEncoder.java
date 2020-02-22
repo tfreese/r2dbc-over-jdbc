@@ -12,18 +12,18 @@ import java.util.Date;
 /**
  * @author Thomas Freese
  */
-public class DateEncoder extends AbstractEncoder<Date>
+public class DateEncoder extends AbstractSqlEncoder<Date>
 {
     /**
      * Erstellt ein neues {@link DateEncoder} Object.
      */
     public DateEncoder()
     {
-        super(Date.class, JDBCType.DATE.getVendorTypeNumber());
+        super(JDBCType.DATE.getVendorTypeNumber());
     }
 
     /**
-     * @see AbstractEncoder#encodeNullSafe(PreparedStatement, int, Object)
+     * @see AbstractSqlEncoder#encodeNullSafe(PreparedStatement, int, Object)
      */
     @Override
     protected void encodeNullSafe(final PreparedStatement preparedStatement, final int parameterIndex, final Date value) throws SQLException

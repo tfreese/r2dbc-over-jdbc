@@ -13,7 +13,7 @@ import java.sql.SQLException;
  * @author Thomas Freese
  * @param <T> Type
  */
-public interface Encoder<T>
+public interface SqlEncoder<T>
 {
     /**
      * @param preparedStatement {@link PreparedStatement}

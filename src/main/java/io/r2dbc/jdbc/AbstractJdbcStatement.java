@@ -14,7 +14,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.r2dbc.jdbc.codec.Codecs;
-import io.r2dbc.jdbc.codec.encoder.Encoder;
+import io.r2dbc.jdbc.codec.encoder.SqlEncoder;
 import io.r2dbc.spi.Statement;
 
 /**
@@ -127,7 +127,7 @@ public abstract class AbstractJdbcStatement implements Statement
                 }
                 else
                 {
-                    Encoder<Object> encoder = Codecs.getEncoder(value.getClass());
+                    SqlEncoder<Object> encoder = Codecs.getSqlEncoder(value.getClass());
 
                     encoder.encode(preparedStatement, parameterIndex, value);
                 }

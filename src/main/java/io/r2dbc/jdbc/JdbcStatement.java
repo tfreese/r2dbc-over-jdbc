@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 import io.r2dbc.jdbc.codec.Codecs;
-import io.r2dbc.jdbc.codec.decoder.Decoder;
+import io.r2dbc.jdbc.codec.decoder.SqlDecoder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SynchronousSink;
@@ -135,7 +135,7 @@ public class JdbcStatement extends AbstractJdbcStatement
                         String columnLabel = columnMetaData.getName();
                         int sqlType = (int) columnMetaData.getNativeTypeMetadata();
 
-                        Decoder<?> decoder = Codecs.getDecoder(sqlType);
+                        SqlDecoder<?> decoder = Codecs.getSqlDecoder(sqlType);
                         Object value = decoder.decode(resultSet, columnLabel);
 
                         row.put(columnLabel, value);

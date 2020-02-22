@@ -20,7 +20,7 @@ public class BitDecoder extends BooleanDecoder
     }
 
     /**
-     * @see io.r2dbc.jdbc.codec.decoder.Decoder#getSqlType()
+     * @see io.r2dbc.jdbc.codec.decoder.SqlDecoder#getSqlType()
      */
     @Override
     public int getSqlType()

@@ -11,33 +11,29 @@ import java.sql.SQLException;
 /**
  * @author Thomas Freese
  */
-public class BooleanDecoder extends AbstractDecoder<Boolean>
+public class BooleanDecoder extends AbstractSqlDecoder<Boolean>
 {
     /**
      * Erstellt ein neues {@link BooleanDecoder} Object.
      */
     public BooleanDecoder()
     {
-        super();
+        super(JDBCType.BOOLEAN.getVendorTypeNumber());
     }
 
     /**
-     * @see io.r2dbc.jdbc.codec.decoder.AbstractDecoder#doDecode(java.sql.ResultSet, java.lang.String)
+     * @see io.r2dbc.jdbc.codec.decoder.SqlDecoder#decode(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    protected Boolean doDecode(final ResultSet resultSet, final String columnLabel) throws SQLException
+    public Boolean decode(final ResultSet resultSet, final String columnLabel) throws SQLException
     {
         boolean value = resultSet.getBoolean(columnLabel);
 
-        return value;
-    }
+        if (resultSet.wasNull())
+        {
+            return null;
+        }
 
-    /**
-     * @see io.r2dbc.jdbc.codec.decoder.Decoder#getSqlType()
-     */
-    @Override
-    public int getSqlType()
-    {
-        return JDBCType.BOOLEAN.getVendorTypeNumber();
+        return value;
     }
 }

@@ -11,18 +11,18 @@ import java.sql.SQLException;
 /**
  * @author Thomas Freese
  */
-public class DoubleEncoder extends AbstractEncoder<Double>
+public class DoubleEncoder extends AbstractSqlEncoder<Double>
 {
     /**
      * Erstellt ein neues {@link DoubleEncoder} Object.
      */
     public DoubleEncoder()
     {
-        super(Double.class, JDBCType.DOUBLE.getVendorTypeNumber());
+        super(JDBCType.DOUBLE.getVendorTypeNumber());
     }
 
     /**
-     * @see AbstractEncoder#encodeNullSafe(PreparedStatement, int, Object)
+     * @see AbstractSqlEncoder#encodeNullSafe(PreparedStatement, int, Object)
      */
     @Override
     protected void encodeNullSafe(final PreparedStatement preparedStatement, final int parameterIndex, final Double value) throws SQLException

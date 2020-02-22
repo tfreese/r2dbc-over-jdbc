@@ -15,18 +15,18 @@ import reactor.core.publisher.Mono;
 /**
  * @author Thomas Freese
  */
-public class BlobEncoder extends AbstractEncoder<Blob>
+public class BlobEncoder extends AbstractSqlEncoder<Blob>
 {
     /**
      * Erstellt ein neues {@link BlobEncoder} Object.
      */
     public BlobEncoder()
     {
-        super(Blob.class, JDBCType.BLOB.getVendorTypeNumber());
+        super(JDBCType.BLOB.getVendorTypeNumber());
     }
 
     /**
-     * @see AbstractEncoder#encodeNullSafe(PreparedStatement, int, Object)
+     * @see AbstractSqlEncoder#encodeNullSafe(PreparedStatement, int, Object)
      */
     @SuppressWarnings("resource")
     @Override

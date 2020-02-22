@@ -11,18 +11,18 @@ import java.sql.SQLException;
 /**
  * @author Thomas Freese
  */
-public class LongEncoder extends AbstractEncoder<Long>
+public class LongEncoder extends AbstractSqlEncoder<Long>
 {
     /**
      * Erstellt ein neues {@link LongEncoder} Object.
      */
     public LongEncoder()
     {
-        super(Long.class, JDBCType.DECIMAL.getVendorTypeNumber());
+        super(JDBCType.DECIMAL.getVendorTypeNumber());
     }
 
     /**
-     * @see io.r2dbc.jdbc.codec.encoder.AbstractEncoder#encodeNullSafe(java.sql.PreparedStatement, int, java.lang.Object)
+     * @see io.r2dbc.jdbc.codec.encoder.AbstractSqlEncoder#encodeNullSafe(java.sql.PreparedStatement, int, java.lang.Object)
      */
     @Override
     protected void encodeNullSafe(final PreparedStatement preparedStatement, final int parameterIndex, final Long value) throws SQLException

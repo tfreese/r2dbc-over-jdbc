@@ -30,13 +30,13 @@ import io.r2dbc.jdbc.codec.decoder.CharDecoder;
 import io.r2dbc.jdbc.codec.decoder.ClobDecoder;
 import io.r2dbc.jdbc.codec.decoder.DateDecoder;
 import io.r2dbc.jdbc.codec.decoder.DecimalDecoder;
-import io.r2dbc.jdbc.codec.decoder.Decoder;
 import io.r2dbc.jdbc.codec.decoder.DoubleDecoder;
 import io.r2dbc.jdbc.codec.decoder.FloatDecoder;
 import io.r2dbc.jdbc.codec.decoder.IntegerDecoder;
 import io.r2dbc.jdbc.codec.decoder.NumericDecoder;
 import io.r2dbc.jdbc.codec.decoder.ObjectDecoder;
 import io.r2dbc.jdbc.codec.decoder.SmallIntDecoder;
+import io.r2dbc.jdbc.codec.decoder.SqlDecoder;
 import io.r2dbc.jdbc.codec.decoder.TimeDecoder;
 import io.r2dbc.jdbc.codec.decoder.TimestampDecoder;
 import io.r2dbc.jdbc.codec.decoder.VarCharDecoder;
@@ -45,10 +45,10 @@ import io.r2dbc.jdbc.codec.encoder.BooleanEncoder;
 import io.r2dbc.jdbc.codec.encoder.ClobEncoder;
 import io.r2dbc.jdbc.codec.encoder.DateEncoder;
 import io.r2dbc.jdbc.codec.encoder.DoubleEncoder;
-import io.r2dbc.jdbc.codec.encoder.Encoder;
 import io.r2dbc.jdbc.codec.encoder.IntegerEncoder;
 import io.r2dbc.jdbc.codec.encoder.LongEncoder;
 import io.r2dbc.jdbc.codec.encoder.ObjectEncoder;
+import io.r2dbc.jdbc.codec.encoder.SqlEncoder;
 import io.r2dbc.jdbc.codec.encoder.StringEncoder;
 
 /**
@@ -66,12 +66,12 @@ public final class Codecs
     /**
      * Fallback-Decoder.
      */
-    public static final Decoder<?> FALLBACK_OBJECT_DECODER = ObjectDecoder.INSTANCE;
+    public static final SqlDecoder<?> FALLBACK_OBJECT_DECODER = ObjectDecoder.INSTANCE;
 
     /**
      * Fallback-Encoder.
      */
-    public static final Encoder<?> FALLBACK_OBJECT_ENCODER = ObjectEncoder.INSTANCE;
+    public static final SqlEncoder<?> FALLBACK_OBJECT_ENCODER = ObjectEncoder.INSTANCE;
 
     /**
      *
@@ -96,21 +96,21 @@ public final class Codecs
     /**
      * @param sqlType int
      * @param <T> Type
-     * @return {@link Decoder}
+     * @return {@link SqlDecoder}
      */
-    public static <T> Decoder<T> getDecoder(final int sqlType)
+    public static <T> SqlDecoder<T> getSqlDecoder(final int sqlType)
     {
-        return INSTANCE.findDecoder(sqlType);
+        return INSTANCE.findSqlDecoder(sqlType);
     }
 
     /**
      * @param javaType {@link Class}
      * @param <T> Type
-     * @return {@link Encoder}
+     * @return {@link SqlEncoder}
      */
-    public static <T> Encoder<T> getEncoder(final Class<?> javaType)
+    public static <T> SqlEncoder<T> getSqlEncoder(final Class<?> javaType)
     {
-        return INSTANCE.findEncoder(javaType);
+        return INSTANCE.findSqlEncoder(javaType);
     }
 
     /**
@@ -122,19 +122,19 @@ public final class Codecs
     }
 
     /**
-     * Register a new {@link Decoder} for a {@link JDBCType}.
+     * Register a new {@link SqlDecoder} for a {@link JDBCType}.
      *
-     * @param decoder {@link Decoder}
+     * @param decoder {@link SqlDecoder}
      */
-    public static void registerDecoder(final Decoder<?> decoder)
+    public static void registerDecoder(final SqlDecoder<?> decoder)
     {
         INSTANCE.register(decoder);
     }
 
     /**
-     * @param encoder {@link Encoder}
+     * @param encoder {@link SqlEncoder}
      */
-    public static void registerEncoder(final Encoder<?> encoder)
+    public static void registerEncoder(final SqlEncoder<?> encoder)
     {
         INSTANCE.register(encoder);
     }
@@ -147,12 +147,12 @@ public final class Codecs
     /**
      *
      */
-    private final Map<Integer, Decoder<?>> decoderMap = new HashMap<>();
+    private final Map<Integer, SqlDecoder<?>> decoderMap = new HashMap<>();
 
     /**
     *
     */
-    private final Map<Class<?>, Encoder<?>> encoderMap = new HashMap<>();
+    private final Map<Class<?>, SqlEncoder<?>> encoderMap = new HashMap<>();
 
     /**
      * Erstellt ein neues {@link Codecs} Object.
@@ -208,7 +208,7 @@ public final class Codecs
      * @return {@link Converter}
      */
     @SuppressWarnings("unchecked")
-    public <T> Converter<T> findConverter(final Class<?> javaType)
+    private <T> Converter<T> findConverter(final Class<?> javaType)
     {
         Converter<?> converter = this.converterMap.get(javaType);
 
@@ -238,12 +238,12 @@ public final class Codecs
     /**
      * @param <T> Type
      * @param sqlType int
-     * @return {@link Decoder}
+     * @return {@link SqlDecoder}
      */
     @SuppressWarnings("unchecked")
-    public <T> Decoder<T> findDecoder(final int sqlType)
+    private <T> SqlDecoder<T> findSqlDecoder(final int sqlType)
     {
-        Decoder<?> decoder = this.decoderMap.get(sqlType);
+        SqlDecoder<?> decoder = this.decoderMap.get(sqlType);
 
         if (decoder == null)
         {
@@ -257,23 +257,23 @@ public final class Codecs
             this.decoderMap.put(sqlType, decoder);
         }
 
-        return (Decoder<T>) decoder;
+        return (SqlDecoder<T>) decoder;
     }
 
     /**
      * @param <T> Type
      * @param javaType {@link Class}
-     * @return {@link Encoder}
+     * @return {@link SqlEncoder}
      */
     @SuppressWarnings("unchecked")
-    public <T> Encoder<T> findEncoder(final Class<?> javaType)
+    private <T> SqlEncoder<T> findSqlEncoder(final Class<?> javaType)
     {
-        Encoder<?> encoder = this.encoderMap.get(javaType);
+        SqlEncoder<?> encoder = this.encoderMap.get(javaType);
 
         if (encoder == null)
         {
             // May be an anonymous implementation.
-            Optional<Encoder<?>> optional = this.encoderMap.values().stream().filter(e -> e.getJavaType().isAssignableFrom(javaType)).findFirst();
+            Optional<SqlEncoder<?>> optional = this.encoderMap.values().stream().filter(e -> e.getJavaType().isAssignableFrom(javaType)).findFirst();
 
             if (optional.isPresent())
             {
@@ -290,7 +290,7 @@ public final class Codecs
             this.encoderMap.put(javaType, encoder);
         }
 
-        return (Encoder<T>) encoder;
+        return (SqlEncoder<T>) encoder;
     }
 
     /**
@@ -304,22 +304,22 @@ public final class Codecs
     }
 
     /**
-     * Register a new {@link Decoder} for a {@link JDBCType}.
+     * Register a new {@link SqlDecoder} for a {@link JDBCType}.
      *
-     * @param decoder {@link Decoder}
+     * @param sqlDecoder {@link SqlDecoder}
      */
-    public void register(final Decoder<?> decoder)
+    public void register(final SqlDecoder<?> sqlDecoder)
     {
-        this.decoderMap.put(decoder.getSqlType(), decoder);
+        this.decoderMap.put(sqlDecoder.getSqlType(), sqlDecoder);
     }
 
     /**
-     * Register a new {@link Encoder} for a Java-Class.
+     * Register a new {@link SqlEncoder} for a Java-Class.
      *
-     * @param encoder {@link Encoder}
+     * @param sqlEncoder {@link SqlEncoder}
      */
-    public void register(final Encoder<?> encoder)
+    public void register(final SqlEncoder<?> sqlEncoder)
     {
-        this.encoderMap.put(encoder.getJavaType(), encoder);
+        this.encoderMap.put(sqlEncoder.getJavaType(), sqlEncoder);
     }
 }

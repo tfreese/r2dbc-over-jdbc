@@ -11,30 +11,21 @@ import java.sql.SQLException;
 /**
  * @author Thomas Freese
  */
-public class CharDecoder extends AbstractDecoder<Character>
+public class CharDecoder extends AbstractSqlDecoder<Character>
 {
     /**
      * Erstellt ein neues {@link CharDecoder} Object.
      */
     public CharDecoder()
     {
-        super();
+        super(JDBCType.CHAR.getVendorTypeNumber());
     }
 
     /**
-     * @see io.r2dbc.jdbc.codec.decoder.AbstractDecoder#checkWasNull(java.sql.ResultSet, java.lang.Object)
+     * @see io.r2dbc.jdbc.codec.decoder.SqlDecoder#decode(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    protected Character checkWasNull(final ResultSet resultSet, final Character value) throws SQLException
-    {
-        return value;
-    }
-
-    /**
-     * @see io.r2dbc.jdbc.codec.decoder.AbstractDecoder#doDecode(java.sql.ResultSet, java.lang.String)
-     */
-    @Override
-    protected Character doDecode(final ResultSet resultSet, final String columnLabel) throws SQLException
+    public Character decode(final ResultSet resultSet, final String columnLabel) throws SQLException
     {
         String value = resultSet.getString(columnLabel);
 
@@ -49,14 +40,5 @@ public class CharDecoder extends AbstractDecoder<Character>
         }
 
         return null;
-    }
-
-    /**
-     * @see io.r2dbc.jdbc.codec.decoder.Decoder#getSqlType()
-     */
-    @Override
-    public int getSqlType()
-    {
-        return JDBCType.CHAR.getVendorTypeNumber();
     }
 }
