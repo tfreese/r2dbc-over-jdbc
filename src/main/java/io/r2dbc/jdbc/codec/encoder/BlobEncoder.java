@@ -8,9 +8,8 @@ import java.nio.ByteBuffer;
 import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import io.r2dbc.jdbc.util.R2dbcUtils;
 import io.r2dbc.spi.Blob;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * @author Thomas Freese
@@ -34,16 +33,7 @@ public class BlobEncoder extends AbstractSqlEncoder<Blob>
     {
         java.sql.Blob blob = preparedStatement.getConnection().createBlob();
 
-        // @formatter:off
-        ByteBuffer byteBuffer = Flux.from(value.stream())
-                .reduce(ByteBuffer::put)
-                .concatWith(Mono.from(value.discard())
-                        .then(Mono.empty())
-                        )
-                .blockFirst();
-        // @formatter:on
-
-        byteBuffer.flip();
+        ByteBuffer byteBuffer = R2dbcUtils.blobToByteBuffer(value);
 
         blob.setBytes(1, byteBuffer.array());
 

@@ -4,12 +4,10 @@
 
 package io.r2dbc.jdbc.codec.decoder;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.stream.Collectors;
+import io.r2dbc.jdbc.util.R2dbcUtils;
 import io.r2dbc.spi.Clob;
 import reactor.core.publisher.Mono;
 
@@ -39,17 +37,8 @@ public class ClobDecoder extends AbstractSqlDecoder<Clob>
             return Clob.from(Mono.empty());
         }
 
-        String string = null;
+        Clob clob = R2dbcUtils.sqlClobToClob(value);
 
-        try (BufferedReader buffer = new BufferedReader(value.getCharacterStream()))
-        {
-            string = buffer.lines().collect(Collectors.joining());
-        }
-        catch (IOException ex)
-        {
-            throw new SQLException(ex);
-        }
-
-        return Clob.from((Mono.just(string)));
+        return clob;
     }
 }

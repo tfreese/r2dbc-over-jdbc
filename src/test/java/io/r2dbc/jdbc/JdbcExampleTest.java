@@ -294,32 +294,30 @@ final class JdbcExampleTest
         // @formatter:off
         Mono.from(this.connectionFactory.create())
             .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-
                     .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
                                 .bind(0, 200)
                                 .add().bind(0, 300)
                                 .add().bind(0, 400)
                                 .execute())
                             .flatMap(TestKit::extractRowsUpdated))
-
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
                             .flatMap(TestKit::extractColumns))
-
                     .concatWith(connection.commitTransaction())
 
+
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
                             .flatMap(TestKit::extractColumns))
 
-                    .concatWith(connection.beginTransaction())
 
+                    .concatWith(connection.beginTransaction())
                     .concatWith(Flux.from(connection.createStatement("DELETE from tbl where value < ?")
                                 .bind(0, 255)
                                 .execute())
                             .flatMap(TestKit::extractRowsUpdated))
-
                     .concatWith(connection.commitTransaction())
+
 
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
@@ -349,14 +347,13 @@ final class JdbcExampleTest
         // @formatter:off
         Mono.from(this.connectionFactory.create())
             .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-
                     .<Object>thenMany(Flux.from(connection.createStatement("DELETE from tbl where value < ?")
                                 .bind(0, 300)
                                 .add().bind(0, 400)
                                 .execute())
                             .flatMap(TestKit::extractRowsUpdated))
-
                     .concatWith(connection.commitTransaction())
+
 
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
@@ -383,13 +380,12 @@ final class JdbcExampleTest
         // @formatter:off
         Mono.from(this.connectionFactory.create())
             .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-
                     .<Object>thenMany(Flux.from(connection.createStatement("DELETE from tbl where value < ?")
                                 .bind(0, 255)
                                 .execute())
                             .flatMap(TestKit::extractRowsUpdated))
-
                     .concatWith(connection.commitTransaction())
+
 
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
@@ -505,28 +501,24 @@ final class JdbcExampleTest
         // @formatter:off
         Mono.from(this.connectionFactory.create())
             .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-
                     .<Object>thenMany(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
                             .flatMap(TestKit::extractColumns))
-
                     .concatWith(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
                                 .bind(0, 200)
                                 .execute())
                             .flatMap(TestKit::extractRowsUpdated))
-
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
                             .flatMap(TestKit::extractColumns))
-
                     .concatWith(connection.commitTransaction())
+
 
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
                             .flatMap(TestKit::extractColumns))
 
                     .concatWith(TestKit.close(connection))
-
             )
             .as(StepVerifier::create)
             .expectNext(List.of(100)).as("value from select")
@@ -549,21 +541,18 @@ final class JdbcExampleTest
         // @formatter:off
         Mono.from(this.connectionFactory.create())
             .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-
                     .<Object>thenMany(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
                             .flatMap(TestKit::extractColumns))
-
                     .concatWith(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
                                 .bind(0, 200)
                                 .execute())
                             .flatMap(TestKit::extractRowsUpdated))
-
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
                             .flatMap(TestKit::extractColumns))
-
                     .concatWith(connection.rollbackTransaction())
+
 
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
@@ -592,23 +581,22 @@ final class JdbcExampleTest
         // @formatter:off
         Mono.from(this.connectionFactory.create())
             .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-
                     .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
                                 .bind(0, 200)
                                 .add().bind(0, 300)
                                 .add().bind(0, 400)
                                 .execute())
                             .flatMap(TestKit::extractRowsUpdated))
-
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
                             .flatMap(TestKit::extractColumns))
-
                     .concatWith(connection.commitTransaction())
 
+
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
                             .flatMap(TestKit::extractColumns))
+
 
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl where value < ?")
                                 .bind(0, 250)
@@ -617,10 +605,12 @@ final class JdbcExampleTest
                                 .execute())
                             .flatMap(TestKit::extractColumns))
 
+
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl where value > ?")
                                 .bind(0, 250)
                                 .execute())
                             .flatMap(TestKit::extractColumns))
+
 
                     .concatWith(TestKit.close(connection))
             )
@@ -646,7 +636,6 @@ final class JdbcExampleTest
         // @formatter:off
         Mono.from(this.connectionFactory.create())
             .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-
                     .<Object>thenMany(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
                             .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Integer.class)))
@@ -684,26 +673,24 @@ final class JdbcExampleTest
         // @formatter:off
         Mono.from(this.connectionFactory.create())
             .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-
                     .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
                                 .bind(0, 200)
                                 .add().bind(0, 300)
                                 .add().bind(0, 400)
                                 .execute())
                             .flatMap(TestKit::extractRowsUpdated))
-
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
                             .flatMap(TestKit::extractColumns))
-
                     .concatWith(connection.commitTransaction())
 
+
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
                             .flatMap(TestKit::extractColumns))
 
-                    .concatWith(connection.beginTransaction())
 
+                    .concatWith(connection.beginTransaction())
                     .concatWith(Flux.from(connection.createStatement("UPDATE tbl set value = ? where value = ?")
                                 .bind(0, 199).bind(1, 100)
                                 .add().bind(0, 299).bind(1, 200)
@@ -711,8 +698,8 @@ final class JdbcExampleTest
                                 .add().bind(0, 499).bind(1, 400)
                                 .execute())
                             .flatMap(TestKit::extractRowsUpdated))
-
                     .concatWith(connection.commitTransaction())
+
 
                     .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())

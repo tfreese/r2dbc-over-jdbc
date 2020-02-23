@@ -4,14 +4,9 @@
 
 package io.r2dbc.jdbc.codec.converter;
 
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import io.r2dbc.jdbc.util.R2dbcUtils;
 import io.r2dbc.spi.Blob;
 import io.r2dbc.spi.Clob;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * @author Thomas Freese
@@ -44,21 +39,7 @@ public class StringConverter extends AbstractConverter<String>
         {
             Blob blob = (Blob) value;
 
-            // @formatter:off
-            ByteBuffer byteBuffer = Flux.from(blob.stream())
-                .reduce(ByteBuffer::put)
-                .concatWith(Mono.from(blob.discard())
-                        .then(Mono.empty())
-                        )
-                .blockFirst();
-            // @formatter:on
-
-            byteBuffer.flip();
-
-            byteBuffer = Base64.getEncoder().encode(byteBuffer);
-            CharBuffer charBuffer = StandardCharsets.UTF_8.decode(byteBuffer);
-
-            String string = charBuffer.toString();
+            String string = R2dbcUtils.blobToString(blob);
 
             return string;
         }
@@ -66,14 +47,7 @@ public class StringConverter extends AbstractConverter<String>
         {
             Clob clob = (Clob) value;
 
-            // @formatter:off
-            String string = Flux.from(clob.stream())
-                .reduce(new StringBuilder(), StringBuilder::append)
-                .map(StringBuilder::toString)
-                .concatWith(Mono.from(clob.discard())
-                        .then(Mono.empty()))
-                .blockFirst();
-            // @formatter:on
+            String string = R2dbcUtils.clobToString(clob);
 
             return string;
         }

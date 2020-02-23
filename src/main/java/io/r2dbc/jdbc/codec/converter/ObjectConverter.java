@@ -5,10 +5,9 @@
 package io.r2dbc.jdbc.codec.converter;
 
 import java.nio.ByteBuffer;
+import io.r2dbc.jdbc.util.R2dbcUtils;
 import io.r2dbc.spi.Blob;
 import io.r2dbc.spi.Clob;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * Fallback-Converter, returns the same Object.
@@ -40,14 +39,7 @@ public class ObjectConverter extends AbstractConverter<Object>
         {
             Clob clob = (Clob) value;
 
-            // @formatter:off
-            String string = Flux.from(clob.stream())
-                    .reduce(new StringBuilder(), StringBuilder::append)
-                    .map(StringBuilder::toString)
-                    .concatWith(Mono.from(clob.discard())
-                            .then(Mono.empty()))
-                    .blockFirst();
-            // @formatter:on
+            String string = R2dbcUtils.clobToString(clob);
 
             return string;
         }
@@ -56,18 +48,7 @@ public class ObjectConverter extends AbstractConverter<Object>
         {
             Blob blob = (Blob) value;
 
-            // @formatter:off
-            ByteBuffer byteBuffer = Flux.from(blob.stream())
-                .reduce(ByteBuffer::put)
-                .concatWith(Mono.from(blob.discard())
-                        .then(Mono.empty())
-                        )
-                .blockFirst();
-            // @formatter:on
-
-            byteBuffer.limit(byteBuffer.capacity());
-            // byteBuffer.compact();
-            // byteBuffer.flip();
+            ByteBuffer byteBuffer = R2dbcUtils.blobToByteBuffer(blob);
 
             return byteBuffer;
         }

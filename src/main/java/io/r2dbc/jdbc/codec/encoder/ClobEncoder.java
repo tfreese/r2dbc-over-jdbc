@@ -7,9 +7,8 @@ package io.r2dbc.jdbc.codec.encoder;
 import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import io.r2dbc.jdbc.util.R2dbcUtils;
 import io.r2dbc.spi.Clob;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * @author Thomas Freese
@@ -33,14 +32,7 @@ public class ClobEncoder extends AbstractSqlEncoder<Clob>
     {
         java.sql.Clob clob = preparedStatement.getConnection().createClob();
 
-        // @formatter:off
-        String string = Flux.from(value.stream())
-                .reduce(new StringBuilder(), StringBuilder::append)
-                .map(StringBuilder::toString)
-                .concatWith(Mono.from(value.discard())
-                        .then(Mono.empty()))
-                .blockFirst();
-        // @formatter:on
+        String string = R2dbcUtils.clobToString(value);
 
         clob.setString(1, string);
 

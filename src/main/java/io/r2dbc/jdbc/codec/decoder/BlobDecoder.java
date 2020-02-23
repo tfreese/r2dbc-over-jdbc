@@ -4,13 +4,10 @@
 
 package io.r2dbc.jdbc.codec.decoder;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import io.r2dbc.jdbc.util.R2dbcUtils;
 import io.r2dbc.spi.Blob;
 import reactor.core.publisher.Mono;
 
@@ -40,21 +37,8 @@ public class BlobDecoder extends AbstractSqlDecoder<Blob>
             return Blob.from(Mono.empty());
         }
 
-        ByteBuffer byteBuffer = null;
+        Blob blob = R2dbcUtils.sqlBlobToBlob(value);
 
-        try (InputStream in = new BufferedInputStream(value.getBinaryStream()))
-        {
-            byte[] bytes = in.readAllBytes();
-
-            byteBuffer = ByteBuffer.wrap(bytes);
-        }
-        catch (IOException ex)
-        {
-            throw new SQLException(ex);
-        }
-
-        byteBuffer.flip();
-
-        return Blob.from((Mono.just(byteBuffer)));
+        return blob;
     }
 }
