@@ -88,21 +88,6 @@ public class JdbcConnection implements Connection
                 sink.error(sex);
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
-
-        // @formatter:off
-//        return Mono.defer(() -> supply(() -> {
-//            if (!this.connection.getAutoCommit())
-//            {
-//                this.connection.setAutoCommit(false);
-//                return Mono.empty();
-//            }
-//
-//            getLogger().debug("Skipping begin transaction because already in one");
-//            return Mono.empty();
-//        }).get())
-//        .onErrorMap(SQLException.class, GenericR2dbcExceptionFactory::create)
-//        .then();
-        // @formatter:on
     }
 
     /**
@@ -293,40 +278,6 @@ public class JdbcConnection implements Connection
         {
             throw JdbcR2dbcExceptionFactory.create(sex);
         }
-
-        // return this.connectionMono.handle((connection, sink) -> {
-        // try
-        // {
-        // getLogger().debug("get transaction isolationLevel");
-        //
-        // int transactionIsolation = connection.getTransactionIsolation();
-        // IsolationLevel isolationLevel = null;
-        //
-        // if (transactionIsolation == java.sql.Connection.TRANSACTION_READ_COMMITTED)
-        // {
-        // isolationLevel = IsolationLevel.READ_COMMITTED;
-        // }
-        // else if (transactionIsolation == java.sql.Connection.TRANSACTION_READ_UNCOMMITTED)
-        // {
-        // isolationLevel = IsolationLevel.READ_UNCOMMITTED;
-        // }
-        // else if (transactionIsolation == java.sql.Connection.TRANSACTION_REPEATABLE_READ)
-        // {
-        // isolationLevel = IsolationLevel.REPEATABLE_READ;
-        // }
-        // else if (transactionIsolation == java.sql.Connection.TRANSACTION_SERIALIZABLE)
-        // {
-        // isolationLevel = IsolationLevel.SERIALIZABLE;
-        // }
-        //
-        // sink.next(isolationLevel);
-        // sink.complete();
-        // }
-        // catch (SQLException sex)
-        // {
-        // sink.error(sex);
-        // }
-        // }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(IsolationLevel.class).block();
     }
 
     /**

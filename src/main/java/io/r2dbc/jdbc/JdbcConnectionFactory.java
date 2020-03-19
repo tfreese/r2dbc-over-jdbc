@@ -7,15 +7,13 @@
 
 package io.r2dbc.jdbc;
 
-import io.r2dbc.spi.ConnectionFactory;
-import io.r2dbc.spi.ConnectionFactoryMetadata;
-import reactor.core.publisher.Mono;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Objects;
-
 import javax.sql.DataSource;
+import io.r2dbc.spi.ConnectionFactory;
+import io.r2dbc.spi.ConnectionFactoryMetadata;
+import reactor.core.publisher.Mono;
 
 /**
  * R2DBC Adapter for JDBC.

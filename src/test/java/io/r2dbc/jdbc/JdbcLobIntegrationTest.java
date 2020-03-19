@@ -6,7 +6,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import io.r2dbc.jdbc.codec.Codecs;
+import io.r2dbc.jdbc.converter.Converters;
 import io.r2dbc.jdbc.util.AbstractIntegrationTestSupport;
 import io.r2dbc.spi.Blob;
 import io.r2dbc.spi.Clob;
@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 /***
- * Integration tests for{@link Codecs} testing all known codecs with pre-defined values and {@code null} values.
+ * Integration tests for{@link Converters} testing all known codecs with pre-defined values and {@code null} values.
  */
 class JdbcLobIntegrationTest extends AbstractIntegrationTestSupport
 {
@@ -46,11 +46,11 @@ class JdbcLobIntegrationTest extends AbstractIntegrationTestSupport
         // @formatter:off
         connection.createStatement("DROP TABLE IF EXISTS lob_test")
             .execute()
-            .flatMap(JdbcResult::getRowsUpdated)
+            .flatMap(Result::getRowsUpdated)
             .onErrorResume(e -> Mono.empty())
             .thenMany(connection.createStatement("CREATE TABLE lob_test (my_col " + columnType + ")")
                     .execute()
-                    .flatMap(JdbcResult::getRowsUpdated)
+                    .flatMap(Result::getRowsUpdated)
                     )
             .as(StepVerifier::create)
             .expectNext(0)

@@ -5,20 +5,17 @@
 
 
 ## Type-Mapping
-Adapt the SqlDecoder, SqlEncoder and Converter to match your underlying Database !
+Adapt the SqlMapper and ObjectTransformer to match your underlying Database !
 
-* `io.r2dbc.jdbc.codec.decoder.SqlDecoder`
-	Decodes a Value from the java.sql.ResultSet to a Java-Object, based on the Column SQL-Type.
+* `io.r2dbc.jdbc.converter.sql.SqlMapper<T`
+	Mapping for a SQL-Type from the java.sql.ResultSet to an Java-Object and vice versa.
 
-* `io.r2dbc.jdbc.codec.encoder.SqlEncoder`
-	Encodes a Java-Object to a SQL-Value for java.sql.PreparedStatement, based on the Column SQL-Type.
-	
-* `io.r2dbc.jdbc.codec.converter.Converter`
-	Convert an Object to the required Type for Method io.r2dbc.spi.Row.get(Object, Class<T>).
+* `io.r2dbc.jdbc.converter.transformer.ObjectTransformer<T>`
+	Transform an Object to the required Type for Method io.r2dbc.spi.Row.get(Object, Class<T>).
 		
 	
-For custom SqlDecoder, Converter and SqlEncoder use
-* `io.r2dbc.jdbc.codec.Codecs#registerDecoder`
+For custom SqlConverter and ObjectTransformer use
+* `io.r2dbc.jdbc.converter.Converters#register`
 
 
 ## Limitations

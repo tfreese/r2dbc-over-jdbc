@@ -6,8 +6,8 @@ package io.r2dbc.jdbc;
 
 import java.util.Map;
 import java.util.Objects;
-import io.r2dbc.jdbc.codec.Codecs;
-import io.r2dbc.jdbc.codec.converter.Converter;
+import io.r2dbc.jdbc.converter.Converters;
+import io.r2dbc.jdbc.converter.transformer.ObjectTransformer;
 import io.r2dbc.spi.Row;
 
 /**
@@ -32,11 +32,6 @@ public class JdbcRow implements Row
         super();
 
         this.values = Objects.requireNonNull(values, "values must not be null");
-
-        // if (this.values.isEmpty())
-        // {
-        //
-        // }
     }
 
     /**
@@ -91,8 +86,13 @@ public class JdbcRow implements Row
 
         Object value = this.values.get(key);
 
-        Converter<T> converter = Codecs.getConverter(type);
+        if (value == null)
+        {
+            return null;
+        }
 
-        return converter.convert(value);
+        ObjectTransformer<T> transformer = Converters.getTransformer(type);
+
+        return transformer.transform(value);
     }
 }

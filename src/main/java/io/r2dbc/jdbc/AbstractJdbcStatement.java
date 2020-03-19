@@ -6,6 +6,7 @@ package io.r2dbc.jdbc;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,8 +14,8 @@ import java.util.Map;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.r2dbc.jdbc.codec.Codecs;
-import io.r2dbc.jdbc.codec.encoder.SqlEncoder;
+import io.r2dbc.jdbc.converter.Converters;
+import io.r2dbc.jdbc.converter.sql.SqlMapper;
 import io.r2dbc.spi.Statement;
 
 /**
@@ -84,9 +85,9 @@ public abstract class AbstractJdbcStatement implements Statement
 
         /**
          * @param preparedStatement {@link java.sql.PreparedStatement}
-         * @throws java.sql.SQLException Falls was schief geht.
+         * @throws SQLException Falls was schief geht.
          */
-        void prepareBatch(final java.sql.PreparedStatement preparedStatement) throws java.sql.SQLException
+        void prepareBatch(final PreparedStatement preparedStatement) throws SQLException
         {
             if (this.bindings.isEmpty())
             {
@@ -110,9 +111,9 @@ public abstract class AbstractJdbcStatement implements Statement
         /**
          * @param preparedStatement {@link java.sql.PreparedStatement}
          * @param binding {@link Map}
-         * @throws java.sql.SQLException Falls was schief geht.
+         * @throws SQLException Falls was schief geht.
          */
-        void prepareStatement(final java.sql.PreparedStatement preparedStatement, final Map<Integer, Object> binding) throws java.sql.SQLException
+        void prepareStatement(final PreparedStatement preparedStatement, final Map<Integer, Object> binding) throws SQLException
         {
             for (Integer index : binding.keySet())
             {
@@ -123,13 +124,14 @@ public abstract class AbstractJdbcStatement implements Statement
 
                 if (value == null)
                 {
+                    // preparedStatement.setNull(parameterIndex, sqlType);
                     preparedStatement.setObject(parameterIndex, null);
                 }
                 else
                 {
-                    SqlEncoder<Object> encoder = Codecs.getSqlEncoder(value.getClass());
+                    SqlMapper<Object> mapper = Converters.getSqlMapper(value.getClass());
 
-                    encoder.encode(preparedStatement, parameterIndex, value);
+                    mapper.mapToSql(preparedStatement, parameterIndex, value);
                 }
             }
         }
@@ -262,8 +264,8 @@ public abstract class AbstractJdbcStatement implements Statement
     {
         super();
 
-        this.connection = Objects.requireNonNull(connection, "connection must not be null");
-        this.sql = Objects.requireNonNull(sql, "sql must not be null");
+        this.connection = Objects.requireNonNull(connection, "connection required");
+        this.sql = Objects.requireNonNull(sql, "sql required");
 
         // Determine SQL-Operation.
         String s = sql.substring(0, 6).toLowerCase();

@@ -4,6 +4,7 @@
 
 package io.r2dbc.jdbc;
 
+import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -47,6 +48,8 @@ public class JdbcRowMetadata implements RowMetadata
         {
             String name = metaData.getColumnLabel(c).toUpperCase();
             int sqlType = metaData.getColumnType(c);
+            JDBCType jdbcType = JDBCType.valueOf(sqlType);
+
             Nullability nullability = null;
 
             switch (metaData.isNullable(c))
@@ -67,7 +70,7 @@ public class JdbcRowMetadata implements RowMetadata
             int precision = metaData.getPrecision(c);
             int scale = metaData.getScale(c);
 
-            list.add(new JdbcColumnMetadata(name, sqlType, nullability, precision, scale));
+            list.add(new JdbcColumnMetadata(name, jdbcType, nullability, precision, scale));
         }
 
         return new JdbcRowMetadata(list);
@@ -118,32 +121,11 @@ public class JdbcRowMetadata implements RowMetadata
         return this.columnMetaDataByName.get(name.toUpperCase());
     }
 
-    // /**
-    // * @see io.r2dbc.spi.RowMetadata#getColumnMetadata(java.lang.Object)
-    // */
-    // @Override
-    // public JdbcColumnMetadata getColumnMetadata(final Object identifier)
-    // {
-    // Objects.requireNonNull(identifier, "identifier must not be null");
-    //
-    // if (identifier instanceof Integer)
-    // {
-    // return this.columnMetaDatas.get((Integer) identifier);
-    // }
-    // else if (identifier instanceof String)
-    // {
-    // return this.columnMetaDataByName.get(((String) identifier).toUpperCase());
-    // }
-    //
-    // throw new IllegalArgumentException(
-    // String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String column name.", identifier));
-    // }
-
     /**
      * @see io.r2dbc.spi.RowMetadata#getColumnMetadatas()
      */
     @Override
-    public List<JdbcColumnMetadata> getColumnMetadatas()
+    public Iterable<ColumnMetadata> getColumnMetadatas()
     {
         return List.copyOf(this.columnMetaDatas);
     }

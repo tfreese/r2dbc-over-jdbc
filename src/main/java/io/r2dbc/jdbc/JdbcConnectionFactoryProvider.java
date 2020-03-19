@@ -2,6 +2,7 @@ package io.r2dbc.jdbc;
 
 import java.util.Objects;
 import javax.sql.DataSource;
+import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
 import io.r2dbc.spi.ConnectionFactoryProvider;
 import io.r2dbc.spi.Option;
@@ -40,7 +41,7 @@ public final class JdbcConnectionFactoryProvider implements ConnectionFactoryPro
      * @see io.r2dbc.spi.ConnectionFactoryProvider#create(io.r2dbc.spi.ConnectionFactoryOptions)
      */
     @Override
-    public JdbcConnectionFactory create(final ConnectionFactoryOptions connectionFactoryOptions)
+    public ConnectionFactory create(final ConnectionFactoryOptions connectionFactoryOptions)
     {
         Objects.requireNonNull(connectionFactoryOptions, "connectionFactoryOptions must not be null");
 

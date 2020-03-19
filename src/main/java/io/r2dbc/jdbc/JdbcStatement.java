@@ -4,15 +4,17 @@
 
 package io.r2dbc.jdbc;
 
+import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
-import io.r2dbc.jdbc.codec.Codecs;
-import io.r2dbc.jdbc.codec.decoder.SqlDecoder;
+import io.r2dbc.jdbc.converter.Converters;
+import io.r2dbc.jdbc.converter.sql.SqlMapper;
+import io.r2dbc.spi.ColumnMetadata;
+import io.r2dbc.spi.Result;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SynchronousSink;
@@ -113,13 +115,13 @@ public class JdbcStatement extends AbstractJdbcStatement
      * @param stmt {@link PreparedStatement}
      * @param resultSet {@link ResultSet}, optional
      * @param affectedRows int[], optional
-     * @return {@link JdbcResult}
+     * @return {@link Result}
      * @throws SQLException Falls was schief geht.
      */
-    protected JdbcResult createResult(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows) throws SQLException
+    protected Result createResult(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows) throws SQLException
     {
         JdbcRowMetadata rowMetadata = JdbcRowMetadata.of(resultSet);
-        List<JdbcColumnMetadata> columnMetaDatas = rowMetadata.getColumnMetadatas();
+        Iterable<ColumnMetadata> columnMetaDatas = rowMetadata.getColumnMetadatas();
 
         Flux<JdbcRow> rows = Flux.generate((final SynchronousSink<Map<Object, Object>> sink) -> {
             try
@@ -130,13 +132,13 @@ public class JdbcStatement extends AbstractJdbcStatement
 
                     int index = 0;
 
-                    for (JdbcColumnMetadata columnMetaData : columnMetaDatas)
+                    for (ColumnMetadata columnMetaData : columnMetaDatas)
                     {
                         String columnLabel = columnMetaData.getName();
-                        int sqlType = (int) columnMetaData.getNativeTypeMetadata();
+                        JDBCType jdbcType = (JDBCType) columnMetaData.getNativeTypeMetadata();
 
-                        SqlDecoder<?> decoder = Codecs.getSqlDecoder(sqlType);
-                        Object value = decoder.decode(resultSet, columnLabel);
+                        SqlMapper<?> mapper = Converters.getSqlMapper(jdbcType);
+                        Object value = mapper.mapFromSql(resultSet, columnLabel);
 
                         row.put(columnLabel, value);
                         row.put(index, value);
@@ -167,7 +169,7 @@ public class JdbcStatement extends AbstractJdbcStatement
 
         Mono<Integer> rowsUpdated = affectedRows != null ? Mono.just(IntStream.of(affectedRows).sum()) : Mono.empty();
 
-        JdbcResult result = new JdbcResult(rows, Mono.just(rowMetadata), rowsUpdated);
+        Result result = new JdbcResult(rows, Mono.just(rowMetadata), rowsUpdated);
 
         return result;
     }
@@ -177,7 +179,7 @@ public class JdbcStatement extends AbstractJdbcStatement
      */
     @SuppressWarnings("resource")
     @Override
-    public Flux<JdbcResult> execute()
+    public Flux<Result> execute()
     {
         // @formatter:off
         return Flux.fromArray(getSql().split(";"))
@@ -190,7 +192,7 @@ public class JdbcStatement extends AbstractJdbcStatement
                             ResultSet resultSet = context.getResultSet();
                             int[] affectedRows = context.getAffectedRows();
 
-                            JdbcResult result = createResult(stmt, resultSet, affectedRows);
+                            Result result = createResult(stmt, resultSet, affectedRows);
 
                             sink.next(result);
 

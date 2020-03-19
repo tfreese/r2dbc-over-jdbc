@@ -33,9 +33,8 @@ final class JdbcRowMetadataTest
     /**
      *
      */
-    private final List<JdbcColumnMetadata> columnMetadatas =
-            Arrays.asList(new JdbcColumnMetadata("TEST-NAME-1", JDBCType.OTHER.getVendorTypeNumber(), NULLABLE, 100, 500),
-                    new JdbcColumnMetadata("TEST-NAME-2", JDBCType.OTHER.getVendorTypeNumber(), NULLABLE, 300, 600));
+    private final List<JdbcColumnMetadata> columnMetadatas = Arrays.asList(new JdbcColumnMetadata("TEST-NAME-1", JDBCType.OTHER, NULLABLE, 100, 500),
+            new JdbcColumnMetadata("TEST-NAME-2", JDBCType.OTHER, NULLABLE, 300, 600));
 
     /**
      *
@@ -60,7 +59,8 @@ final class JdbcRowMetadataTest
         for (int i = 0; i < this.columnMetadatas.size(); i++)
         {
             when(this.resultSetMetaData.getColumnLabel(i + 1)).thenReturn(this.columnMetadatas.get(i).getName());
-            when(this.resultSetMetaData.getColumnType(i + 1)).thenReturn((int) this.columnMetadatas.get(i).getNativeTypeMetadata());
+            when(this.resultSetMetaData.getColumnType(i + 1))
+                    .thenReturn(((JDBCType) this.columnMetadatas.get(i).getNativeTypeMetadata()).getVendorTypeNumber());
             when(this.resultSetMetaData.isNullable(i + 1)).thenReturn(ResultSetMetaData.columnNullable);
             when(this.resultSetMetaData.getPrecision(i + 1)).thenReturn(this.columnMetadatas.get(i).getPrecision());
             when(this.resultSetMetaData.getScale(i + 1)).thenReturn(this.columnMetadatas.get(i).getScale());

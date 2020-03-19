@@ -4,6 +4,7 @@
 
 package io.r2dbc.jdbc;
 
+import java.sql.JDBCType;
 import java.util.Objects;
 import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Nullability;
@@ -15,6 +16,11 @@ import io.r2dbc.spi.Nullability;
  */
 public class JdbcColumnMetadata implements ColumnMetadata
 {
+    /**
+     *
+     */
+    private final JDBCType jdbcType;
+
     /**
      *
      */
@@ -36,26 +42,21 @@ public class JdbcColumnMetadata implements ColumnMetadata
     private final int scale;
 
     /**
-     *
-     */
-    private final int sqlType;
-
-    /**
      * Erstellt ein neues {@link JdbcColumnMetadata} Object.
      *
      * @param name String
-     * @param sqlType int
+     * @param jdbcType {@link JDBCType}
      * @param nullability {@link Nullability}
      * @param precision int
      * @param scale int
      */
-    public JdbcColumnMetadata(final String name, final int sqlType, final Nullability nullability, final int precision, final int scale)
+    public JdbcColumnMetadata(final String name, final JDBCType jdbcType, final Nullability nullability, final int precision, final int scale)
     {
         super();
 
-        this.name = Objects.requireNonNull(name, "name must not be null");
-        this.sqlType = sqlType;
-        this.nullability = Objects.requireNonNull(nullability, "nullability must not be null");
+        this.name = Objects.requireNonNull(name, "name required");
+        this.jdbcType = Objects.requireNonNull(jdbcType, "jdbcType required");
+        this.nullability = Objects.requireNonNull(nullability, "nullability required");
         this.precision = precision;
         this.scale = scale;
     }
@@ -95,7 +96,14 @@ public class JdbcColumnMetadata implements ColumnMetadata
             return false;
         }
 
-        if (this.sqlType != other.sqlType)
+        if (this.jdbcType == null)
+        {
+            if (other.jdbcType != null)
+            {
+                return false;
+            }
+        }
+        else if (!this.jdbcType.equals(other.jdbcType))
         {
             return false;
         }
@@ -133,7 +141,7 @@ public class JdbcColumnMetadata implements ColumnMetadata
     @Override
     public Object getNativeTypeMetadata()
     {
-        return this.sqlType;
+        return this.jdbcType;
     }
 
     /**
@@ -172,9 +180,8 @@ public class JdbcColumnMetadata implements ColumnMetadata
         final int prime = 31;
         int result = 1;
 
-        // result = (prime * result) + ((this.javaType == null) ? 0 : this.javaType.hashCode());
         result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
-        result = (prime * result) + this.sqlType;
+        result = (prime * result) + ((this.jdbcType == null) ? 0 : this.jdbcType.hashCode());
         result = (prime * result) + ((this.nullability == null) ? 0 : this.nullability.hashCode());
         result = (prime * result) + this.precision;
         result = (prime * result) + this.scale;
