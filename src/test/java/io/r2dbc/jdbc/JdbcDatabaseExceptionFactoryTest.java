@@ -15,7 +15,6 @@ import java.sql.SQLTransactionRollbackException;
 import java.sql.SQLTransientConnectionException;
 import java.sql.SQLTransientException;
 import org.junit.jupiter.api.Test;
-import io.r2dbc.jdbc.JdbcR2dbcExceptionFactory;
 import io.r2dbc.spi.R2dbcBadGrammarException;
 import io.r2dbc.spi.R2dbcDataIntegrityViolationException;
 import io.r2dbc.spi.R2dbcException;
@@ -48,9 +47,8 @@ final class JdbcDatabaseExceptionFactoryTest
     @Test
     void integrityConstraintViolationException()
     {
-        assertThat(JdbcR2dbcExceptionFactory.create(new SQLIntegrityConstraintViolationException("SQLException", "SQLState", 999)))
-                .hasMessage("SQLException").isInstanceOf(R2dbcDataIntegrityViolationException.class).extracting("sqlState", "errorCode")
-                .containsExactly("SQLState", 999);
+        assertThat(JdbcR2dbcExceptionFactory.create(new SQLIntegrityConstraintViolationException("SQLException", "SQLState", 999))).hasMessage("SQLException")
+                .isInstanceOf(R2dbcDataIntegrityViolationException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
     }
 
     /**
