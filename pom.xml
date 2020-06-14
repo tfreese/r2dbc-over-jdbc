@@ -7,6 +7,7 @@
 		<groupId>de.freese</groupId>
 		<artifactId>maven-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
+		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
 	<artifactId>r2dbc-over-jdbc</artifactId>
