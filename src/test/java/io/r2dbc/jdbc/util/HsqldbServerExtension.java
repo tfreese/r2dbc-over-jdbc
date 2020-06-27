@@ -11,6 +11,8 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
+import org.junit.jupiter.api.extension.ExtensionContext.Store;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import com.zaxxer.hikari.HikariDataSource;
@@ -69,7 +71,7 @@ public final class HsqldbServerExtension implements BeforeAllCallback, AfterAllC
 
         this.dataSource = new HikariDataSource();
         this.dataSource.setDriverClassName("org.hsqldb.jdbc.JDBCDriver");
-        this.dataSource.setJdbcUrl("jdbc:hsqldb:mem:%d" + System.nanoTime());
+        this.dataSource.setJdbcUrl("jdbc:hsqldb:mem:" + System.nanoTime());
         // this.dataSource.setDriverClassName("org.h2.Driver");
         // this.dataSource.setJdbcUrl("jdbc:h2:mem:%d" + System.nanoTime());
         this.dataSource.setUsername("sa");
@@ -111,6 +113,39 @@ public final class HsqldbServerExtension implements BeforeAllCallback, AfterAllC
     public String getPassword()
     {
         return this.dataSource.getPassword();
+    }
+
+    /**
+     * Test-Übergreifender Object-Store.
+     *
+     * @param context {@link ExtensionContext}
+     * @return {@link Store}
+     */
+    Store getStoreForClass(final ExtensionContext context)
+    {
+        return context.getStore(Namespace.create(getClass()));
+    }
+
+    /**
+     * Test-Übergreifender Object-Store.
+     *
+     * @param context {@link ExtensionContext}
+     * @return {@link Store}
+     */
+    Store getStoreForGlobal(final ExtensionContext context)
+    {
+        return context.getStore(Namespace.create("global"));
+    }
+
+    /**
+     * Test-Übergreifender Object-Store.
+     *
+     * @param context {@link ExtensionContext}
+     * @return {@link Store}
+     */
+    Store getStoreForMethod(final ExtensionContext context)
+    {
+        return context.getStore(Namespace.create(getClass(), context.getRequiredTestMethod()));
     }
 
     /**
