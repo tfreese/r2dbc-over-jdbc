@@ -184,8 +184,8 @@ public class JdbcStatement extends AbstractJdbcStatement
         // @formatter:off
         return Flux.fromArray(getSql().split(";"))
                 .map(String::trim)
-                .flatMap(sql -> {
-                    return createExecuteMono(getConnection(), sql).handle((context, sink) -> {
+                .flatMap(sql ->
+                     createExecuteMono(getConnection(), sql).handle((context, sink) -> {
                         try
                         {
                             PreparedStatement stmt = context.getStmt();
@@ -202,8 +202,8 @@ public class JdbcStatement extends AbstractJdbcStatement
                         {
                             sink.error(sex);
                         }
-                    }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(JdbcResult.class);
-        });
+                    }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(JdbcResult.class)
+        );
         // @formatter:on
     }
 }

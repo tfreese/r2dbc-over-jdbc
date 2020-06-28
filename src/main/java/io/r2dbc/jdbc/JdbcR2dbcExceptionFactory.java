@@ -30,10 +30,10 @@ import io.r2dbc.spi.R2dbcTransientResourceException;
 
 /**
  * R2DBC Adapter for JDBC.
- * 
+ *
  * @author Thomas Freese
  */
-public class JdbcR2dbcExceptionFactory
+public final class JdbcR2dbcExceptionFactory
 {
     /**
      * @author Thomas Freese
@@ -203,5 +203,13 @@ public class JdbcR2dbcExceptionFactory
         }
 
         return new JdbcR2dbcException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+    }
+
+    /**
+     * Erstellt ein neues {@link JdbcR2dbcExceptionFactory} Object.
+     */
+    private JdbcR2dbcExceptionFactory()
+    {
+        super();
     }
 }

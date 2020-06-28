@@ -20,7 +20,7 @@ import com.zaxxer.hikari.HikariDataSource;
 /**
  * @author Thomas Freese
  */
-public final class HsqldbServerExtension implements BeforeAllCallback, AfterAllCallback
+public final class DBServerExtension implements BeforeAllCallback, AfterAllCallback
 {
     /**
      *
@@ -33,9 +33,9 @@ public final class HsqldbServerExtension implements BeforeAllCallback, AfterAllC
     private JdbcOperations jdbcOperations;
 
     /**
-     * Erstellt ein neues {@link HsqldbServerExtension} Object.
+     * Erstellt ein neues {@link DBServerExtension} Object.
      */
-    public HsqldbServerExtension()
+    public DBServerExtension()
     {
         super();
     }
@@ -77,7 +77,7 @@ public final class HsqldbServerExtension implements BeforeAllCallback, AfterAllC
         this.dataSource.setUsername("sa");
         this.dataSource.setPassword("");
 
-        this.dataSource.setMaximumPoolSize(3);
+        this.dataSource.setMaximumPoolSize(2);
         // this.dataSource.setConnectionTimeout(TimeUnit.MINUTES.toMillis(5));
 
         this.jdbcOperations = new JdbcTemplate(this.dataSource);

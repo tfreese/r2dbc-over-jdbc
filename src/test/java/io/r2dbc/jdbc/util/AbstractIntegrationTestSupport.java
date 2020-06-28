@@ -39,7 +39,7 @@ public abstract class AbstractIntegrationTestSupport
      *
      */
     @RegisterExtension
-    static final HsqldbServerExtension SERVER = new HsqldbServerExtension();
+    static final DBServerExtension SERVER = new DBServerExtension();
 
     /**
      *

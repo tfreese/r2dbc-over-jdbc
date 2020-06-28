@@ -1,6 +1,6 @@
 package io.r2dbc.jdbc;
 
-import io.r2dbc.jdbc.util.HsqldbServerExtension;
+import io.r2dbc.jdbc.util.DBServerExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import reactor.test.StepVerifier;
@@ -19,7 +19,7 @@ final class JdbcConnectionFactoryTest
      *
      */
     @RegisterExtension
-    static final HsqldbServerExtension SERVER = new HsqldbServerExtension();
+    static final DBServerExtension SERVER = new DBServerExtension();
 
     /**
      *

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.jdbc.core.JdbcOperations;
-import io.r2dbc.jdbc.util.HsqldbServerExtension;
+import io.r2dbc.jdbc.util.DBServerExtension;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
@@ -29,7 +29,7 @@ final class JdbcRowTest
      *
      */
     @RegisterExtension
-    static final HsqldbServerExtension SERVER = new HsqldbServerExtension();
+    static final DBServerExtension SERVER = new DBServerExtension();
 
     /**
      *

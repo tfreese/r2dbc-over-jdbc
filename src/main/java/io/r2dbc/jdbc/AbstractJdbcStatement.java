@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,7 @@ public abstract class AbstractJdbcStatement implements Statement
         /**
          *
          */
-        private final List<Map<Integer, Object>> bindings = new ArrayList<>();
+        private final List<Map<Integer, Object>> binds = new ArrayList<>();
 
         /**
          *
@@ -64,7 +65,7 @@ public abstract class AbstractJdbcStatement implements Statement
             if (this.current == null)
             {
                 this.current = new HashMap<>();
-                this.bindings.add(this.current);
+                this.binds.add(this.current);
             }
 
             return this.current;
@@ -75,12 +76,12 @@ public abstract class AbstractJdbcStatement implements Statement
          */
         Map<Integer, Object> getLast()
         {
-            if (this.bindings.isEmpty())
+            if (this.binds.isEmpty())
             {
                 return getCurrent();
             }
 
-            return this.bindings.get(this.bindings.size() - 1);
+            return this.binds.get(this.binds.size() - 1);
         }
 
         /**
@@ -89,20 +90,20 @@ public abstract class AbstractJdbcStatement implements Statement
          */
         void prepareBatch(final PreparedStatement preparedStatement) throws SQLException
         {
-            if (this.bindings.isEmpty())
+            if (this.binds.isEmpty())
             {
                 preparedStatement.addBatch();
                 return;
             }
 
-            for (Map<Integer, Object> binding : this.bindings)
+            for (Map<Integer, Object> bind : this.binds)
             {
-                if (binding.isEmpty())
+                if (bind.isEmpty())
                 {
                     continue;
                 }
 
-                prepareStatement(preparedStatement, binding);
+                prepareStatement(preparedStatement, bind);
 
                 preparedStatement.addBatch();
             }
@@ -110,17 +111,18 @@ public abstract class AbstractJdbcStatement implements Statement
 
         /**
          * @param preparedStatement {@link java.sql.PreparedStatement}
-         * @param binding {@link Map}
+         * @param bind {@link Map}
          * @throws SQLException Falls was schief geht.
          */
-        void prepareStatement(final PreparedStatement preparedStatement, final Map<Integer, Object> binding) throws SQLException
+        void prepareStatement(final PreparedStatement preparedStatement, final Map<Integer, Object> bind) throws SQLException
         {
-            for (Integer index : binding.keySet())
+            for (Entry<Integer, Object> entry : bind.entrySet())
             {
+                Integer index = entry.getKey();
+                Object value = entry.getValue();
+
                 // JDBC fängt bei 1 an !
                 int parameterIndex = index + 1;
-
-                Object value = binding.get(index);
 
                 if (value == null)
                 {
@@ -270,7 +272,7 @@ public abstract class AbstractJdbcStatement implements Statement
         // Determine SQL-Operation.
         String s = sql.substring(0, 6).toLowerCase();
 
-        if (s.startsWith("select"))
+        if (s.startsWith("select") || s.startsWith("with"))
         {
             this.sqlOperation = SQL_OPERATION.SELECT;
         }
