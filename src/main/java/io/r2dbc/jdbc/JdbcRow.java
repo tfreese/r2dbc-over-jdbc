@@ -20,7 +20,7 @@ public class JdbcRow implements Row
     /**
      *
      */
-    private Map<Object, Object> values = null;
+    private Map<Object, Object> values;
 
     /**
      * Erstellt ein neues {@link JdbcRow} Object.
