@@ -1,7 +1,4 @@
-/**
- * Created: 12.06.2019
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.sql.JDBCType;
@@ -18,6 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Nullability;
 import io.r2dbc.spi.RowMetadata;

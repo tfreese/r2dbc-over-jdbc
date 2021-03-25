@@ -1,11 +1,9 @@
-/**
- * Created: 14.06.2019
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.util.Objects;
 import java.util.function.BiFunction;
+
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;

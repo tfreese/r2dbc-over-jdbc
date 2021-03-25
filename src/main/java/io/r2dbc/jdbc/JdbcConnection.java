@@ -1,7 +1,4 @@
-/**
- * Created: 11.06.2019
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.sql.DatabaseMetaData;
@@ -10,8 +7,10 @@ import java.sql.Savepoint;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionMetadata;

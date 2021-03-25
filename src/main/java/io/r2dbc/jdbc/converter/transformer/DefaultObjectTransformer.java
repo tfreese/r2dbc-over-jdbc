@@ -1,10 +1,8 @@
-/**
- * Created: 19.06.2019
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc.converter.transformer;
 
 import java.nio.ByteBuffer;
+
 import io.r2dbc.jdbc.util.R2dbcUtils;
 import io.r2dbc.spi.Blob;
 import io.r2dbc.spi.Clob;
@@ -20,14 +18,6 @@ public class DefaultObjectTransformer extends AbstractObjectTransofrmer<Object>
      * Fallback-Converter, returns the same Object.
      */
     public static final ObjectTransformer<Object> INSTANCE = new DefaultObjectTransformer();
-
-    /**
-     * Erstellt ein neues {@link DefaultObjectTransformer} Object.
-     */
-    public DefaultObjectTransformer()
-    {
-        super();
-    }
 
     /**
      * @see io.r2dbc.jdbc.converter.transformer.ObjectTransformer#transform(java.lang.Object)

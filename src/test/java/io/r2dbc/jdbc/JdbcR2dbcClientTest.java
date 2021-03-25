@@ -1,7 +1,4 @@
-/**
- * Created: 22.06.2019
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import org.junit.jupiter.api.AfterEach;
@@ -9,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.jdbc.core.JdbcOperations;
+
 import io.r2dbc.client.R2dbc;
 import io.r2dbc.jdbc.util.DBServerExtension;
 import io.r2dbc.spi.ConnectionFactories;
@@ -80,7 +78,7 @@ final class JdbcR2dbcClientTest
     *
     */
     @Test
-    void insert()
+    void testInsert()
     {
        // @formatter:off
        this.r2dbc.inTransaction(handle -> handle.execute("INSERT INTO tbl VALUES (?)", 200))
@@ -95,7 +93,7 @@ final class JdbcR2dbcClientTest
     *
     */
     @Test
-    void insertBatch()
+    void testInsertBatch()
     {
        // @formatter:off
        this.r2dbc.inTransaction(handle -> handle.execute("INSERT INTO tbl VALUES (?)", 100)
@@ -115,7 +113,7 @@ final class JdbcR2dbcClientTest
     *
     */
     @Test
-    void insertWithSelect()
+    void testInsertWithSelect()
     {
         // @formatter:off
         this.r2dbc.inTransaction(handle -> handle.execute("INSERT INTO tbl VALUES (?)", 100))

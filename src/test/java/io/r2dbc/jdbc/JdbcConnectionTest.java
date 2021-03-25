@@ -1,10 +1,4 @@
-/*
- * Copyright 2018 the original author or authors. Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at https://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in
- * writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and limitations under the License.
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import static io.r2dbc.spi.IsolationLevel.READ_UNCOMMITTED;
@@ -18,12 +12,15 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.sql.SQLTransactionRollbackException;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
+
 import io.r2dbc.spi.R2dbcNonTransientResourceException;
 import io.r2dbc.spi.R2dbcRollbackException;
 import reactor.test.StepVerifier;
@@ -42,7 +39,7 @@ final class JdbcConnectionTest
      *
      */
     @Test
-    void beginTransaction()
+    void testBeginTransaction()
     {
         new JdbcConnection(this.connection).beginTransaction().as(StepVerifier::create).verifyComplete();
     }
@@ -52,7 +49,7 @@ final class JdbcConnectionTest
      */
     @SuppressWarnings("resource")
     @Test
-    void beginTransactionErrorResponse() throws SQLException
+    void testBeginTransactionErrorResponse() throws SQLException
     {
         when(this.connection.getAutoCommit()).thenReturn(true);
         doThrow(new SQLNonTransientConnectionException("Unable to disable autocommits", "some state", 999)).when(this.connection)
@@ -66,7 +63,7 @@ final class JdbcConnectionTest
      * @throws SQLException Falls was schief geht.
      */
     @Test
-    void beginTransactionInTransaction() throws SQLException
+    void testBeginTransactionInTransaction() throws SQLException
     {
         when(this.connection.getAutoCommit()).thenReturn(true);
         verifyNoMoreInteractions(this.connection);
@@ -78,7 +75,7 @@ final class JdbcConnectionTest
      * @throws SQLException Falls was schief geht.
      */
     @Test
-    void close() throws SQLException
+    void testClose() throws SQLException
     {
         when(this.connection.isClosed()).thenReturn(false);
 
@@ -89,7 +86,7 @@ final class JdbcConnectionTest
      * @throws SQLException Falls was schief geht.
      */
     @Test
-    void closeWhenClosed() throws SQLException
+    void testCloseWhenClosed() throws SQLException
     {
         when(this.connection.isClosed()).thenReturn(true);
         verifyNoMoreInteractions(this.connection);
@@ -101,7 +98,7 @@ final class JdbcConnectionTest
      * @throws SQLException Falls was schief geht.
      */
     @Test
-    void commitTransaction() throws SQLException
+    void testCommitTransaction() throws SQLException
     {
         when(this.connection.getAutoCommit()).thenReturn(false);
 
@@ -113,7 +110,7 @@ final class JdbcConnectionTest
      */
     @SuppressWarnings("resource")
     @Test
-    void commitTransactionErrorResponse() throws SQLException
+    void testCommitTransactionErrorResponse() throws SQLException
     {
         when(this.connection.getAutoCommit()).thenReturn(false);
         doThrow(new SQLTransactionRollbackException("can't commit", "some state", 999)).when(this.connection).commit();
@@ -125,7 +122,7 @@ final class JdbcConnectionTest
      * @throws SQLException Falls was schief geht.
      */
     @Test
-    void commitTransactionNonOpen() throws SQLException
+    void testCommitTransactionNonOpen() throws SQLException
     {
         when(this.connection.getAutoCommit()).thenReturn(true);
         verifyNoMoreInteractions(this.connection);
@@ -137,7 +134,7 @@ final class JdbcConnectionTest
      *
      */
     @Test
-    void constructorNoClient()
+    void testConstructorNoClient()
     {
         assertThatNullPointerException().isThrownBy(() -> new JdbcConnection(null)).withMessage("connection must not be null");
     }
@@ -146,7 +143,7 @@ final class JdbcConnectionTest
      *
      */
     @Test
-    void createBatch()
+    void testCreateBatch()
     {
         JdbcConnection jdbcConnection = new JdbcConnection(this.connection);
 
@@ -158,7 +155,7 @@ final class JdbcConnectionTest
      *
      */
     @Test
-    void createSavepoint()
+    void testCreateSavepoint()
     {
         // new JdbcConnection(this.connection).createSavepoint("test").as(StepVerifier::create)
         // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
@@ -169,7 +166,7 @@ final class JdbcConnectionTest
      *
      */
     @Test
-    void createSavepointNoName()
+    void testCreateSavepointNoName()
     {
         // new
         // JdbcConnection(this.connection).createSavepoint(null).as(StepVerifier::create).verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
@@ -180,7 +177,7 @@ final class JdbcConnectionTest
      *
      */
     @Test
-    void createStatement()
+    void testCreateStatement()
     {
         assertThat(new JdbcConnection(this.connection).createStatement("select-query-?")).isInstanceOf(JdbcStatement.class);
         assertThat(new JdbcConnection(this.connection).createStatement("insert-query-?")).isInstanceOf(JdbcStatement.class);
@@ -194,7 +191,7 @@ final class JdbcConnectionTest
      *
      */
     @Test
-    void releaseSavepoint()
+    void testReleaseSavepoint()
     {
         // new JdbcConnection(this.connection).releaseSavepoint("test").as(StepVerifier::create)
         // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
@@ -205,7 +202,7 @@ final class JdbcConnectionTest
      *
      */
     @Test
-    void releaseSavepointNoName()
+    void testReleaseSavepointNoName()
     {
         // new JdbcConnection(this.connection).releaseSavepoint(null).as(StepVerifier::create)
         // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
@@ -216,7 +213,7 @@ final class JdbcConnectionTest
      * @throws SQLException Falls was schief geht.
      */
     @Test
-    void rollbackTransaction() throws SQLException
+    void testRollbackTransaction() throws SQLException
     {
         when(this.connection.getAutoCommit()).thenReturn(false);
 
@@ -228,7 +225,7 @@ final class JdbcConnectionTest
      */
     @SuppressWarnings("resource")
     @Test
-    void rollbackTransactionErrorResponse() throws SQLException
+    void testRollbackTransactionErrorResponse() throws SQLException
     {
         when(this.connection.getAutoCommit()).thenReturn(false);
         doThrow(new SQLTransactionRollbackException("can't commit", "some state", 999)).when(this.connection).rollback();
@@ -240,7 +237,7 @@ final class JdbcConnectionTest
      * @throws SQLException Falls was schief geht.
      */
     @Test
-    void rollbackTransactionNonOpen() throws SQLException
+    void testRollbackTransactionNonOpen() throws SQLException
     {
         when(this.connection.getAutoCommit()).thenReturn(true);
         verifyNoMoreInteractions(this.connection);
@@ -252,7 +249,7 @@ final class JdbcConnectionTest
      *
      */
     @Test
-    void rollbackTransactionToSavepoint()
+    void testRollbackTransactionToSavepoint()
     {
         // new JdbcConnection(this.connection).rollbackTransactionToSavepoint("test").as(StepVerifier::create)
         // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
@@ -263,7 +260,7 @@ final class JdbcConnectionTest
      *
      */
     @Test
-    void rollbackTransactionToSavepointNoName()
+    void testRollbackTransactionToSavepointNoName()
     {
         // new JdbcConnection(this.connection).rollbackTransactionToSavepoint(null).as(StepVerifier::create)
         // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
@@ -275,7 +272,7 @@ final class JdbcConnectionTest
      *
      */
     @Test
-    void setTransactionIsolationLevelNoIsolationLevel()
+    void testSetTransactionIsolationLevelNoIsolationLevel()
     {
         // .expectError(NullPointerException.class)
         // .expectNextCount(1).verifyComplete();
@@ -287,7 +284,7 @@ final class JdbcConnectionTest
      *
      */
     @Test
-    void setTransactionIsolationLevelReadUncommitted()
+    void testSetTransactionIsolationLevelReadUncommitted()
     {
         // when(this.connection.getAutoCommit()).thenReturn(false);
         // when(this.client.execute("SET LOCK_MODE 0")).thenReturn(Mono.empty());
@@ -299,7 +296,7 @@ final class JdbcConnectionTest
      *
      */
     @Test
-    void setTransactionIsolationLevelRepeatableRead()
+    void testSetTransactionIsolationLevelRepeatableRead()
     {
         // when(this.connection.getAutoCommit()).thenReturn(false);
         // when(this.client.execute("SET LOCK_MODE 1")).thenReturn(Mono.empty());
@@ -311,7 +308,7 @@ final class JdbcConnectionTest
      *
      */
     @Test
-    void setTransactionIsolationLevelSerializable()
+    void testSetTransactionIsolationLevelSerializable()
     {
         // when(this.connection.getAutoCommit()).thenReturn(false);
         // when(this.client.execute("SET LOCK_MODE 1")).thenReturn(Mono.empty());

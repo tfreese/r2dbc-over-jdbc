@@ -1,7 +1,4 @@
-/**
- * Created: 14.06.2019
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.sql.PreparedStatement;
@@ -13,8 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import io.r2dbc.jdbc.converter.Converters;
 import io.r2dbc.jdbc.converter.sql.SqlMapper;
 import io.r2dbc.spi.Statement;
@@ -40,14 +39,6 @@ public abstract class AbstractJdbcStatement implements Statement
          *
          */
         private Map<Integer, Object> current;
-
-        /**
-         * Erstellt ein neues {@link Bindings} Object.
-         */
-        public Bindings()
-        {
-            super();
-        }
 
         /**
          *
@@ -203,7 +194,7 @@ public abstract class AbstractJdbcStatement implements Statement
     /**
      * @author Thomas Freese
      */
-    static enum SQL_OPERATION
+    enum SQL_OPERATION
     {
         /**
          *
@@ -262,7 +253,7 @@ public abstract class AbstractJdbcStatement implements Statement
      * @param connection {@link java.sql.Connection}
      * @param sql String
      */
-    public AbstractJdbcStatement(final java.sql.Connection connection, final String sql)
+    protected AbstractJdbcStatement(final java.sql.Connection connection, final String sql)
     {
         super();
 

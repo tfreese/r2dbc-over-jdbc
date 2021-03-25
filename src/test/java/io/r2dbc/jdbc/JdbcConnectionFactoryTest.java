@@ -1,14 +1,16 @@
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
-
-import io.r2dbc.jdbc.util.DBServerExtension;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import reactor.test.StepVerifier;
-
-import javax.sql.DataSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+
+import javax.sql.DataSource;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+
+import io.r2dbc.jdbc.util.DBServerExtension;
+import reactor.test.StepVerifier;
 
 /**
  * @author Thomas Freese
@@ -25,7 +27,7 @@ final class JdbcConnectionFactoryTest
      *
      */
     @Test
-    void constructorNoConfiguration()
+    void testConstructorNoConfiguration()
     {
         assertThatNullPointerException().isThrownBy(() -> new JdbcConnectionFactory((DataSource) null)).withMessage("dataSource must not be null");
     }
@@ -34,7 +36,7 @@ final class JdbcConnectionFactoryTest
      *
      */
     @Test
-    void create()
+    void testCreate()
     {
         JdbcConnectionConfiguration configuration = JdbcConnectionConfiguration.builder().dataSource(SERVER.getDataSource()).build();
 
@@ -45,7 +47,7 @@ final class JdbcConnectionFactoryTest
      *
      */
     @Test
-    void getMetadata()
+    void testGetMetadata()
     {
         JdbcConnectionConfiguration configuration = JdbcConnectionConfiguration.builder().dataSource(SERVER.getDataSource()).build();
 
@@ -56,7 +58,7 @@ final class JdbcConnectionFactoryTest
      *
      */
     @Test
-    void options()
+    void testOptions()
     {
         JdbcConnectionConfiguration configuration = JdbcConnectionConfiguration.builder().dataSource(SERVER.getDataSource()).build();
 

@@ -1,8 +1,11 @@
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import static io.r2dbc.spi.Nullability.NULLABLE;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+
 import java.sql.JDBCType;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -14,7 +17,7 @@ final class JdbcColumnMetadataTest
      *
      */
     @Test
-    void constructorNoName()
+    void testConstructorNoName()
     {
         assertThatNullPointerException().isThrownBy(() -> new JdbcColumnMetadata(null, JDBCType.OTHER, NULLABLE, 100, 500)).withMessage("name required");
     }
@@ -23,7 +26,7 @@ final class JdbcColumnMetadataTest
      *
      */
     @Test
-    void constructorNoNullability()
+    void testConstructorNoNullability()
     {
         assertThatNullPointerException().isThrownBy(() -> new JdbcColumnMetadata("test-name", JDBCType.OTHER, null, 100, 500))
                 .withMessage("nullability required");

@@ -1,7 +1,4 @@
-/**
- * Created: 19.06.2019
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc.converter.transformer;
 
 import java.time.Instant;
@@ -13,14 +10,6 @@ import java.time.ZoneId;
  */
 public class LocalDateTransformer extends AbstractObjectTransofrmer<LocalDate>
 {
-    /**
-     * Erstellt ein neues {@link LocalDateTransformer} Object.
-     */
-    public LocalDateTransformer()
-    {
-        super();
-    }
-
     /**
      * @see io.r2dbc.jdbc.converter.transformer.ObjectTransformer#transform(java.lang.Object)
      */

@@ -1,7 +1,4 @@
-/**
- * Created: 22.02.2020
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc.converter.transformer;
 
 import io.r2dbc.spi.Blob;
@@ -11,15 +8,6 @@ import io.r2dbc.spi.Blob;
  */
 public class BlobTransformer extends AbstractObjectTransofrmer<Blob>
 {
-    /**
-     * Erstellt ein neues {@link BlobTransformer} Object.
-     */
-    public BlobTransformer()
-    {
-        super();
-
-    }
-
     /**
      * @see io.r2dbc.jdbc.converter.transformer.ObjectTransformer#transform(java.lang.Object)
      */

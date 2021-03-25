@@ -1,7 +1,4 @@
-/**
- * Created: 19.06.2019
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc.converter.transformer;
 
 import java.text.DateFormat;
@@ -13,14 +10,6 @@ import java.util.Date;
  */
 public class DateTransformer extends AbstractObjectTransofrmer<Date>
 {
-    /**
-     * Erstellt ein neues {@link DateTransformer} Object.
-     */
-    public DateTransformer()
-    {
-        super();
-    }
-
     /**
      * @see io.r2dbc.jdbc.converter.transformer.ObjectTransformer#transform(java.lang.Object)
      */

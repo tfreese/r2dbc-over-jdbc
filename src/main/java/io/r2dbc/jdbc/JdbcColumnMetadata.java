@@ -1,11 +1,9 @@
-/**
- * Created: 12.06.2019
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.sql.JDBCType;
 import java.util.Objects;
+
 import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Nullability;
 

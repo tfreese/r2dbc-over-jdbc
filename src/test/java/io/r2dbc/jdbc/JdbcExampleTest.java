@@ -1,22 +1,22 @@
-/*
- * Copyright 2018 the original author or authors. Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at https://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in
- * writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and limitations under the License.
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
+
+import static io.r2dbc.jdbc.util.Awaits.awaitNone;
+import static io.r2dbc.jdbc.util.Awaits.awaitQuery;
+import static io.r2dbc.jdbc.util.Awaits.awaitUpdate;
 
 import java.util.List;
 import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.jdbc.core.JdbcOperations;
+
 import io.r2dbc.jdbc.util.DBServerExtension;
+import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
@@ -32,209 +32,6 @@ import reactor.test.StepVerifier;
 final class JdbcExampleTest
 {
     /**
-     * @author Thomas Freese
-     */
-    @Nested
-    final class JdbcStyle implements TestKit<Integer>
-    {
-        /**
-         * @see io.r2dbc.spi.test.TestKit#batch()
-         */
-        @Override
-        public void batch()
-        {
-            TestKit.super.batch();
-        }
-
-        /**
-         * @see io.r2dbc.spi.test.TestKit#bindFails()
-         */
-        @Override
-        public void bindFails()
-        {
-            TestKit.super.bindFails();
-        }
-
-        /**
-         * @see io.r2dbc.spi.test.TestKit#bindNullFails()
-         */
-        @Override
-        public void bindNullFails()
-        {
-            TestKit.super.bindNullFails();
-        }
-
-        // /**
-        // * @see io.r2dbc.spi.test.TestKit#blobInsert()
-        // */
-        // @Override
-        // @Test
-        // public void blobInsert()
-        // {
-        // // Example.super.blobInsert();
-        //
-//            // @formatter:off
-//            Mono.from(getConnectionFactory().create())
-//                .flatMapMany(connection -> Flux.from(connection
-//
-//                    .createStatement(String.format("INSERT INTO blob_test VALUES (%s)", getPlaceholder(0)))
-//                    .bind(getIdentifier(0), Blob.from(Mono.just(StandardCharsets.UTF_8.encode("test-value"))))
-//                    .execute())
-//
-//                    .concatWith(TestKit.close(connection)))
-//                .as(StepVerifier::create)
-//                .expectNextCount(1).as("rows inserted")
-//                .verifyComplete()
-//                ;
-//            // @formatter:on
-        // }
-
-        // /**
-        // * @see io.r2dbc.spi.test.TestKit#clobInsert()
-        // */
-        // @Override
-        // @Test
-        // public void clobInsert()
-        // {
-        // // Example.super.clobInsert();
-        //
-//            // @formatter:off
-//            Mono.from(getConnectionFactory().create())
-//                .flatMapMany(connection -> Flux.from(connection
-//
-//                    .createStatement(String.format("INSERT INTO clob_test VALUES (%s)", getPlaceholder(0)))
-//                    .bind(getIdentifier(0), Clob.from(Mono.just("test-value")))
-//                    .execute())
-//
-//                    .concatWith(TestKit.close(connection)))
-//                .as(StepVerifier::create)
-//                .expectNextCount(1).as("rows inserted")
-//                .verifyComplete()
-//                ;
-//         // @formatter:on
-        // }
-
-        /**
-         * @see io.r2dbc.spi.test.TestKit#columnMetadata()
-         */
-        @Override
-        public void columnMetadata()
-        {
-            TestKit.super.columnMetadata();
-        }
-
-        /**
-         * @see io.r2dbc.spi.test.TestKit#createStatementFails()
-         */
-        @Override
-        public void createStatementFails()
-        {
-            TestKit.super.createStatementFails();
-        }
-
-        /**
-         * @see io.r2dbc.spi.test.TestKit#duplicateColumnNames()
-         */
-        @Override
-        public void duplicateColumnNames()
-        {
-            TestKit.super.duplicateColumnNames();
-        }
-
-        /**
-         * @see io.r2dbc.spi.test.TestKit#getConnectionFactory()
-         */
-        @Override
-        public ConnectionFactory getConnectionFactory()
-        {
-            return JdbcExampleTest.this.connectionFactory;
-        }
-
-        /**
-         * @see io.r2dbc.spi.test.TestKit#getCreateTableWithAutogeneratedKey()
-         */
-        @Override
-        public String getCreateTableWithAutogeneratedKey()
-        {
-            return "CREATE TABLE tbl_auto ( id INTEGER GENERATED BY DEFAULT AS IDENTITY(START WITH 1, INCREMENT BY 1), value INTEGER);";
-        }
-
-        /**
-         * @see io.r2dbc.spi.test.TestKit#getIdentifier(int)
-         */
-        @Override
-        public Integer getIdentifier(final int index)
-        {
-            return index;
-        }
-
-        /**
-         * @see io.r2dbc.spi.test.TestKit#getJdbcOperations()
-         */
-        @Override
-        public JdbcOperations getJdbcOperations()
-        {
-
-            return JdbcExampleTest.this.getJdbcOperations();
-        }
-
-        /**
-         * @see io.r2dbc.spi.test.TestKit#getPlaceholder(int)
-         */
-        @Override
-        public String getPlaceholder(final int index)
-        {
-            return "?";
-        }
-
-        /**
-         * @see io.r2dbc.spi.test.TestKit#prepareStatement()
-         */
-        @Override
-        public void prepareStatement()
-        {
-            TestKit.super.prepareStatement();
-        }
-
-        /**
-         * @see io.r2dbc.spi.test.TestKit#prepareStatementWithIncompleteBatchFails()
-         */
-        @Override
-        public void prepareStatementWithIncompleteBatchFails()
-        {
-            TestKit.super.prepareStatementWithIncompleteBatchFails();
-        }
-
-        /**
-         * @see io.r2dbc.spi.test.TestKit#prepareStatementWithIncompleteBindingFails()
-         */
-        @Override
-        public void prepareStatementWithIncompleteBindingFails()
-        {
-            TestKit.super.prepareStatementWithIncompleteBindingFails();
-        }
-
-        /**
-         * @see io.r2dbc.spi.test.TestKit#returnGeneratedValues()
-         */
-        @Override
-        // @Disabled
-        public void returnGeneratedValues()
-        {
-            TestKit.super.returnGeneratedValues();
-        }
-
-        /**
-         * @see io.r2dbc.spi.test.TestKit#savePointStartsTransaction()
-         */
-        @Override
-        public void savePointStartsTransaction()
-        {
-            TestKit.super.savePointStartsTransaction();
-        }
-    }
-
-    /**
      *
      */
     @RegisterExtension
@@ -243,7 +40,7 @@ final class JdbcExampleTest
     /**
      *
      */
-    private final ConnectionFactory connectionFactory =
+    final ConnectionFactory connectionFactory =
             ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, SERVER.getDataSource()).build());
 
     /**
@@ -287,174 +84,240 @@ final class JdbcExampleTest
      *
      */
     @Test
-    void prepareStatementDelete()
+    void testPrepareStatementDelete()
     {
-        getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
-
-        // @formatter:off
-        Mono.from(this.connectionFactory.create())
-            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-                    .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
-                                .bind(0, 200)
-                                .add().bind(0, 300)
-                                .add().bind(0, 400)
-                                .execute())
-                            .flatMap(TestKit::extractRowsUpdated))
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-                    .concatWith(connection.commitTransaction())
-
-
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-
-
-                    .concatWith(connection.beginTransaction())
-                    .concatWith(Flux.from(connection.createStatement("DELETE from tbl where value < ?")
-                                .bind(0, 255)
-                                .execute())
-                            .flatMap(TestKit::extractRowsUpdated))
-                    .concatWith(connection.commitTransaction())
-
-
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-
-                    .concatWith(TestKit.close(connection))
-            )
-            .as(StepVerifier::create)
-            .expectNext(3).as("rows inserted")
-            .expectNext(List.of(100, 200, 300, 400)).as("values from select before commit")
-            .expectNext(List.of(100, 200, 300, 400)).as("values from select after commit")
-            .expectNext(2).as("rows deleted")
-            .expectNext(List.of(300, 400)).as("values from select after delete after commit")
-            .verifyComplete()
-            ;
-       // @formatter:on
+        // getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
+        //
+//        // @formatter:off
+//        Mono.from(this.connectionFactory.create())
+//            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
+//                    .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
+//                                .bind(0, 200)
+//                                .add().bind(0, 300)
+//                                .add().bind(0, 400)
+//                                .execute())
+//                            .flatMap(TestKit::extractRowsUpdated))
+//                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//                    .concatWith(connection.commitTransaction())
+//
+//
+//                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//
+//
+//                    .concatWith(connection.beginTransaction())
+//                    .concatWith(Flux.from(connection.createStatement("DELETE from tbl where value < ?")
+//                                .bind(0, 255)
+//                                .execute())
+//                            .flatMap(TestKit::extractRowsUpdated))
+//                    .concatWith(connection.commitTransaction())
+//
+//
+//                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//
+//                    .concatWith(TestKit.close(connection))
+//            )
+//            .as(StepVerifier::create)
+//            .expectNext(3).as("rows inserted")
+//            .expectNext(List.of(100, 200, 300, 400)).as("values from select before commit")
+//            .expectNext(List.of(100, 200, 300, 400)).as("values from select after commit")
+//            .expectNext(2).as("rows deleted")
+//            .expectNext(List.of(300, 400)).as("values from select after delete after commit")
+//            .verifyComplete()
+//            ;
+//       // @formatter:on
     }
 
     /**
      *
      */
     @Test
-    void prepareStatementDeleteBatch()
+    void testPrepareStatementDeleteBatch()
     {
-        getJdbcOperations().execute("INSERT INTO tbl VALUES (100, 200, 300, 400, 500)");
+        Connection connection = Mono.from(this.connectionFactory.create()).block(DBServerExtension.getSqlTimeout());
 
-        // @formatter:off
-        Mono.from(this.connectionFactory.create())
-            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-                    .<Object>thenMany(Flux.from(connection.createStatement("DELETE from tbl where value < ?")
-                                .bind(0, 300)
-                                .add().bind(0, 400)
-                                .execute())
-                            .flatMap(TestKit::extractRowsUpdated))
-                    .concatWith(connection.commitTransaction())
+        try
+        {
+            awaitUpdate(5, connection.createStatement("INSERT INTO tbl VALUES (100, 200, 300, 400, 500)"));
+            awaitUpdate(2, connection.createStatement("DELETE FROM tbl where value = ?").bind(0, 300).add().bind(0, 400));
+            awaitQuery(List.of(100, 200, 500), row -> row.get(0, Integer.class), connection.createStatement("SELECT value FROM tbl"));
+            awaitQuery(List.of(100, 200, 500), row -> row.get("value", Integer.class), connection.createStatement("SELECT value FROM tbl"));
+        }
+        finally
+        {
+            awaitNone(connection.close());
+        }
 
-
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-
-                    .concatWith(TestKit.close(connection))
-            )
-            .as(StepVerifier::create)
-            .expectNext(3).as("rows deleted")
-            .expectNext(List.of(400, 500)).as("values from select after delete after commit")
-            .verifyComplete()
-            ;
-       // @formatter:on
+        // getJdbcOperations().execute("INSERT INTO tbl VALUES (100, 200, 300, 400, 500)");
+        //
+//        // @formatter:off
+//        Mono.from(this.connectionFactory.create())
+//            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
+//                    .<Object>thenMany(Flux.from(connection.createStatement("DELETE FROM tbl where value < ?")
+//                                .bind(0, 300)
+//                                .add().bind(0, 400)
+//                                .execute())
+//                            .flatMap(TestKit::extractRowsUpdated))
+//                    .concatWith(connection.commitTransaction())
+//
+//
+//                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//
+//                    .concatWith(TestKit.close(connection))
+//            )
+//            .as(StepVerifier::create)
+//            .expectNext(3).as("rows deleted")
+//            .expectNext(List.of(400, 500)).as("values from select after delete after commit")
+//            .verifyComplete()
+//            ;
+//       // @formatter:on
     }
 
     /**
      *
      */
     @Test
-    void prepareStatementDeleteSimple()
+    void testPrepareStatementDeleteSimple()
     {
-        getJdbcOperations().execute("INSERT INTO tbl VALUES (100, 200, 300, 400)");
+        Connection connection = Mono.from(this.connectionFactory.create()).block(DBServerExtension.getSqlTimeout());
 
-        // @formatter:off
-        Mono.from(this.connectionFactory.create())
-            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-                    .<Object>thenMany(Flux.from(connection.createStatement("DELETE from tbl where value < ?")
-                                .bind(0, 255)
-                                .execute())
-                            .flatMap(TestKit::extractRowsUpdated))
-                    .concatWith(connection.commitTransaction())
+        try
+        {
+            awaitUpdate(4, connection.createStatement("INSERT INTO tbl VALUES (100, 200, 300, 400)"));
+            awaitUpdate(2, connection.createStatement("DELETE FROM tbl where value < ?").bind(0, 255));
+            awaitQuery(List.of(300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT value FROM tbl"));
+            awaitQuery(List.of(300, 400), row -> row.get("value", Integer.class), connection.createStatement("SELECT value FROM tbl"));
+        }
+        finally
+        {
+            awaitNone(connection.close());
+        }
 
-
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-
-                    .concatWith(TestKit.close(connection))
-            )
-            .as(StepVerifier::create)
-            .expectNext(2).as("rows deleted")
-            .expectNext(List.of(300, 400)).as("values from select after delete after commit")
-            .verifyComplete()
-            ;
-       // @formatter:on
+        // getJdbcOperations().execute("INSERT INTO tbl VALUES (100, 200, 300, 400)");
+        //
+//        // @formatter:off
+//        Mono.from(this.connectionFactory.create())
+//            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
+//                    .<Object>thenMany(Flux.from(connection.createStatement("DELETE FROM tbl where value < ?")
+//                                .bind(0, 255)
+//                                .execute())
+//                            .flatMap(TestKit::extractRowsUpdated))
+//                    .concatWith(connection.commitTransaction())
+//
+//
+//                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//
+//                    .concatWith(TestKit.close(connection))
+//            )
+//            .as(StepVerifier::create)
+//            .expectNext(2).as("rows deleted")
+//            .expectNext(List.of(300, 400)).as("values from select after delete after commit")
+//            .verifyComplete()
+//            ;
+//       // @formatter:on
     }
 
     /**
      *
      */
     @Test
-    void prepareStatementInsert()
+    void testPrepareStatementInsert()
     {
-        // @formatter:off
-       Mono.from(this.connectionFactory.create())
-           .flatMapMany(connection -> {
-               Statement statement = connection.createStatement("INSERT INTO tbl VALUES (?)")
-                       .bind(0, 2)
-                       .add()
-                       .add()
-                       .add()
-                       ;
+        Connection connection = Mono.from(this.connectionFactory.create()).block(DBServerExtension.getSqlTimeout());
 
-               return Flux.from(statement.execute())
-                       .flatMap(TestKit::extractRowsUpdated)
-                       .concatWith(TestKit.close(connection));
-           })
-           .as(StepVerifier::create)
-           .expectNext(1).as("value from insertion")
-           .verifyComplete();
-       // @formatter:on
+        try
+        {
+            // @formatter:off
+            awaitUpdate(1, connection.createStatement("INSERT INTO tbl VALUES (?)")
+                    .bind(0, 1).add()
+                    .add()
+                    .add()
+                    .add()
+                    .add()
+                    );
+            // @formatter:on
+        }
+        finally
+        {
+            awaitNone(connection.close());
+        }
+
+//        // @formatter:off
+//       Mono.from(this.connectionFactory.create())
+//           .flatMapMany(connection -> {
+//               Statement statement = connection.createStatement("INSERT INTO tbl VALUES (?)")
+//                       .bind(0, 2)
+//                       .add()
+//                       .add()
+//                       .add()
+//                       ;
+//
+//               return Flux.from(statement.execute())
+//                       .flatMap(TestKit::extractRowsUpdated)
+//                       .concatWith(TestKit.close(connection));
+//           })
+//           .as(StepVerifier::create)
+//           .expectNext(1).as("value from insertion")
+//           .verifyComplete();
+//       // @formatter:on
     }
 
     /**
      *
      */
     @Test
-    void prepareStatementInsertBatch()
+    void testPrepareStatementInsertBatch()
     {
-        // @formatter:off
-        Mono.from(this.connectionFactory.create())
-            .flatMapMany(connection -> {
-                Statement statement = connection.createStatement("INSERT INTO tbl VALUES (?)");
+        Connection connection = Mono.from(this.connectionFactory.create()).block(DBServerExtension.getSqlTimeout());
 
-                IntStream.range(0, 10).forEach(i -> statement.bind(0, i).add());
+        try
+        {
+            // @formatter:off
+            awaitUpdate(5, connection.createStatement("INSERT INTO tbl VALUES (?)")
+                    .bind(0, 1).add()
+                    .bind(0, 2).add()
+                    .bind(0, 3).add()
+                    .bind(0, 4).add()
+                    .bind(0, 5).add()
+                    );
+            // @formatter:on
+        }
+        finally
+        {
+            awaitNone(connection.close());
+        }
 
-                return Flux.from(statement.execute())
-                        .flatMap(TestKit::extractRowsUpdated)
-                        .concatWith(TestKit.close(connection));
-            })
-            .as(StepVerifier::create)
-            .expectNext(10).as("values from insertions")
-            .verifyComplete();
-        // @formatter:on
+//        // @formatter:off
+//        Mono.from(this.connectionFactory.create())
+//            .flatMapMany(connection -> {
+//                Statement statement = connection.createStatement("INSERT INTO tbl VALUES (?)");
+//
+//                IntStream.range(0, 10).forEach(i -> statement.bind(0, i).add());
+//
+//                return Flux.from(statement.execute())
+//                        .flatMap(TestKit::extractRowsUpdated)
+//                        .concatWith(TestKit.close(connection));
+//            })
+//            .as(StepVerifier::create)
+//            .expectNext(10).as("values from insertions")
+//            .verifyComplete();
+//        // @formatter:on
     }
 
     /**
      *
      */
     @Test
-    void prepareStatementInsertBatchAutoIncrement()
+    void testPrepareStatementInsertBatchAutoIncrement()
     {
         // @formatter:off
         Mono.from(this.connectionFactory.create())
@@ -479,7 +342,7 @@ final class JdbcExampleTest
      */
     @Test
     @Disabled
-    void prepareStatementInsertBatchExpectNextCount()
+    void testPrepareStatementInsertBatchExpectNextCount()
     {
         Mono.from(this.connectionFactory.create()).flatMapMany(connection -> {
             Statement statement = connection.createStatement("INSERT INTO tbl VALUES (?)");
@@ -494,142 +357,142 @@ final class JdbcExampleTest
      *
      */
     @Test
-    void prepareStatementInsertBatchWithCommit()
+    void testPrepareStatementInsertBatchWithCommit()
     {
-        getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
-
-        // @formatter:off
-        Mono.from(this.connectionFactory.create())
-            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-                    .<Object>thenMany(Flux.from(connection.createStatement("SELECT value FROM tbl")
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-                    .concatWith(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
-                                .bind(0, 200)
-                                .execute())
-                            .flatMap(TestKit::extractRowsUpdated))
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-                    .concatWith(connection.commitTransaction())
-
-
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-
-                    .concatWith(TestKit.close(connection))
-            )
-            .as(StepVerifier::create)
-            .expectNext(List.of(100)).as("value from select")
-            .expectNext(1).as("rows inserted")
-            .expectNext(List.of(100, 200)).as("values from select before commit")
-            .expectNext(List.of(100, 200)).as("values from select after commit")
-            .verifyComplete()
-            ;
-       // @formatter:on
+        // getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
+        //
+//        // @formatter:off
+//        Mono.from(this.connectionFactory.create())
+//            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
+//                    .<Object>thenMany(Flux.from(connection.createStatement("SELECT value FROM tbl")
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//                    .concatWith(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
+//                                .bind(0, 200)
+//                                .execute())
+//                            .flatMap(TestKit::extractRowsUpdated))
+//                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//                    .concatWith(connection.commitTransaction())
+//
+//
+//                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//
+//                    .concatWith(TestKit.close(connection))
+//            )
+//            .as(StepVerifier::create)
+//            .expectNext(List.of(100)).as("value from select")
+//            .expectNext(1).as("rows inserted")
+//            .expectNext(List.of(100, 200)).as("values from select before commit")
+//            .expectNext(List.of(100, 200)).as("values from select after commit")
+//            .verifyComplete()
+//            ;
+//       // @formatter:on
     }
 
     /**
      *
      */
     @Test
-    void prepareStatementInsertBatchWithRollback()
+    void testPrepareStatementInsertBatchWithRollback()
     {
-        getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
-
-        // @formatter:off
-        Mono.from(this.connectionFactory.create())
-            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-                    .<Object>thenMany(Flux.from(connection.createStatement("SELECT value FROM tbl")
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-                    .concatWith(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
-                                .bind(0, 200)
-                                .execute())
-                            .flatMap(TestKit::extractRowsUpdated))
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-                    .concatWith(connection.rollbackTransaction())
-
-
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-
-                    .concatWith(TestKit.close(connection))
-            )
-            .as(StepVerifier::create)
-            .expectNext(List.of(100)).as("value from select")
-            .expectNext(1).as("rows inserted")
-            .expectNext(List.of(100, 200)).as("values from select before rollback")
-            .expectNext(List.of(100)).as("value from select after rollback")
-            .verifyComplete()
-            ;
-       // @formatter:on
+        // getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
+        //
+//        // @formatter:off
+//        Mono.from(this.connectionFactory.create())
+//            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
+//                    .<Object>thenMany(Flux.from(connection.createStatement("SELECT value FROM tbl")
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//                    .concatWith(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
+//                                .bind(0, 200)
+//                                .execute())
+//                            .flatMap(TestKit::extractRowsUpdated))
+//                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//                    .concatWith(connection.rollbackTransaction())
+//
+//
+//                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//
+//                    .concatWith(TestKit.close(connection))
+//            )
+//            .as(StepVerifier::create)
+//            .expectNext(List.of(100)).as("value from select")
+//            .expectNext(1).as("rows inserted")
+//            .expectNext(List.of(100, 200)).as("values from select before rollback")
+//            .expectNext(List.of(100)).as("value from select after rollback")
+//            .verifyComplete()
+//            ;
+//       // @formatter:on
     }
 
     /**
      *
      */
     @Test
-    void prepareStatementSelect()
+    void testPrepareStatementSelect()
     {
-        getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
-
-        // @formatter:off
-        Mono.from(this.connectionFactory.create())
-            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-                    .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
-                                .bind(0, 200)
-                                .add().bind(0, 300)
-                                .add().bind(0, 400)
-                                .execute())
-                            .flatMap(TestKit::extractRowsUpdated))
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-                    .concatWith(connection.commitTransaction())
-
-
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-
-
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl where value < ?")
-                                .bind(0, 250)
-                                .add()
-                                .add()
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-
-
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl where value > ?")
-                                .bind(0, 250)
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-
-
-                    .concatWith(TestKit.close(connection))
-            )
-            .as(StepVerifier::create)
-            .expectNext(3).as("rows inserted")
-            .expectNext(List.of(100, 200, 300, 400)).as("values from select before commit")
-            .expectNext(List.of(100, 200, 300, 400)).as("values from select after commit")
-            .expectNext(List.of(100, 200)).as("values from select where value < ?")
-            .expectNext(List.of(300, 400)).as("values from select where value > ?")
-            .verifyComplete()
-            ;
-       // @formatter:on
+        // getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
+        //
+//        // @formatter:off
+//        Mono.from(this.connectionFactory.create())
+//            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
+//                    .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
+//                                .bind(0, 200)
+//                                .add().bind(0, 300)
+//                                .add().bind(0, 400)
+//                                .execute())
+//                            .flatMap(TestKit::extractRowsUpdated))
+//                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//                    .concatWith(connection.commitTransaction())
+//
+//
+//                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//
+//
+//                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl where value < ?")
+//                                .bind(0, 250)
+//                                .add()
+//                                .add()
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//
+//
+//                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl where value > ?")
+//                                .bind(0, 250)
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//
+//
+//                    .concatWith(TestKit.close(connection))
+//            )
+//            .as(StepVerifier::create)
+//            .expectNext(3).as("rows inserted")
+//            .expectNext(List.of(100, 200, 300, 400)).as("values from select before commit")
+//            .expectNext(List.of(100, 200, 300, 400)).as("values from select after commit")
+//            .expectNext(List.of(100, 200)).as("values from select where value < ?")
+//            .expectNext(List.of(300, 400)).as("values from select where value > ?")
+//            .verifyComplete()
+//            ;
+//       // @formatter:on
     }
 
     /**
      *
      */
     @Test
-    void prepareStatementSelectWithConverter()
+    void testPrepareStatementSelectWithConverter()
     {
         getJdbcOperations().execute("INSERT INTO tbl VALUES (100, 200)");
 
@@ -663,58 +526,58 @@ final class JdbcExampleTest
     }
 
     /**
-     *
-     */
+    *
+    */
     @Test
-    void prepareStatementUpdate()
+    void testPrepareStatementUpdate()
     {
-        getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
-
-        // @formatter:off
-        Mono.from(this.connectionFactory.create())
-            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-                    .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
-                                .bind(0, 200)
-                                .add().bind(0, 300)
-                                .add().bind(0, 400)
-                                .execute())
-                            .flatMap(TestKit::extractRowsUpdated))
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-                    .concatWith(connection.commitTransaction())
-
-
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-
-
-                    .concatWith(connection.beginTransaction())
-                    .concatWith(Flux.from(connection.createStatement("UPDATE tbl set value = ? where value = ?")
-                                .bind(0, 199).bind(1, 100)
-                                .add().bind(0, 299).bind(1, 200)
-                                .add().bind(0, 399).bind(1, 300)
-                                .add().bind(0, 499).bind(1, 400)
-                                .execute())
-                            .flatMap(TestKit::extractRowsUpdated))
-                    .concatWith(connection.commitTransaction())
-
-
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
-                                .execute())
-                            .flatMap(TestKit::extractColumns))
-
-                    .concatWith(TestKit.close(connection))
-            )
-            .as(StepVerifier::create)
-            .expectNext(3).as("rows inserted")
-            .expectNext(List.of(100, 200, 300, 400)).as("values from select before commit")
-            .expectNext(List.of(100, 200, 300, 400)).as("values from select after commit")
-            .expectNext(4).as("rows updated")
-            .expectNext(List.of(199, 299, 399, 499)).as("values from select after update after commit")
-            .verifyComplete()
-            ;
-       // @formatter:on
+        // getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
+        //
+//        // @formatter:off
+//        Mono.from(this.connectionFactory.create())
+//            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
+//                    .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
+//                                .bind(0, 200)
+//                                .add().bind(0, 300)
+//                                .add().bind(0, 400)
+//                                .execute())
+//                            .flatMap(TestKit::extractRowsUpdated))
+//                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//                    .concatWith(connection.commitTransaction())
+//
+//
+//                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//
+//
+//                    .concatWith(connection.beginTransaction())
+//                    .concatWith(Flux.from(connection.createStatement("UPDATE tbl set value = ? where value = ?")
+//                                .bind(0, 199).bind(1, 100)
+//                                .add().bind(0, 299).bind(1, 200)
+//                                .add().bind(0, 399).bind(1, 300)
+//                                .add().bind(0, 499).bind(1, 400)
+//                                .execute())
+//                            .flatMap(TestKit::extractRowsUpdated))
+//                    .concatWith(connection.commitTransaction())
+//
+//
+//                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+//                                .execute())
+//                            .flatMap(TestKit::extractColumns))
+//
+//                    .concatWith(TestKit.close(connection))
+//            )
+//            .as(StepVerifier::create)
+//            .expectNext(3).as("rows inserted")
+//            .expectNext(List.of(100, 200, 300, 400)).as("values from select before commit")
+//            .expectNext(List.of(100, 200, 300, 400)).as("values from select after commit")
+//            .expectNext(4).as("rows updated")
+//            .expectNext(List.of(199, 299, 399, 499)).as("values from select after update after commit")
+//            .verifyComplete()
+//            ;
+//       // @formatter:on
     }
 }

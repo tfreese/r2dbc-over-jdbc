@@ -1,7 +1,4 @@
-/**
- * Created: 19.03.2020
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc.converter.sql;
 
 import java.sql.JDBCType;
@@ -21,11 +18,12 @@ public class ObjectSqlMapper extends AbstractSqlMapper<Object>
     public static final SqlMapper<Object> INSTANCE = new ObjectSqlMapper();
 
     /**
-     * Erstellt ein neues {@link ObjectSqlMapper} Object.
+     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#getSupportedJdbcTypes()
      */
-    public ObjectSqlMapper()
+    @Override
+    public Set<JDBCType> getSupportedJdbcTypes()
     {
-        super();
+        return Set.of(JDBCType.OTHER);
     }
 
     /**
@@ -51,14 +49,5 @@ public class ObjectSqlMapper extends AbstractSqlMapper<Object>
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Object value) throws SQLException
     {
         preparedStatement.setObject(parameterIndex, value);
-    }
-
-    /**
-     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#getSupportedJdbcTypes()
-     */
-    @Override
-    public Set<JDBCType> getSupportedJdbcTypes()
-    {
-        return Set.of(JDBCType.OTHER);
     }
 }

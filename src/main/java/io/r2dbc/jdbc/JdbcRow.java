@@ -1,11 +1,9 @@
-/**
- * Created: 14.06.2019
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.util.Map;
 import java.util.Objects;
+
 import io.r2dbc.jdbc.converter.Converters;
 import io.r2dbc.jdbc.converter.transformer.ObjectTransformer;
 import io.r2dbc.spi.Row;

@@ -1,10 +1,4 @@
-/*
- * Copyright 2017-2018 the original author or authors. Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at https://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed
- * to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing permissions and limitations under the License.
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import static io.r2dbc.spi.Nullability.NULLABLE;
@@ -14,14 +8,17 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import io.r2dbc.spi.ColumnMetadata;
 
 /**
@@ -50,7 +47,7 @@ final class JdbcRowMetadataTest
      * @throws SQLException Falls was schief geht.
      */
     @BeforeEach
-    public void beforeEach() throws SQLException
+    void beforeEach() throws SQLException
     {
         when(this.resultSet.getMetaData()).thenReturn(this.resultSetMetaData);
 
@@ -71,7 +68,7 @@ final class JdbcRowMetadataTest
      *
      */
     @Test
-    void constructorNoColumnMetadata()
+    void testConstructorNoColumnMetadata()
     {
         assertThatNullPointerException().isThrownBy(() -> new JdbcRowMetadata(null)).withMessage("columnMetaDatas must not be null");
     }
@@ -80,7 +77,7 @@ final class JdbcRowMetadataTest
      * @throws SQLException Falls was schief geht.
      */
     @Test
-    void getColumnMetadataIndex() throws SQLException
+    void testGetColumnMetadataIndex() throws SQLException
     {
         assertThat(JdbcRowMetadata.of(this.resultSet).getColumnMetadata(0)).isEqualTo(this.columnMetadatas.get(0));
     }
@@ -89,16 +86,16 @@ final class JdbcRowMetadataTest
      * @throws SQLException Falls was schief geht.
      */
     @Test
-    void getColumnMetadataInvalidName() throws SQLException
+    void testGetColumnMetadataInvalidName() throws SQLException
     {
-        assertThat(JdbcRowMetadata.of(this.resultSet).getColumnMetadata("test-name-3")).isEqualTo(null);
+        assertThat(JdbcRowMetadata.of(this.resultSet).getColumnMetadata("test-name-3")).isNull();
     }
 
     /**
      * @throws SQLException Falls was schief geht.
      */
     @Test
-    void getColumnMetadataName() throws SQLException
+    void testGetColumnMetadataName() throws SQLException
     {
         assertThat(JdbcRowMetadata.of(this.resultSet).getColumnMetadata("TEST-NAME-2")).isEqualTo(this.columnMetadatas.get(1));
     }
@@ -107,7 +104,7 @@ final class JdbcRowMetadataTest
      *
      */
     @Test
-    void getColumnMetadataNoIdentifier()
+    void testGetColumnMetadataNoIdentifier()
     {
         assertThatNullPointerException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata(null)).withMessage("name required");
     }
@@ -116,7 +113,7 @@ final class JdbcRowMetadataTest
      * @throws SQLException Falls was schief geht.
      */
     @Test
-    void getColumnMetadataWrongIdentifierType() throws SQLException
+    void testGetColumnMetadataWrongIdentifierType() throws SQLException
     {
         String identifier = "-";
 
@@ -131,7 +128,7 @@ final class JdbcRowMetadataTest
      *
      */
     @Test
-    void toRowMetadataNoResultSet()
+    void testToRowMetadataNoResultSet()
     {
         assertThatNullPointerException().isThrownBy(() -> new JdbcRowMetadata(null)).withMessage("columnMetaDatas must not be null");
     }

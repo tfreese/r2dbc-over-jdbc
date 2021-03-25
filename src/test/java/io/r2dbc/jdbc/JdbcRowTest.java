@@ -1,17 +1,25 @@
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
+import static io.r2dbc.jdbc.util.Awaits.awaitNone;
+import static io.r2dbc.jdbc.util.Awaits.awaitQuery;
+import static io.r2dbc.jdbc.util.Awaits.awaitUpdate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.jdbc.core.JdbcOperations;
+
 import io.r2dbc.jdbc.util.DBServerExtension;
+import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
@@ -40,26 +48,8 @@ final class JdbcRowTest
     /**
      *
      */
-    @Test
-    void constructorNoValues()
-    {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcRow(null)).withMessage("values must not be null");
-    }
-
-    /**
-     *
-     */
-    @BeforeEach
-    void createTable()
-    {
-        getJdbcOperations().execute("CREATE TABLE test ( value INTEGER )");
-    }
-
-    /**
-     *
-     */
     @AfterEach
-    void dropTable()
+    void afterEach()
     {
         getJdbcOperations().execute("DROP TABLE test");
     }
@@ -67,40 +57,10 @@ final class JdbcRowTest
     /**
      *
      */
-    @Test
-    void getByIndex()
+    @BeforeEach
+    void beforeEach()
     {
-        Object value = new Object();
-
-        Map<Object, Object> values = new HashMap<>();
-        values.put("TEST-NAME-1", value);
-        values.put(0, value);
-
-        assertThat(new JdbcRow(values).get(0, Object.class)).isSameAs(value);
-    }
-
-    /**
-     *
-     */
-    @Test
-    void getByName()
-    {
-        Object value = new Object();
-
-        Map<Object, Object> values = new HashMap<>();
-        values.put("TEST-NAME-2", value);
-
-        assertThat(new JdbcRow(values).get("test-name-2", Object.class)).isSameAs(value);
-    }
-
-    /**
-     *
-     */
-    @Test
-    void getInvalidIdentifier()
-    {
-        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcRow(new HashMap<>()).get(3, Object.class))
-                .withMessage("Column identifier '3' does not exist");
+        getJdbcOperations().execute("CREATE TABLE test ( value INTEGER )");
     }
 
     /**
@@ -122,7 +82,55 @@ final class JdbcRowTest
      *
      */
     @Test
-    void getNoIdentifier()
+    void testConstructorNoValues()
+    {
+        assertThatNullPointerException().isThrownBy(() -> new JdbcRow(null)).withMessage("values must not be null");
+    }
+
+    /**
+     *
+     */
+    @Test
+    void testGetByIndex()
+    {
+        Object value = new Object();
+
+        Map<Object, Object> values = new HashMap<>();
+        values.put("TEST-NAME-1", value);
+        values.put(0, value);
+
+        assertThat(new JdbcRow(values).get(0, Object.class)).isSameAs(value);
+    }
+
+    /**
+     *
+     */
+    @Test
+    void testGetByName()
+    {
+        Object value = new Object();
+
+        Map<Object, Object> values = new HashMap<>();
+        values.put("TEST-NAME-2", value);
+
+        assertThat(new JdbcRow(values).get("test-name-2", Object.class)).isSameAs(value);
+    }
+
+    /**
+     *
+     */
+    @Test
+    void testGetInvalidIdentifier()
+    {
+        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcRow(new HashMap<>()).get(3, Object.class))
+                .withMessage("Column identifier '3' does not exist");
+    }
+
+    /**
+     *
+     */
+    @Test
+    void testGetNoIdentifier()
     {
         assertThatNullPointerException().isThrownBy(() -> new JdbcRow(new HashMap<>()).get(null, Object.class)).withMessage("identifier must not be null");
     }
@@ -131,7 +139,7 @@ final class JdbcRowTest
      *
      */
     @Test
-    void getNull()
+    void testGetNull()
     {
         Map<Object, Object> values = new HashMap<>();
         values.put("TEST-NAME-3", null);
@@ -143,7 +151,7 @@ final class JdbcRowTest
      *
      */
     @Test
-    void getWrongIdentifierType()
+    void testGetWrongIdentifierType()
     {
         String identifier = "-";
 
@@ -155,7 +163,7 @@ final class JdbcRowTest
      *
      */
     @Test
-    void selectWithAliases()
+    void testSelectWithAliases()
     {
         getJdbcOperations().execute("INSERT INTO test VALUES (100)");
 
@@ -175,21 +183,37 @@ final class JdbcRowTest
     }
 
     /**
-     *
-     */
+    *
+    */
     @Test
-    void selectWithoutAliases()
+    void testSelectWithoutAliases()
     {
-        getJdbcOperations().execute("INSERT INTO test VALUES (100)");
-
+        // getJdbcOperations().execute("INSERT INTO test VALUES (100)");
+        //
         // @formatter:off
-        Mono.from(this.connectionFactory.create())
-            .flatMapMany(connection -> Flux.from(connection.createStatement("SELECT value FROM test").execute())
-                .flatMap(TestKit::extractColumns)
-                .concatWith(TestKit.close(connection)))
-        .as(StepVerifier::create)
-        .expectNext(List.of(100))
-        .verifyComplete();
+//        Mono.from(this.connectionFactory.create())
+//            .flatMapMany(connection -> Flux.from(connection.createStatement("SELECT value FROM test").execute())
+//                .flatMap(TestKit::extractColumns)
+//                .concatWith(TestKit.close(connection)))
+//        .as(StepVerifier::create)
+//        .expectNext(List.of(100))
+//        .verifyComplete();
         // @formatter:on
+
+        Connection connection = Mono.from(this.connectionFactory.create()).block(DBServerExtension.getSqlTimeout());
+
+        try
+        {
+            // awaitExecution(connection.createStatement("CREATE TABLE test ( value INTEGER )"));
+
+            awaitUpdate(1, connection.createStatement("INSERT INTO test VALUES (100)"));
+
+            awaitQuery(List.of(100), row -> row.get(0, Integer.class), connection.createStatement("SELECT value FROM test"));
+            awaitQuery(List.of(100), row -> row.get("value", Integer.class), connection.createStatement("SELECT value FROM test"));
+        }
+        finally
+        {
+            awaitNone(connection.close());
+        }
     }
 }

@@ -1,7 +1,4 @@
-/**
- * Created: 11.06.2019
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.sql.SQLDataException;
@@ -17,6 +14,7 @@ import java.sql.SQLTimeoutException;
 import java.sql.SQLTransactionRollbackException;
 import java.sql.SQLTransientConnectionException;
 import java.sql.SQLTransientException;
+
 import io.r2dbc.spi.R2dbcBadGrammarException;
 import io.r2dbc.spi.R2dbcDataIntegrityViolationException;
 import io.r2dbc.spi.R2dbcException;
@@ -132,77 +130,77 @@ public final class JdbcR2dbcExceptionFactory
     }
 
     /**
-     * @param e {@link SQLException}
+     * @param ex {@link SQLException}
      * @return {@link R2dbcException}
      */
-    public static R2dbcException create(final SQLException e)
+    public static R2dbcException create(final SQLException ex)
     {
-        if (e.getClass() == SQLDataException.class)
+        if (ex.getClass() == SQLDataException.class)
         {
-            return new JdbcR2dbcDataException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new JdbcR2dbcDataException(ex.getMessage(), ex.getSQLState(), ex.getErrorCode(), ex);
         }
 
-        if (e.getClass() == SQLException.class)
+        if (ex.getClass() == SQLException.class)
         {
-            return new JdbcR2dbcException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new JdbcR2dbcException(ex.getMessage(), ex.getSQLState(), ex.getErrorCode(), ex);
         }
 
-        if (e.getClass() == SQLFeatureNotSupportedException.class)
+        if (ex.getClass() == SQLFeatureNotSupportedException.class)
         {
-            return new JdbcR2dbcNonTransientException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new JdbcR2dbcNonTransientException(ex.getMessage(), ex.getSQLState(), ex.getErrorCode(), ex);
         }
 
-        if (e.getClass() == SQLIntegrityConstraintViolationException.class)
+        if (ex.getClass() == SQLIntegrityConstraintViolationException.class)
         {
-            return new R2dbcDataIntegrityViolationException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new R2dbcDataIntegrityViolationException(ex.getMessage(), ex.getSQLState(), ex.getErrorCode(), ex);
         }
 
-        if (e.getClass() == SQLInvalidAuthorizationSpecException.class)
+        if (ex.getClass() == SQLInvalidAuthorizationSpecException.class)
         {
-            return new R2dbcPermissionDeniedException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new R2dbcPermissionDeniedException(ex.getMessage(), ex.getSQLState(), ex.getErrorCode(), ex);
         }
 
-        if (e.getClass() == SQLNonTransientConnectionException.class)
+        if (ex.getClass() == SQLNonTransientConnectionException.class)
         {
-            return new R2dbcNonTransientResourceException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new R2dbcNonTransientResourceException(ex.getMessage(), ex.getSQLState(), ex.getErrorCode(), ex);
         }
 
-        if (e.getClass() == SQLNonTransientException.class)
+        if (ex.getClass() == SQLNonTransientException.class)
         {
-            return new JdbcR2dbcNonTransientException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new JdbcR2dbcNonTransientException(ex.getMessage(), ex.getSQLState(), ex.getErrorCode(), ex);
         }
 
-        if (e.getClass() == SQLRecoverableException.class)
+        if (ex.getClass() == SQLRecoverableException.class)
         {
-            return new JdbcR2dbcNonTransientException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new JdbcR2dbcNonTransientException(ex.getMessage(), ex.getSQLState(), ex.getErrorCode(), ex);
         }
 
-        if (e.getClass() == SQLSyntaxErrorException.class)
+        if (ex.getClass() == SQLSyntaxErrorException.class)
         {
-            return new R2dbcBadGrammarException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new R2dbcBadGrammarException(ex.getMessage(), ex.getSQLState(), ex.getErrorCode(), ex);
         }
 
-        if (e.getClass() == SQLTimeoutException.class)
+        if (ex.getClass() == SQLTimeoutException.class)
         {
-            return new R2dbcTimeoutException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new R2dbcTimeoutException(ex.getMessage(), ex.getSQLState(), ex.getErrorCode(), ex);
         }
 
-        if (e.getClass() == SQLTransactionRollbackException.class)
+        if (ex.getClass() == SQLTransactionRollbackException.class)
         {
-            return new R2dbcRollbackException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new R2dbcRollbackException(ex.getMessage(), ex.getSQLState(), ex.getErrorCode(), ex);
         }
 
-        if (e.getClass() == SQLTransientConnectionException.class)
+        if (ex.getClass() == SQLTransientConnectionException.class)
         {
-            return new R2dbcTransientResourceException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new R2dbcTransientResourceException(ex.getMessage(), ex.getSQLState(), ex.getErrorCode(), ex);
         }
 
-        if (e.getClass() == SQLTransientException.class)
+        if (ex.getClass() == SQLTransientException.class)
         {
-            return new JdbcR2dbcTransientException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+            return new JdbcR2dbcTransientException(ex.getMessage(), ex.getSQLState(), ex.getErrorCode(), ex);
         }
 
-        return new JdbcR2dbcException(e.getMessage(), e.getSQLState(), e.getErrorCode(), e);
+        return new JdbcR2dbcException(ex.getMessage(), ex.getSQLState(), ex.getErrorCode(), ex);
     }
 
     /**

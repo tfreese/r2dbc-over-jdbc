@@ -1,7 +1,4 @@
-/**
- * Created: 19.03.2020
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc.converter.sql;
 
 import java.sql.JDBCType;
@@ -16,11 +13,12 @@ import java.util.Set;
 public class IntegerSqlMapper extends AbstractSqlMapper<Integer>
 {
     /**
-     * Erstellt ein neues {@link IntegerSqlMapper} Object.
+     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#getSupportedJdbcTypes()
      */
-    public IntegerSqlMapper()
+    @Override
+    public Set<JDBCType> getSupportedJdbcTypes()
     {
-        super();
+        return Set.of(JDBCType.INTEGER);
     }
 
     /**
@@ -46,14 +44,5 @@ public class IntegerSqlMapper extends AbstractSqlMapper<Integer>
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Integer value) throws SQLException
     {
         preparedStatement.setInt(parameterIndex, value);
-    }
-
-    /**
-     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#getSupportedJdbcTypes()
-     */
-    @Override
-    public Set<JDBCType> getSupportedJdbcTypes()
-    {
-        return Set.of(JDBCType.INTEGER);
     }
 }

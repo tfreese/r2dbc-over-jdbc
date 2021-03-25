@@ -1,7 +1,4 @@
-/**
- * Created: 19.03.2020
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc.converter.sql;
 
 import java.sql.JDBCType;
@@ -9,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
+
 import io.r2dbc.jdbc.util.R2dbcUtils;
 import io.r2dbc.spi.Clob;
 import reactor.core.publisher.Mono;
@@ -19,11 +17,12 @@ import reactor.core.publisher.Mono;
 public class ClobSqlMapper extends AbstractSqlMapper<Clob>
 {
     /**
-     * Erstellt ein neues {@link ClobSqlMapper} Object.
+     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#getSupportedJdbcTypes()
      */
-    public ClobSqlMapper()
+    @Override
+    public Set<JDBCType> getSupportedJdbcTypes()
     {
-        super();
+        return Set.of(JDBCType.CLOB);
     }
 
     /**
@@ -58,14 +57,5 @@ public class ClobSqlMapper extends AbstractSqlMapper<Clob>
         clob.setString(1, string);
 
         preparedStatement.setClob(parameterIndex, clob);
-    }
-
-    /**
-     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#getSupportedJdbcTypes()
-     */
-    @Override
-    public Set<JDBCType> getSupportedJdbcTypes()
-    {
-        return Set.of(JDBCType.CLOB);
     }
 }

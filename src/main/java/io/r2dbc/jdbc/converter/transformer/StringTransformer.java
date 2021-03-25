@@ -1,7 +1,4 @@
-/**
- * Created: 19.06.2019
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc.converter.transformer;
 
 import io.r2dbc.jdbc.util.R2dbcUtils;
@@ -13,14 +10,6 @@ import io.r2dbc.spi.Clob;
  */
 public class StringTransformer extends AbstractObjectTransofrmer<String>
 {
-    /**
-     * Erstellt ein neues {@link StringTransformer} Object.
-     */
-    public StringTransformer()
-    {
-        super();
-    }
-
     /**
      * @see io.r2dbc.jdbc.converter.transformer.ObjectTransformer#transform(java.lang.Object)
      */

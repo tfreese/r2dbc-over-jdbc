@@ -1,12 +1,10 @@
-/**
- * Created: 06.10.2019
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Objects;
+
 import io.r2dbc.spi.ConnectionMetadata;
 
 /**

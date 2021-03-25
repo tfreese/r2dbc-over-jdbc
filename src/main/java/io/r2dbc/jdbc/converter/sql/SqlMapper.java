@@ -1,7 +1,4 @@
-/**
- * Created: 19.03.2020
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc.converter.sql;
 
 import java.sql.JDBCType;
@@ -19,6 +16,16 @@ import java.util.Set;
 public interface SqlMapper<T>
 {
     /**
+     * @return Object
+     */
+    public Class<T> getJavaType();
+
+    /**
+     * @return {@link Set}
+     */
+    public Set<JDBCType> getSupportedJdbcTypes();
+
+    /**
      * @param resultSet {@link ResultSet}
      * @param columnLabel String
      * @return Object
@@ -33,14 +40,4 @@ public interface SqlMapper<T>
      * @throws SQLException Falls was schief geht.
      */
     public void mapToSql(PreparedStatement preparedStatement, int parameterIndex, T value) throws SQLException;
-
-    /**
-     * @return Object
-     */
-    public Class<T> getJavaType();
-
-    /**
-     * @return {@link Set}
-     */
-    public Set<JDBCType> getSupportedJdbcTypes();
 }

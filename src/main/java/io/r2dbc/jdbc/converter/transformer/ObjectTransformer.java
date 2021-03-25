@@ -1,7 +1,4 @@
-/**
- * Created: 19.06.2019
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc.converter.transformer;
 
 import io.r2dbc.spi.Row;
@@ -17,13 +14,13 @@ import io.r2dbc.spi.Row;
 public interface ObjectTransformer<T>
 {
     /**
+     * @return {@link Class}
+     */
+    public Class<T> getJavaType();
+
+    /**
      * @param value Object
      * @return Object
      */
     public T transform(Object value);
-
-    /**
-     * @return {@link Class}
-     */
-    public Class<T> getJavaType();
 }

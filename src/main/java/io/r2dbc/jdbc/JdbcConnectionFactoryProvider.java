@@ -1,7 +1,10 @@
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.util.Objects;
+
 import javax.sql.DataSource;
+
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
 import io.r2dbc.spi.ConnectionFactoryProvider;
@@ -30,14 +33,6 @@ public final class JdbcConnectionFactoryProvider implements ConnectionFactoryPro
     public static final Option<DataSource> DATASOURCE = Option.valueOf("datasource");
 
     /**
-     * Erstellt ein neues {@link JdbcConnectionFactoryProvider} Object.
-     */
-    public JdbcConnectionFactoryProvider()
-    {
-        super();
-    }
-
-    /**
      * @see io.r2dbc.spi.ConnectionFactoryProvider#create(io.r2dbc.spi.ConnectionFactoryOptions)
      */
     @Override
@@ -45,12 +40,10 @@ public final class JdbcConnectionFactoryProvider implements ConnectionFactoryPro
     {
         Objects.requireNonNull(connectionFactoryOptions, "connectionFactoryOptions must not be null");
 
-        JdbcConnectionConfiguration.Builder builder = JdbcConnectionConfiguration.builder();
-
         DataSource dataSource = connectionFactoryOptions.getValue(DATASOURCE);
-        builder.dataSource(dataSource);
 
-        return new JdbcConnectionFactory(builder.build());
+        JdbcConnectionConfiguration.Builder builder = JdbcConnectionConfiguration.builder();
+        builder.dataSource(dataSource);
 
         // String userName = connectionFactoryOptions.getValue(USER);
         //
@@ -82,8 +75,8 @@ public final class JdbcConnectionFactoryProvider implements ConnectionFactoryPro
         // builder.option(option);
         // }
         // }
-        //
-        // return new JdbcConnectionFactory(builder.build());
+
+        return new JdbcConnectionFactory(builder.build());
     }
 
     /**

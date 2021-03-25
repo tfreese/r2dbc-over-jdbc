@@ -1,7 +1,4 @@
-/**
- * Created: 14.06.2019
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc.util;
 
 import java.sql.SQLException;

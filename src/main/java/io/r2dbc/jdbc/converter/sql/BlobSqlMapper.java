@@ -1,7 +1,4 @@
-/**
- * Created: 19.03.2020
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc.converter.sql;
 
 import java.nio.ByteBuffer;
@@ -10,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
+
 import io.r2dbc.jdbc.util.R2dbcUtils;
 import io.r2dbc.spi.Blob;
 import reactor.core.publisher.Mono;
@@ -20,11 +18,12 @@ import reactor.core.publisher.Mono;
 public class BlobSqlMapper extends AbstractSqlMapper<Blob>
 {
     /**
-     * Erstellt ein neues {@link BlobSqlMapper} Object.
+     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#getSupportedJdbcTypes()
      */
-    public BlobSqlMapper()
+    @Override
+    public Set<JDBCType> getSupportedJdbcTypes()
     {
-        super();
+        return Set.of(JDBCType.BINARY, JDBCType.BLOB);
     }
 
     /**
@@ -59,14 +58,5 @@ public class BlobSqlMapper extends AbstractSqlMapper<Blob>
         blob.setBytes(1, byteBuffer.array());
 
         preparedStatement.setBlob(parameterIndex, blob);
-    }
-
-    /**
-     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#getSupportedJdbcTypes()
-     */
-    @Override
-    public Set<JDBCType> getSupportedJdbcTypes()
-    {
-        return Set.of(JDBCType.BINARY, JDBCType.BLOB);
     }
 }

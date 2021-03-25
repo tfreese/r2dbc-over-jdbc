@@ -1,7 +1,4 @@
-/**
- * Created: 19.06.2019
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc.converter.transformer;
 
 /**
@@ -9,14 +6,6 @@ package io.r2dbc.jdbc.converter.transformer;
  */
 public class ByteTransformer extends AbstractObjectTransofrmer<Byte>
 {
-    /**
-     * Erstellt ein neues {@link ByteTransformer} Object.
-     */
-    public ByteTransformer()
-    {
-        super();
-    }
-
     /**
      * @see io.r2dbc.jdbc.converter.transformer.ObjectTransformer#transform(java.lang.Object)
      */

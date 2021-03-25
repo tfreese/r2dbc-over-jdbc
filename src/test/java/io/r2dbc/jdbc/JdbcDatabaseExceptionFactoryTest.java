@@ -1,6 +1,8 @@
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
@@ -14,7 +16,9 @@ import java.sql.SQLTimeoutException;
 import java.sql.SQLTransactionRollbackException;
 import java.sql.SQLTransientConnectionException;
 import java.sql.SQLTransientException;
+
 import org.junit.jupiter.api.Test;
+
 import io.r2dbc.spi.R2dbcBadGrammarException;
 import io.r2dbc.spi.R2dbcDataIntegrityViolationException;
 import io.r2dbc.spi.R2dbcException;
@@ -35,7 +39,7 @@ final class JdbcDatabaseExceptionFactoryTest
      *
      */
     @Test
-    void featureNotSupportedException()
+    void testFeatureNotSupportedException()
     {
         assertThat(JdbcR2dbcExceptionFactory.create(new SQLFeatureNotSupportedException("SQLException", "SQLState", 999))).hasMessage("SQLException")
                 .isInstanceOf(R2dbcNonTransientException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
@@ -45,7 +49,7 @@ final class JdbcDatabaseExceptionFactoryTest
      *
      */
     @Test
-    void integrityConstraintViolationException()
+    void testIntegrityConstraintViolationException()
     {
         assertThat(JdbcR2dbcExceptionFactory.create(new SQLIntegrityConstraintViolationException("SQLException", "SQLState", 999))).hasMessage("SQLException")
                 .isInstanceOf(R2dbcDataIntegrityViolationException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
@@ -55,7 +59,7 @@ final class JdbcDatabaseExceptionFactoryTest
      *
      */
     @Test
-    void invalidAuthorizationSpecException()
+    void testInvalidAuthorizationSpecException()
     {
         assertThat(JdbcR2dbcExceptionFactory.create(new SQLInvalidAuthorizationSpecException("SQLException", "SQLState", 999))).hasMessage("SQLException")
                 .isInstanceOf(R2dbcPermissionDeniedException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
@@ -65,7 +69,7 @@ final class JdbcDatabaseExceptionFactoryTest
      *
      */
     @Test
-    void nonTransientConnectionException()
+    void testNonTransientConnectionException()
     {
         assertThat(JdbcR2dbcExceptionFactory.create(new SQLNonTransientConnectionException("SQLException", "SQLState", 999))).hasMessage("SQLException")
                 .isInstanceOf(R2dbcNonTransientResourceException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
@@ -75,7 +79,7 @@ final class JdbcDatabaseExceptionFactoryTest
      *
      */
     @Test
-    void nonTransientException()
+    void testNonTransientException()
     {
         assertThat(JdbcR2dbcExceptionFactory.create(new SQLNonTransientException("SQLException", "SQLState", 999))).hasMessage("SQLException")
                 .isInstanceOf(R2dbcNonTransientException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
@@ -85,7 +89,7 @@ final class JdbcDatabaseExceptionFactoryTest
      *
      */
     @Test
-    void recoverableException()
+    void testRecoverableException()
     {
         assertThat(JdbcR2dbcExceptionFactory.create(new SQLRecoverableException("SQLException", "SQLState", 999))).hasMessage("SQLException")
                 .isInstanceOf(R2dbcNonTransientException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
@@ -95,7 +99,7 @@ final class JdbcDatabaseExceptionFactoryTest
      *
      */
     @Test
-    void sqlDataException()
+    void testSqlDataException()
     {
         assertThat(JdbcR2dbcExceptionFactory.create(new SQLDataException("SQLDataException", "SQLState", 999))).hasMessage("SQLDataException")
                 .isInstanceOf(R2dbcException.class).extracting("sqlState", "errorCode").contains("SQLState", 999);
@@ -105,7 +109,7 @@ final class JdbcDatabaseExceptionFactoryTest
      *
      */
     @Test
-    void sqlException()
+    void testSqlException()
     {
         assertThat(JdbcR2dbcExceptionFactory.create(new SQLException("SQLException", "SQLState", 999))).hasMessage("SQLException")
                 .isInstanceOf(R2dbcException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
@@ -115,7 +119,7 @@ final class JdbcDatabaseExceptionFactoryTest
      *
      */
     @Test
-    void syntaxErrorException()
+    void testSyntaxErrorException()
     {
         assertThat(JdbcR2dbcExceptionFactory.create(new SQLSyntaxErrorException("SQLException", "SQLState", 999))).hasMessage("SQLException")
                 .isInstanceOf(R2dbcBadGrammarException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
@@ -125,7 +129,7 @@ final class JdbcDatabaseExceptionFactoryTest
      *
      */
     @Test
-    void timeoutException()
+    void testTimeoutException()
     {
         assertThat(JdbcR2dbcExceptionFactory.create(new SQLTimeoutException("SQLException", "SQLState", 999))).hasMessage("SQLException")
                 .isInstanceOf(R2dbcTimeoutException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
@@ -135,7 +139,7 @@ final class JdbcDatabaseExceptionFactoryTest
      *
      */
     @Test
-    void transactionRollbackException()
+    void testTransactionRollbackException()
     {
         assertThat(JdbcR2dbcExceptionFactory.create(new SQLTransactionRollbackException("SQLException", "SQLState", 999))).hasMessage("SQLException")
                 .isInstanceOf(R2dbcRollbackException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
@@ -145,7 +149,7 @@ final class JdbcDatabaseExceptionFactoryTest
      *
      */
     @Test
-    void transientConnectionException()
+    void testTransientConnectionException()
     {
         assertThat(JdbcR2dbcExceptionFactory.create(new SQLTransientConnectionException("SQLException", "SQLState", 999))).hasMessage("SQLException")
                 .isInstanceOf(R2dbcTransientResourceException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
@@ -155,7 +159,7 @@ final class JdbcDatabaseExceptionFactoryTest
      *
      */
     @Test
-    void transientException()
+    void testTransientException()
     {
         assertThat(JdbcR2dbcExceptionFactory.create(new SQLTransientException("SQLException", "SQLState", 999))).hasMessage("SQLException")
                 .isInstanceOf(R2dbcTransientException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
@@ -165,7 +169,7 @@ final class JdbcDatabaseExceptionFactoryTest
      *
      */
     @Test
-    void unknownException()
+    void testUnknownException()
     {
         assertThat(JdbcR2dbcExceptionFactory.create(new SQLException("SQLException", "SQLState", 999))).hasMessage("SQLException")
                 .isInstanceOf(R2dbcException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);

@@ -1,13 +1,8 @@
-/*
- * Copyright 2017-2018 the original author or authors. Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at https://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed
- * to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing permissions and limitations under the License.
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.util.Objects;
+
 import javax.sql.DataSource;
 
 /**
@@ -25,12 +20,12 @@ final class JdbcConnectionConfiguration
         /**
         *
         */
-        private DataSource dataSource = null;
+        private DataSource dataSource;
 
         // /**
         // *
         // */
-        // private String driver = null;
+        // private String driver;
         //
         // /**
         // *
@@ -40,17 +35,17 @@ final class JdbcConnectionConfiguration
         // /**
         // *
         // */
-        // private String password = null;
+        // private String password;
         //
         // /**
         // *
         // */
-        // private String url = null;
+        // private String url;
         //
         // /**
         // *
         // */
-        // private String username = null;
+        // private String username;
 
         /**
          * Erstellt ein neues {@link Builder} Object.
@@ -129,7 +124,7 @@ final class JdbcConnectionConfiguration
         {
             StringBuilder builder = new StringBuilder();
             builder.append("Builder [");
-            // builder.append("dataSource=").append(this.dataSource);
+            builder.append("dataSource=").append(this.dataSource);
             // builder.append(", username=").append(this.username);
             // builder.append(", password=").append(this.password);
             // builder.append(", url=").append(this.url);
@@ -173,7 +168,7 @@ final class JdbcConnectionConfiguration
     /**
     *
     */
-    private DataSource dataSource = null;
+    private final DataSource dataSource;
 
     // /**
     // *

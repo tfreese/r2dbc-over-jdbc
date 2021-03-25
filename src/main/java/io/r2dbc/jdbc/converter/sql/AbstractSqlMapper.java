@@ -1,7 +1,4 @@
-/**
- * Created: 19.03.2020
- */
-
+// Created: 14.06.2019
 package io.r2dbc.jdbc.converter.sql;
 
 import java.lang.reflect.ParameterizedType;
@@ -24,7 +21,7 @@ public abstract class AbstractSqlMapper<T> implements SqlMapper<T>
      * Erstellt ein neues {@link AbstractSqlMapper} Object.
      */
     @SuppressWarnings("unchecked")
-    public AbstractSqlMapper()
+    protected AbstractSqlMapper()
     {
         super();
 
@@ -36,7 +33,7 @@ public abstract class AbstractSqlMapper<T> implements SqlMapper<T>
      *
      * @param javaType Class
      */
-    public AbstractSqlMapper(final Class<T> javaType)
+    protected AbstractSqlMapper(final Class<T> javaType)
     {
         super();
 
