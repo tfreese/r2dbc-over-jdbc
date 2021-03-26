@@ -70,58 +70,15 @@ public class JdbcColumnMetadata implements ColumnMetadata
             return true;
         }
 
-        if (obj == null)
-        {
-            return false;
-        }
-
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof JdbcColumnMetadata))
         {
             return false;
         }
 
         JdbcColumnMetadata other = (JdbcColumnMetadata) obj;
 
-        if (this.name == null)
-        {
-            if (other.name != null)
-            {
-                return false;
-            }
-        }
-        else if (!this.name.equals(other.name))
-        {
-            return false;
-        }
-
-        if (this.jdbcType == null)
-        {
-            if (other.jdbcType != null)
-            {
-                return false;
-            }
-        }
-        else if (!this.jdbcType.equals(other.jdbcType))
-        {
-            return false;
-        }
-
-        if (this.nullability != other.nullability)
-        {
-            return false;
-        }
-
-        if (this.precision != other.precision)
-        {
-            return false;
-        }
-
-        if (this.scale != other.scale)
-        {
-            return false;
-        }
-
-        return true;
+        return (this.jdbcType == other.jdbcType) && Objects.equals(this.name, other.name) && (this.nullability == other.nullability)
+                && (this.precision == other.precision) && (this.scale == other.scale);
     }
 
     /**
@@ -175,15 +132,6 @@ public class JdbcColumnMetadata implements ColumnMetadata
     @Override
     public int hashCode()
     {
-        final int prime = 31;
-        int result = 1;
-
-        result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
-        result = (prime * result) + ((this.jdbcType == null) ? 0 : this.jdbcType.hashCode());
-        result = (prime * result) + ((this.nullability == null) ? 0 : this.nullability.hashCode());
-        result = (prime * result) + this.precision;
-        result = (prime * result) + this.scale;
-
-        return result;
+        return Objects.hash(this.jdbcType, this.name, this.nullability, this.precision, this.scale);
     }
 }

@@ -38,7 +38,17 @@ public class JdbcRow implements Row
     @Override
     public <T> T get(final int index, final Class<T> type)
     {
-        return getByIdentifier(index, type);
+        Object value = this.values.get(index);
+
+        if (value == null)
+        {
+            throw new IllegalArgumentException(
+                    String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String column name.", index));
+        }
+
+        ObjectTransformer<T> transformer = Converters.getTransformer(type);
+
+        return transformer.transform(value);
     }
 
     /**
@@ -47,46 +57,26 @@ public class JdbcRow implements Row
     @Override
     public <T> T get(final String name, final Class<T> type)
     {
-        return getByIdentifier(name, type);
-    }
-
-    /**
-     * @param <T> Value Type
-     * @param identifier Object
-     * @param type Class
-     * @return OBject
-     */
-    private <T> T getByIdentifier(final Object identifier, final Class<T> type)
-    {
-        Objects.requireNonNull(identifier, "identifier must not be null");
-        Objects.requireNonNull(type, "type must not be null");
-
-        final Object key;
-
-        if (identifier instanceof String)
+        if (name == null)
         {
-            key = ((String) identifier).toUpperCase();
-        }
-        else if (identifier instanceof Integer)
-        {
-            key = identifier;
-        }
-        else
-        {
-            throw new IllegalArgumentException(
-                    String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String column name.", identifier));
+            throw new IllegalArgumentException("name is null");
         }
 
-        if (!this.values.containsKey(key))
+        if (type == null)
         {
-            throw new IllegalArgumentException(String.format("Column identifier '%s' does not exist", key));
+            throw new IllegalArgumentException("type is null");
         }
 
-        Object value = this.values.get(key);
+        Object value = this.values.get(name.toLowerCase());
 
         if (value == null)
         {
-            return null;
+            value = this.values.get(name.toUpperCase());
+        }
+
+        if (value == null)
+        {
+            throw new IllegalArgumentException(String.format("Column identifier '%s' does not exist", name));
         }
 
         ObjectTransformer<T> transformer = Converters.getTransformer(type);

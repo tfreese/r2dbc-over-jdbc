@@ -165,6 +165,21 @@ public class JdbcConnection implements Connection
     @Override
     public Mono<Void> createSavepoint(final String name)
     {
+        if (name == null)
+        {
+            throw new IllegalArgumentException("name is null");
+        }
+
+        // Begin Transaction.
+        try
+        {
+            this.connection.setAutoCommit(false);
+        }
+        catch (SQLException ex)
+        {
+            // Ignore
+        }
+
         // return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
         return this.connectionMono.handle((con, sink) -> {
             try
@@ -192,6 +207,11 @@ public class JdbcConnection implements Connection
     @Override
     public JdbcStatement createStatement(final String sql)
     {
+        if (sql == null)
+        {
+            throw new IllegalArgumentException("sql is null");
+        }
+
         return new JdbcStatement(this.connection, sql);
         // return this.connectionMono.handle((connection, sink) -> {
         // try
@@ -317,6 +337,11 @@ public class JdbcConnection implements Connection
     @Override
     public Mono<Void> releaseSavepoint(final String name)
     {
+        if (name == null)
+        {
+            throw new IllegalArgumentException("name is null");
+        }
+
         // return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
         return this.connectionMono.handle((con, sink) -> {
             try

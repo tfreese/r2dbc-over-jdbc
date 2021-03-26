@@ -302,6 +302,13 @@ public abstract class AbstractJdbcStatement implements Statement
     @Override
     public Statement bind(final int index, final Object value)
     {
+        requireValidIndex(index);
+
+        if (value == null)
+        {
+            throw new IllegalArgumentException("value is null");
+        }
+
         getBindings().getCurrent().put(index, value);
 
         return this;
@@ -313,6 +320,16 @@ public abstract class AbstractJdbcStatement implements Statement
     @Override
     public Statement bind(final String name, final Object value)
     {
+        if (name == null)
+        {
+            throw new IllegalArgumentException("name is null");
+        }
+
+        if (value == null)
+        {
+            throw new IllegalArgumentException("value is null");
+        }
+
         try
         {
             return bind(Integer.parseInt(name), value);
@@ -322,6 +339,24 @@ public abstract class AbstractJdbcStatement implements Statement
             throw new IllegalArgumentException(
                     String.format("Name '%s' is not valid. Should either be an Integer index or a String represented integer.", name));
         }
+    }
+
+    /**
+     * @see io.r2dbc.spi.Statement#bindNull(int, java.lang.Class)
+     */
+    @Override
+    public Statement bindNull(final int index, final Class<?> type)
+    {
+        requireValidIndex(index);
+
+        if (type == null)
+        {
+            throw new IllegalArgumentException("type is null");
+        }
+
+        getBindings().getCurrent().put(index, null);
+
+        return this;
     }
 
     // /**
@@ -344,14 +379,30 @@ public abstract class AbstractJdbcStatement implements Statement
     // }
 
     /**
-     * @see io.r2dbc.spi.Statement#bindNull(int, java.lang.Class)
+     * @see io.r2dbc.spi.Statement#bindNull(java.lang.String, java.lang.Class)
      */
     @Override
-    public Statement bindNull(final int index, final Class<?> type)
+    public Statement bindNull(final String name, final Class<?> type)
     {
-        getBindings().getCurrent().put(index, null);
+        if (name == null)
+        {
+            throw new IllegalArgumentException("name is null");
+        }
 
-        return this;
+        if (type == null)
+        {
+            throw new IllegalArgumentException("type is null");
+        }
+
+        try
+        {
+            return bind(Integer.parseInt(name), type);
+        }
+        catch (Exception ex)
+        {
+            throw new IllegalArgumentException(
+                    String.format("Name '%s' is not valid. Should either be an Integer index or a String represented integer.", name));
+        }
     }
 
     // /**
@@ -372,23 +423,6 @@ public abstract class AbstractJdbcStatement implements Statement
     // throw new IllegalArgumentException(
     // String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String represented integer.", identifier));
     // }
-
-    /**
-     * @see io.r2dbc.spi.Statement#bindNull(java.lang.String, java.lang.Class)
-     */
-    @Override
-    public Statement bindNull(final String name, final Class<?> type)
-    {
-        try
-        {
-            return bind(Integer.parseInt(name), type);
-        }
-        catch (Exception ex)
-        {
-            throw new IllegalArgumentException(
-                    String.format("Name '%s' is not valid. Should either be an Integer index or a String represented integer.", name));
-        }
-    }
 
     /**
      * @return {@link Bindings}
@@ -428,6 +462,20 @@ public abstract class AbstractJdbcStatement implements Statement
     protected SQL_OPERATION getSqlOperation()
     {
         return this.sqlOperation;
+    }
+
+    /**
+     * Checks that the specified 0-based {@code index} is within the range of valid parameter indexes for this statement.
+     *
+     * @param index A 0-based parameter index
+     * @throws IndexOutOfBoundsException If the {@code index} is outside of the valid range.
+     */
+    protected void requireValidIndex(final int index)
+    {
+        if (index < 0)
+        {
+            throw new IndexOutOfBoundsException("Parameter index is non-positive: " + index);
+        }
     }
 
     // /**
