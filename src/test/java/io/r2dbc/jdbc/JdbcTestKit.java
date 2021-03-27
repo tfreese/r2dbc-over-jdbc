@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.jdbc.core.JdbcOperations;
 
+import io.r2dbc.jdbc.codecs.DefaultCodecs;
 import io.r2dbc.jdbc.util.DBServerExtension;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.test.TestKit;
@@ -229,7 +230,7 @@ final class JdbcTestKit implements TestKit<Integer>
     {
         if (connectionFactory == null)
         {
-            connectionFactory = new JdbcConnectionFactory(SERVER.getDataSource());
+            connectionFactory = new JdbcConnectionFactory(SERVER.getDataSource(), new DefaultCodecs());
         }
 
         return connectionFactory;

@@ -7,6 +7,8 @@ import java.util.Objects;
 
 import javax.sql.DataSource;
 
+import io.r2dbc.jdbc.codecs.Codecs;
+import io.r2dbc.jdbc.codecs.DefaultCodecs;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryMetadata;
 import reactor.core.publisher.Mono;
@@ -21,20 +23,27 @@ public final class JdbcConnectionFactory implements ConnectionFactory
     /**
      *
      */
-    private final Mono<Connection> connectionFactory;
+    private final Codecs codecs;
+
+    /**
+     *
+     */
+    private final Mono<Connection> jdbcConnectionFactory;
 
     /**
      * Erstellt ein neues {@link JdbcConnectionFactory} Object.
      *
      * @param dataSource {@link DataSource}
+     * @param codecs {@link Codecs}
      */
-    public JdbcConnectionFactory(final DataSource dataSource)
+    public JdbcConnectionFactory(final DataSource dataSource, final Codecs codecs)
     {
         super();
 
         Objects.requireNonNull(dataSource, "dataSource must not be null");
 
-        this.connectionFactory = Mono.fromCallable(dataSource::getConnection).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create);
+        this.jdbcConnectionFactory = Mono.fromCallable(dataSource::getConnection).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create);
+        this.codecs = new DefaultCodecs();
     }
 
     /**
@@ -44,7 +53,7 @@ public final class JdbcConnectionFactory implements ConnectionFactory
      */
     public JdbcConnectionFactory(final JdbcConnectionConfiguration connectionConfiguration)
     {
-        this(connectionConfiguration.getDataSource());
+        this(connectionConfiguration.getDataSource(), connectionConfiguration.getCodecs());
     }
 
     /**
@@ -53,7 +62,7 @@ public final class JdbcConnectionFactory implements ConnectionFactory
     @Override
     public Mono<JdbcConnection> create()
     {
-        return this.connectionFactory.map(JdbcConnection::new);
+        return this.jdbcConnectionFactory.map(connection -> new JdbcConnection(connection, this.codecs));
     }
 
     /**

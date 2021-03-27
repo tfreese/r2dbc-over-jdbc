@@ -22,6 +22,8 @@ import java.sql.SQLTransactionRollbackException;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 
+import io.r2dbc.jdbc.codecs.Codecs;
+import io.r2dbc.jdbc.codecs.DefaultCodecs;
 import io.r2dbc.spi.R2dbcNonTransientResourceException;
 import io.r2dbc.spi.R2dbcRollbackException;
 import reactor.test.StepVerifier;
@@ -31,6 +33,11 @@ import reactor.test.StepVerifier;
  */
 final class JdbcConnectionTest
 {
+    /**
+    *
+    */
+    private final Codecs codecs = new DefaultCodecs();
+
     /**
      *
      */
@@ -42,7 +49,7 @@ final class JdbcConnectionTest
     @Test
     void testBeginTransaction()
     {
-        new JdbcConnection(this.connection).beginTransaction().as(StepVerifier::create).verifyComplete();
+        new JdbcConnection(this.connection, this.codecs).beginTransaction().as(StepVerifier::create).verifyComplete();
     }
 
     /**
@@ -56,7 +63,7 @@ final class JdbcConnectionTest
         doThrow(new SQLNonTransientConnectionException("Unable to disable autocommits", "some state", 999)).when(this.connection)
                 .setAutoCommit(ArgumentMatchers.anyBoolean());
 
-        new JdbcConnection(this.connection).beginTransaction().as(StepVerifier::create)
+        new JdbcConnection(this.connection, this.codecs).beginTransaction().as(StepVerifier::create)
                 .verifyErrorMatches(R2dbcNonTransientResourceException.class::isInstance);
     }
 
@@ -69,7 +76,7 @@ final class JdbcConnectionTest
         when(this.connection.getAutoCommit()).thenReturn(true);
         verifyNoMoreInteractions(this.connection);
 
-        new JdbcConnection(this.connection).beginTransaction().as(StepVerifier::create).verifyComplete();
+        new JdbcConnection(this.connection, this.codecs).beginTransaction().as(StepVerifier::create).verifyComplete();
     }
 
     /**
@@ -80,7 +87,7 @@ final class JdbcConnectionTest
     {
         when(this.connection.isClosed()).thenReturn(false);
 
-        new JdbcConnection(this.connection).close().as(StepVerifier::create).verifyComplete();
+        new JdbcConnection(this.connection, this.codecs).close().as(StepVerifier::create).verifyComplete();
     }
 
     /**
@@ -92,7 +99,7 @@ final class JdbcConnectionTest
         when(this.connection.isClosed()).thenReturn(true);
         verifyNoMoreInteractions(this.connection);
 
-        new JdbcConnection(this.connection).close().as(StepVerifier::create).verifyComplete();
+        new JdbcConnection(this.connection, this.codecs).close().as(StepVerifier::create).verifyComplete();
     }
 
     /**
@@ -103,7 +110,7 @@ final class JdbcConnectionTest
     {
         when(this.connection.getAutoCommit()).thenReturn(false);
 
-        new JdbcConnection(this.connection).commitTransaction().as(StepVerifier::create).verifyComplete();
+        new JdbcConnection(this.connection, this.codecs).commitTransaction().as(StepVerifier::create).verifyComplete();
     }
 
     /**
@@ -116,7 +123,8 @@ final class JdbcConnectionTest
         when(this.connection.getAutoCommit()).thenReturn(false);
         doThrow(new SQLTransactionRollbackException("can't commit", "some state", 999)).when(this.connection).commit();
 
-        new JdbcConnection(this.connection).commitTransaction().as(StepVerifier::create).verifyErrorMatches(R2dbcRollbackException.class::isInstance);
+        new JdbcConnection(this.connection, this.codecs).commitTransaction().as(StepVerifier::create)
+                .verifyErrorMatches(R2dbcRollbackException.class::isInstance);
     }
 
     /**
@@ -128,7 +136,7 @@ final class JdbcConnectionTest
         when(this.connection.getAutoCommit()).thenReturn(true);
         verifyNoMoreInteractions(this.connection);
 
-        new JdbcConnection(this.connection).commitTransaction().as(StepVerifier::create).verifyComplete();
+        new JdbcConnection(this.connection, this.codecs).commitTransaction().as(StepVerifier::create).verifyComplete();
     }
 
     /**
@@ -137,7 +145,7 @@ final class JdbcConnectionTest
     @Test
     void testConstructorNoClient()
     {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcConnection(null)).withMessage("connection must not be null");
+        assertThatNullPointerException().isThrownBy(() -> new JdbcConnection(null, null)).withMessage("connection must not be null");
     }
 
     /**
@@ -146,7 +154,7 @@ final class JdbcConnectionTest
     @Test
     void testCreateBatch()
     {
-        JdbcConnection jdbcConnection = new JdbcConnection(this.connection);
+        JdbcConnection jdbcConnection = new JdbcConnection(this.connection, this.codecs);
 
         // assertThat(new JdbcConnection(connection).createBatch()).isInstanceOf(JdbcBatch.class);
         assertThatThrownBy(jdbcConnection::createBatch).isInstanceOf(UnsupportedOperationException.class);
@@ -158,7 +166,7 @@ final class JdbcConnectionTest
     @Test
     void testCreateSavepoint()
     {
-        new JdbcConnection(this.connection).createSavepoint("test").as(StepVerifier::create).verifyComplete();
+        new JdbcConnection(this.connection, this.codecs).createSavepoint("test").as(StepVerifier::create).verifyComplete();
     }
 
     /**
@@ -169,7 +177,7 @@ final class JdbcConnectionTest
     {
         // new JdbcConnection(this.connection).createSavepoint(null).as(StepVerifier::create).verifyErrorMatches(IllegalArgumentException.class::isInstance);
 
-        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcConnection(this.connection).createSavepoint(null));
+        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcConnection(this.connection, this.codecs).createSavepoint(null));
     }
 
     /**
@@ -178,12 +186,12 @@ final class JdbcConnectionTest
     @Test
     void testCreateStatement()
     {
-        assertThat(new JdbcConnection(this.connection).createStatement("select-query-?")).isInstanceOf(JdbcStatement.class);
-        assertThat(new JdbcConnection(this.connection).createStatement("insert-query-?")).isInstanceOf(JdbcStatement.class);
-        assertThat(new JdbcConnection(this.connection).createStatement("update-query-?")).isInstanceOf(JdbcStatement.class);
-        assertThat(new JdbcConnection(this.connection).createStatement("delete-query-?")).isInstanceOf(JdbcStatement.class);
+        assertThat(new JdbcConnection(this.connection, this.codecs).createStatement("select-query-?")).isInstanceOf(JdbcStatement.class);
+        assertThat(new JdbcConnection(this.connection, this.codecs).createStatement("insert-query-?")).isInstanceOf(JdbcStatement.class);
+        assertThat(new JdbcConnection(this.connection, this.codecs).createStatement("update-query-?")).isInstanceOf(JdbcStatement.class);
+        assertThat(new JdbcConnection(this.connection, this.codecs).createStatement("delete-query-?")).isInstanceOf(JdbcStatement.class);
 
-        // assertThatThrownBy(() -> new JdbcConnection(this.connection).createStatement("some-query-?")).isInstanceOf(R2dbcBadGrammarException.class);
+        // assertThatThrownBy(() -> new JdbcConnection(this.connection,codecs).createStatement("some-query-?")).isInstanceOf(R2dbcBadGrammarException.class);
     }
 
     /**
@@ -194,7 +202,7 @@ final class JdbcConnectionTest
     {
         // new JdbcConnection(this.connection).releaseSavepoint("test").as(StepVerifier::create)
         // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
-        new JdbcConnection(this.connection).releaseSavepoint("test").as(StepVerifier::create).verifyComplete();
+        new JdbcConnection(this.connection, this.codecs).releaseSavepoint("test").as(StepVerifier::create).verifyComplete();
     }
 
     /**
@@ -203,11 +211,12 @@ final class JdbcConnectionTest
     @Test
     void testReleaseSavepointNoName()
     {
-        // new JdbcConnection(this.connection).releaseSavepoint(null).as(StepVerifier::create)
+        // new JdbcConnection(this.connection,codecs).releaseSavepoint(null).as(StepVerifier::create)
         // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
-        // new JdbcConnection(this.connection).releaseSavepoint(null).as(StepVerifier::create).verifyErrorMatches(IllegalArgumentException.class::isInstance);
+        // new
+        // JdbcConnection(this.connection,codecs).releaseSavepoint(null).as(StepVerifier::create).verifyErrorMatches(IllegalArgumentException.class::isInstance);
 
-        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcConnection(this.connection).releaseSavepoint(null));
+        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcConnection(this.connection, this.codecs).releaseSavepoint(null));
     }
 
     /**
@@ -218,7 +227,7 @@ final class JdbcConnectionTest
     {
         when(this.connection.getAutoCommit()).thenReturn(false);
 
-        new JdbcConnection(this.connection).rollbackTransaction().as(StepVerifier::create).verifyComplete();
+        new JdbcConnection(this.connection, this.codecs).rollbackTransaction().as(StepVerifier::create).verifyComplete();
     }
 
     /**
@@ -231,7 +240,8 @@ final class JdbcConnectionTest
         when(this.connection.getAutoCommit()).thenReturn(false);
         doThrow(new SQLTransactionRollbackException("can't commit", "some state", 999)).when(this.connection).rollback();
 
-        new JdbcConnection(this.connection).rollbackTransaction().as(StepVerifier::create).verifyErrorMatches(R2dbcRollbackException.class::isInstance);
+        new JdbcConnection(this.connection, this.codecs).rollbackTransaction().as(StepVerifier::create)
+                .verifyErrorMatches(R2dbcRollbackException.class::isInstance);
     }
 
     /**
@@ -243,7 +253,7 @@ final class JdbcConnectionTest
         when(this.connection.getAutoCommit()).thenReturn(true);
         verifyNoMoreInteractions(this.connection);
 
-        new JdbcConnection(this.connection).rollbackTransaction().as(StepVerifier::create).verifyComplete();
+        new JdbcConnection(this.connection, this.codecs).rollbackTransaction().as(StepVerifier::create).verifyComplete();
     }
 
     /**
@@ -254,7 +264,7 @@ final class JdbcConnectionTest
     {
         // new JdbcConnection(this.connection).rollbackTransactionToSavepoint("test").as(StepVerifier::create)
         // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
-        new JdbcConnection(this.connection).rollbackTransactionToSavepoint("test").as(StepVerifier::create).verifyComplete();
+        new JdbcConnection(this.connection, this.codecs).rollbackTransactionToSavepoint("test").as(StepVerifier::create).verifyComplete();
     }
 
     /**
@@ -265,7 +275,7 @@ final class JdbcConnectionTest
     {
         // new JdbcConnection(this.connection).rollbackTransactionToSavepoint(null).as(StepVerifier::create)
         // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
-        new JdbcConnection(this.connection).rollbackTransactionToSavepoint(null).as(StepVerifier::create)
+        new JdbcConnection(this.connection, this.codecs).rollbackTransactionToSavepoint(null).as(StepVerifier::create)
                 .verifyErrorMatches(NullPointerException.class::isInstance);
     }
 
@@ -277,7 +287,7 @@ final class JdbcConnectionTest
     {
         // .expectError(NullPointerException.class)
         // .expectNextCount(1).verifyComplete();
-        new JdbcConnection(this.connection).setTransactionIsolationLevel(null).as(StepVerifier::create)
+        new JdbcConnection(this.connection, this.codecs).setTransactionIsolationLevel(null).as(StepVerifier::create)
                 .verifyErrorMatches(NullPointerException.class::isInstance);
     }
 
@@ -290,7 +300,7 @@ final class JdbcConnectionTest
         // when(this.connection.getAutoCommit()).thenReturn(false);
         // when(this.client.execute("SET LOCK_MODE 0")).thenReturn(Mono.empty());
 
-        new JdbcConnection(this.connection).setTransactionIsolationLevel(READ_UNCOMMITTED).as(StepVerifier::create).verifyComplete();
+        new JdbcConnection(this.connection, this.codecs).setTransactionIsolationLevel(READ_UNCOMMITTED).as(StepVerifier::create).verifyComplete();
     }
 
     /**
@@ -302,7 +312,7 @@ final class JdbcConnectionTest
         // when(this.connection.getAutoCommit()).thenReturn(false);
         // when(this.client.execute("SET LOCK_MODE 1")).thenReturn(Mono.empty());
 
-        new JdbcConnection(this.connection).setTransactionIsolationLevel(REPEATABLE_READ).as(StepVerifier::create).verifyComplete();
+        new JdbcConnection(this.connection, this.codecs).setTransactionIsolationLevel(REPEATABLE_READ).as(StepVerifier::create).verifyComplete();
     }
 
     /**
@@ -314,6 +324,6 @@ final class JdbcConnectionTest
         // when(this.connection.getAutoCommit()).thenReturn(false);
         // when(this.client.execute("SET LOCK_MODE 1")).thenReturn(Mono.empty());
 
-        new JdbcConnection(this.connection).setTransactionIsolationLevel(SERIALIZABLE).as(StepVerifier::create).verifyComplete();
+        new JdbcConnection(this.connection, this.codecs).setTransactionIsolationLevel(SERIALIZABLE).as(StepVerifier::create).verifyComplete();
     }
 }

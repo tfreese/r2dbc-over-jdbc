@@ -11,6 +11,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.r2dbc.jdbc.codecs.Codecs;
 import io.r2dbc.spi.Batch;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionMetadata;
@@ -33,6 +34,11 @@ public class JdbcConnection implements Connection
     /**
     *
     */
+    private final Codecs codecs;
+
+    /**
+    *
+    */
     private final java.sql.Connection connection;
 
     /**
@@ -49,12 +55,14 @@ public class JdbcConnection implements Connection
      * Erstellt ein neues {@link JdbcConnection} Object.
      *
      * @param connection {@link java.sql.Connection}
+     * @param codecs {@link Codecs}
      */
-    public JdbcConnection(final java.sql.Connection connection)
+    public JdbcConnection(final java.sql.Connection connection, final Codecs codecs)
     {
         super();
 
         this.connection = Objects.requireNonNull(connection, "connection must not be null");
+        this.codecs = Objects.requireNonNull(codecs, "codecs must not be null");
 
         this.connectionMono = Mono.just(this.connection);
     }

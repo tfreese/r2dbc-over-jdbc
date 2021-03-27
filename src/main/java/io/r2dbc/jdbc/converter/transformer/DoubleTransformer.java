@@ -4,7 +4,7 @@ package io.r2dbc.jdbc.converter.transformer;
 /**
  * @author Thomas Freese
  */
-public class DoubleTransformer extends AbstractObjectTransofrmer<Double>
+public class DoubleTransformer extends AbstractObjectTransformer<Double>
 {
     /**
      * @see io.r2dbc.jdbc.converter.transformer.ObjectTransformer#transform(java.lang.Object)

@@ -12,7 +12,7 @@ import io.r2dbc.spi.Clob;
  *
  * @author Thomas Freese
  */
-public class DefaultObjectTransformer extends AbstractObjectTransofrmer<Object>
+public class DefaultObjectTransformer extends AbstractObjectTransformer<Object>
 {
     /**
      * Fallback-Converter, returns the same Object.

@@ -29,7 +29,7 @@ final class JdbcConnectionFactoryTest
     @Test
     void testConstructorNoConfiguration()
     {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcConnectionFactory((DataSource) null)).withMessage("dataSource must not be null");
+        assertThatNullPointerException().isThrownBy(() -> new JdbcConnectionFactory((DataSource) null, null)).withMessage("dataSource must not be null");
     }
 
     /**

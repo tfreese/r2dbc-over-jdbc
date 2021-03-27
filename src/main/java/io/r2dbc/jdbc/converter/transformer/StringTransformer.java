@@ -8,7 +8,7 @@ import io.r2dbc.spi.Clob;
 /**
  * @author Thomas Freese
  */
-public class StringTransformer extends AbstractObjectTransofrmer<String>
+public class StringTransformer extends AbstractObjectTransformer<String>
 {
     /**
      * @see io.r2dbc.jdbc.converter.transformer.ObjectTransformer#transform(java.lang.Object)

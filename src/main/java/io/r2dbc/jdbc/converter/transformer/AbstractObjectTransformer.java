@@ -14,7 +14,7 @@ import io.r2dbc.spi.Row;
  * @author Thomas Freese
  * @param <T> Type
  */
-public abstract class AbstractObjectTransofrmer<T> implements ObjectTransformer<T>
+public abstract class AbstractObjectTransformer<T> implements ObjectTransformer<T>
 {
     /**
     *
@@ -22,10 +22,10 @@ public abstract class AbstractObjectTransofrmer<T> implements ObjectTransformer<
     private final Class<T> javaType;
 
     /**
-     * Erstellt ein neues {@link AbstractObjectTransofrmer} Object.
+     * Erstellt ein neues {@link AbstractObjectTransformer} Object.
      */
     @SuppressWarnings("unchecked")
-    protected AbstractObjectTransofrmer()
+    protected AbstractObjectTransformer()
     {
         super();
 
@@ -33,11 +33,11 @@ public abstract class AbstractObjectTransofrmer<T> implements ObjectTransformer<
     }
 
     /**
-     * Erstellt ein neues {@link AbstractObjectTransofrmer} Object.
+     * Erstellt ein neues {@link AbstractObjectTransformer} Object.
      *
      * @param javaType {@link Class}
      */
-    protected AbstractObjectTransofrmer(final Class<T> javaType)
+    protected AbstractObjectTransformer(final Class<T> javaType)
     {
         super();
 

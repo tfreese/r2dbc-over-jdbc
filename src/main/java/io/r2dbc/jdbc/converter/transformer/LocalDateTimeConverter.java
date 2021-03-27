@@ -8,7 +8,7 @@ import java.time.ZoneId;
 /**
  * @author Thomas Freese
  */
-public class LocalDateTimeConverter extends AbstractObjectTransofrmer<LocalDateTime>
+public class LocalDateTimeConverter extends AbstractObjectTransformer<LocalDateTime>
 {
     /**
      * @see io.r2dbc.jdbc.converter.transformer.ObjectTransformer#transform(java.lang.Object)

@@ -6,7 +6,7 @@ import io.r2dbc.spi.Blob;
 /**
  * @author Thomas Freese
  */
-public class BlobTransformer extends AbstractObjectTransofrmer<Blob>
+public class BlobTransformer extends AbstractObjectTransformer<Blob>
 {
     /**
      * @see io.r2dbc.jdbc.converter.transformer.ObjectTransformer#transform(java.lang.Object)

@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * @author Thomas Freese
  */
-public class DateTransformer extends AbstractObjectTransofrmer<Date>
+public class DateTransformer extends AbstractObjectTransformer<Date>
 {
     /**
      * @see io.r2dbc.jdbc.converter.transformer.ObjectTransformer#transform(java.lang.Object)

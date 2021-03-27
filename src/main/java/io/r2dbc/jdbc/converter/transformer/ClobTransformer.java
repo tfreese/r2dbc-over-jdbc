@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 /**
  * @author Thomas Freese
  */
-public class ClobTransformer extends AbstractObjectTransofrmer<Clob>
+public class ClobTransformer extends AbstractObjectTransformer<Clob>
 {
     /**
      * @see io.r2dbc.jdbc.converter.transformer.ObjectTransformer#transform(java.lang.Object)
