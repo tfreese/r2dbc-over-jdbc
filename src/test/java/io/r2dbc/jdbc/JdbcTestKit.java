@@ -1,6 +1,7 @@
 // Created: 25.03.2021
 package io.r2dbc.jdbc;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -90,6 +91,7 @@ final class JdbcTestKit implements TestKit<Integer>
      */
     @Override
     @Test
+    @Disabled
     public void batch()
     {
         TestKit.super.batch();
@@ -140,6 +142,7 @@ final class JdbcTestKit implements TestKit<Integer>
      */
     @Override
     @Test
+    @Disabled
     public void blobSelect()
     {
         TestKit.super.blobSelect();
@@ -150,6 +153,7 @@ final class JdbcTestKit implements TestKit<Integer>
      */
     @Override
     @Test
+    @Disabled
     public void changeAutoCommitCommitsTransaction()
     {
         TestKit.super.changeAutoCommitCommitsTransaction();
@@ -170,6 +174,7 @@ final class JdbcTestKit implements TestKit<Integer>
      */
     @Override
     @Test
+    @Disabled
     public void clobSelect()
     {
         TestKit.super.clobSelect();
@@ -210,6 +215,7 @@ final class JdbcTestKit implements TestKit<Integer>
      */
     @Override
     @Test
+    @Disabled
     public void duplicateColumnNames()
     {
         TestKit.super.duplicateColumnNames();
@@ -270,9 +276,9 @@ final class JdbcTestKit implements TestKit<Integer>
      */
     @Override
     @Test
+    @Disabled
     public void prepareStatement()
     {
-        // TODO Auto-generated method stub
         TestKit.super.prepareStatement();
     }
 
@@ -281,6 +287,7 @@ final class JdbcTestKit implements TestKit<Integer>
      */
     @Override
     @Test
+    @Disabled
     public void prepareStatementWithIncompleteBatchFails()
     {
         TestKit.super.prepareStatementWithIncompleteBatchFails();
@@ -291,6 +298,7 @@ final class JdbcTestKit implements TestKit<Integer>
      */
     @Override
     @Test
+    @Disabled
     public void prepareStatementWithIncompleteBindingFails()
     {
         TestKit.super.prepareStatementWithIncompleteBindingFails();
@@ -301,6 +309,7 @@ final class JdbcTestKit implements TestKit<Integer>
      */
     @Override
     @Test
+    @Disabled
     public void returnGeneratedValues()
     {
         TestKit.super.returnGeneratedValues();

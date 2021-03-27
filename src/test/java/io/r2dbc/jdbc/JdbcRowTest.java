@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
+import java.sql.JDBCType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
+import io.r2dbc.spi.Nullability;
 import io.r2dbc.spi.test.TestKit;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -84,7 +86,11 @@ final class JdbcRowTest
     @Test
     void testConstructorNoValues()
     {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcRow(null)).withMessage("values must not be null");
+        JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-1", 0, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
+        JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
+
+        assertThatNullPointerException().isThrownBy(() -> new JdbcRow(null, new HashMap<>())).withMessage("rowMetadata required");
+        assertThatNullPointerException().isThrownBy(() -> new JdbcRow(rowMetadata, null)).withMessage("values required");
     }
 
     /**
@@ -93,13 +99,16 @@ final class JdbcRowTest
     @Test
     void testGetByIndex()
     {
+        JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-1", 0, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
+        JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
+
         Object value = new Object();
 
         Map<Object, Object> values = new HashMap<>();
         values.put("TEST-NAME-1", value);
         values.put(0, value);
 
-        assertThat(new JdbcRow(values).get(0, Object.class)).isSameAs(value);
+        assertThat(new JdbcRow(rowMetadata, values).get(0, Object.class)).isSameAs(value);
     }
 
     /**
@@ -108,12 +117,15 @@ final class JdbcRowTest
     @Test
     void testGetByName()
     {
+        JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-2", 0, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
+        JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
+
         Object value = new Object();
 
         Map<Object, Object> values = new HashMap<>();
         values.put("TEST-NAME-2", value);
 
-        assertThat(new JdbcRow(values).get("test-name-2", Object.class)).isSameAs(value);
+        assertThat(new JdbcRow(rowMetadata, values).get("test-name-2", Object.class)).isSameAs(value);
     }
 
     /**
@@ -122,7 +134,10 @@ final class JdbcRowTest
     @Test
     void testGetInvalidIdentifier()
     {
-        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcRow(new HashMap<>()).get(3, Object.class))
+        JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
+        JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
+
+        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcRow(rowMetadata, new HashMap<>()).get(3, Object.class))
                 .withMessage("Column identifier '3' does not exist");
     }
 
@@ -132,7 +147,11 @@ final class JdbcRowTest
     @Test
     void testGetNoIdentifier()
     {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcRow(new HashMap<>()).get(null, Object.class)).withMessage("identifier must not be null");
+        JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
+        JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
+
+        assertThatNullPointerException().isThrownBy(() -> new JdbcRow(rowMetadata, new HashMap<>()).get(null, Object.class))
+                .withMessage("identifier must not be null");
     }
 
     /**
@@ -141,10 +160,13 @@ final class JdbcRowTest
     @Test
     void testGetNull()
     {
+        JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-3", 0, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
+        JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
+
         Map<Object, Object> values = new HashMap<>();
         values.put("TEST-NAME-3", null);
 
-        assertThat(new JdbcRow(values).get("test-name-3", Object.class)).isNull();
+        assertThat(new JdbcRow(rowMetadata, values).get("test-name-3", Object.class)).isNull();
     }
 
     /**
@@ -155,7 +177,10 @@ final class JdbcRowTest
     {
         String identifier = "-";
 
-        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcRow(new HashMap<>()).get(identifier, Object.class))
+        JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
+        JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
+
+        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcRow(rowMetadata, new HashMap<>()).get(identifier, Object.class))
                 .withMessage("Column identifier '%s' does not exist", identifier);
     }
 

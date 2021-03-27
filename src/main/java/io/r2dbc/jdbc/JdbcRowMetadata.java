@@ -15,10 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Nullability;
@@ -364,36 +362,27 @@ public class JdbcRowMetadata implements RowMetadata
             int sqlType = metaData.getColumnType(c);
             JDBCType jdbcType = JDBCType.valueOf(sqlType);
 
-            Nullability nullability = null;
-
-            switch (metaData.isNullable(c))
+            Nullability nullability = switch (metaData.isNullable(c))
             {
-                case ResultSetMetaData.columnNoNulls:
-                    nullability = Nullability.NON_NULL;
-                    break;
+                case ResultSetMetaData.columnNoNulls -> Nullability.NON_NULL;
+                case ResultSetMetaData.columnNullable -> Nullability.NULLABLE;
 
-                case ResultSetMetaData.columnNullable:
-                    nullability = Nullability.NULLABLE;
-                    break;
-
-                default:
-                    nullability = Nullability.UNKNOWN;
-                    break;
-            }
+                default -> Nullability.UNKNOWN;
+            };
 
             int precision = metaData.getPrecision(c);
             int scale = metaData.getScale(c);
 
-            list.add(new JdbcColumnMetadata(name, jdbcType, nullability, precision, scale));
+            list.add(new JdbcColumnMetadata(name, c, jdbcType, nullability, precision, scale));
         }
 
         return new JdbcRowMetadata(list);
     }
 
-    /**
-     *
-     */
-    private final Map<String, JdbcColumnMetadata> columnMetaDataByName;
+    // /**
+    // *
+    // */
+    // private final Map<String, JdbcColumnMetadata> columnMetaDataByName;
 
     /**
      *
@@ -401,9 +390,14 @@ public class JdbcRowMetadata implements RowMetadata
     private final List<JdbcColumnMetadata> columnMetaDatas;
 
     /**
+     *
+     */
+    private final Collection<String> columnNames;
+
+    /**
     *
     */
-    private final Collection<String> columnNames;
+    private final Map<Object, JdbcColumnMetadata> map = new LinkedHashMap<>();
 
     /**
      * Erstellt ein neues {@link JdbcRowMetadata} Object.
@@ -416,9 +410,16 @@ public class JdbcRowMetadata implements RowMetadata
 
         this.columnMetaDatas = Objects.requireNonNull(columnMetaDatas, "columnMetaDatas must not be null");
 
-        this.columnMetaDataByName = this.columnMetaDatas.stream()
-                .collect(Collectors.toMap(cmd -> cmd.getName().toUpperCase(), Function.identity(), (a, b) -> a, LinkedHashMap::new));
+        columnMetaDatas.forEach(cmd -> {
+            this.map.put(cmd.getName(), cmd);
+            this.map.put(cmd.getName().toLowerCase(), cmd);
+            this.map.put(cmd.getName().toUpperCase(), cmd);
+            this.map.put(cmd.getColumn(), cmd);
+        });
 
+        // this.columnMetaDataByName = this.columnMetaDatas.stream()
+        // .collect(Collectors.toMap(cmd -> cmd.getName().toUpperCase(), Function.identity(), (a, b) -> a, LinkedHashMap::new));
+        //
         this.columnNames = new ColumnNamesCollection();
     }
 
@@ -428,7 +429,19 @@ public class JdbcRowMetadata implements RowMetadata
     @Override
     public ColumnMetadata getColumnMetadata(final int index)
     {
-        return this.columnMetaDatas.get(index);
+        if ((index < 0) || (index >= this.columnMetaDatas.size()))
+        {
+            throw new ArrayIndexOutOfBoundsException("Index: " + index + ", Size: " + this.columnMetaDatas.size());
+        }
+
+        ColumnMetadata metaData = this.columnMetaDatas.get(index);
+
+        if (metaData == null)
+        {
+            throw new NoSuchElementException("No MetaData for Index: " + index);
+        }
+
+        return metaData;
     }
 
     /**
@@ -437,9 +450,19 @@ public class JdbcRowMetadata implements RowMetadata
     @Override
     public ColumnMetadata getColumnMetadata(final String name)
     {
-        Objects.requireNonNull(name, "name required");
+        if (name == null)
+        {
+            throw new IllegalArgumentException("name is null");
+        }
 
-        return this.columnMetaDataByName.get(name.toUpperCase());
+        ColumnMetadata metaData = this.map.get(name);
+
+        if (metaData == null)
+        {
+            throw new NoSuchElementException("No MetaData for Name: " + name);
+        }
+
+        return metaData;
     }
 
     /**

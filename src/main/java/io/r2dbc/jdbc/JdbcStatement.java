@@ -13,6 +13,7 @@ import io.r2dbc.jdbc.converter.Converters;
 import io.r2dbc.jdbc.converter.sql.SqlMapper;
 import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Result;
+import io.r2dbc.spi.Statement;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SynchronousSink;
@@ -121,7 +122,7 @@ public class JdbcStatement extends AbstractJdbcStatement
         JdbcRowMetadata rowMetadata = JdbcRowMetadata.of(resultSet);
         Iterable<ColumnMetadata> columnMetaDatas = rowMetadata.getColumnMetadatas();
 
-        Flux<JdbcRow> rows = Flux.generate((final SynchronousSink<Map<Object, Object>> sink) -> {
+        Flux<JdbcRow> rows = Flux.generate((final SynchronousSink<JdbcRow> sink) -> {
             try
             {
                 if ((resultSet != null) && resultSet.next())
@@ -138,12 +139,14 @@ public class JdbcStatement extends AbstractJdbcStatement
                         SqlMapper<?> mapper = Converters.getSqlMapper(jdbcType);
                         Object value = mapper.mapFromSql(resultSet, columnLabel);
 
-                        row.put(columnLabel, value);
+                        row.put(columnLabel.toLowerCase(), value);
+                        row.put(columnLabel.toUpperCase(), value);
                         row.put(index, value);
                         index++;
                     }
 
-                    sink.next(row);
+                    // sink.next(row);
+                    sink.next(new JdbcRow(rowMetadata, row));
                 }
                 else
                 {
@@ -163,7 +166,9 @@ public class JdbcStatement extends AbstractJdbcStatement
             {
                 sink.error(sex);
             }
-        }).map(JdbcRow::new).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create);
+        })
+                // .map(JdbcRow::new)
+                .onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create);
 
         Mono<Integer> rowsUpdated = affectedRows != null ? Mono.just(IntStream.of(affectedRows).sum()) : Mono.empty();
 
@@ -203,5 +208,25 @@ public class JdbcStatement extends AbstractJdbcStatement
                     }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(JdbcResult.class)
         );
         // @formatter:on
+    }
+
+    /**
+     * @see io.r2dbc.spi.Statement#fetchSize(int)
+     */
+    @Override
+    public Statement fetchSize(final int rows)
+    {
+        // TODO Auto-generated method stub
+        return super.fetchSize(rows);
+    }
+
+    /**
+     * @see io.r2dbc.spi.Statement#returnGeneratedValues(java.lang.String[])
+     */
+    @Override
+    public Statement returnGeneratedValues(final String...columns)
+    {
+        // TODO Auto-generated method stub
+        return super.returnGeneratedValues(columns);
     }
 }

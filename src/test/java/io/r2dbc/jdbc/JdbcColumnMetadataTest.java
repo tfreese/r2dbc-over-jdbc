@@ -19,7 +19,7 @@ final class JdbcColumnMetadataTest
     @Test
     void testConstructorNoName()
     {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcColumnMetadata(null, JDBCType.OTHER, NULLABLE, 100, 500)).withMessage("name required");
+        assertThatNullPointerException().isThrownBy(() -> new JdbcColumnMetadata(null, 0, JDBCType.OTHER, NULLABLE, 100, 500)).withMessage("name required");
     }
 
     /**
@@ -28,7 +28,7 @@ final class JdbcColumnMetadataTest
     @Test
     void testConstructorNoNullability()
     {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcColumnMetadata("test-name", JDBCType.OTHER, null, 100, 500))
+        assertThatNullPointerException().isThrownBy(() -> new JdbcColumnMetadata("test-name", 0, JDBCType.OTHER, null, 100, 500))
                 .withMessage("nullability required");
     }
 }

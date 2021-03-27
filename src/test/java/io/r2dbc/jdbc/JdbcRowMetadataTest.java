@@ -3,8 +3,9 @@ package io.r2dbc.jdbc;
 
 import static io.r2dbc.spi.Nullability.NULLABLE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -15,11 +16,11 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import io.r2dbc.spi.ColumnMetadata;
 
 /**
  * @author Thomas Freese
@@ -30,8 +31,18 @@ final class JdbcRowMetadataTest
     /**
      *
      */
-    private final List<JdbcColumnMetadata> columnMetadatas = Arrays.asList(new JdbcColumnMetadata("TEST-NAME-1", JDBCType.OTHER, NULLABLE, 100, 500),
-            new JdbcColumnMetadata("TEST-NAME-2", JDBCType.OTHER, NULLABLE, 300, 600));
+    @BeforeAll
+    static void beforeAll()
+    {
+        // this.columnMetadatas = Arrays.asList(new JdbcColumnMetadata("TEST-NAME-1", JDBCType.OTHER, NULLABLE, 100, 500),
+        // new JdbcColumnMetadata("TEST-NAME-2", JDBCType.OTHER, NULLABLE, 300, 600));
+    }
+
+    /**
+     *
+     */
+    private final List<JdbcColumnMetadata> columnMetadatas = Arrays.asList(new JdbcColumnMetadata("TEST-NAME-1", 0, JDBCType.OTHER, NULLABLE, 100, 500),
+            new JdbcColumnMetadata("TEST-NAME-2", 1, JDBCType.OTHER, NULLABLE, 300, 600));
 
     /**
      *
@@ -88,7 +99,9 @@ final class JdbcRowMetadataTest
     @Test
     void testGetColumnMetadataInvalidName() throws SQLException
     {
-        assertThat(JdbcRowMetadata.of(this.resultSet).getColumnMetadata("test-name-3")).isNull();
+        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata("test-name-3"));
+
+        // assertThat(JdbcRowMetadata.of(this.resultSet).getColumnMetadata("test-name-3")).isNull();
     }
 
     /**
@@ -106,7 +119,7 @@ final class JdbcRowMetadataTest
     @Test
     void testGetColumnMetadataNoIdentifier()
     {
-        assertThatNullPointerException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata(null)).withMessage("name required");
+        assertThatIllegalArgumentException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata(null)).withMessage("name is null");
     }
 
     /**
@@ -117,11 +130,12 @@ final class JdbcRowMetadataTest
     {
         String identifier = "-";
 
-        // assertThatIllegalArgumentException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata(identifier))
-        // .withMessage("Column identifier '%s' does not exist", identifier.toString());
+        // assertThat(JdbcRowMetadata.of(this.resultSet).getColumnMetadata(identifier)).isNull();
 
-        ColumnMetadata columnMetadata = JdbcRowMetadata.of(this.resultSet).getColumnMetadata(identifier);
-        assertNull(columnMetadata);
+        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata(identifier));
+
+        // assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata(identifier))
+        // .withMessage("Column identifier '%s' does not exist", identifier.toString());
     }
 
     /**

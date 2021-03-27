@@ -309,6 +309,11 @@ public abstract class AbstractJdbcStatement implements Statement
             throw new IllegalArgumentException("value is null");
         }
 
+        if (Class.class.equals(value))
+        {
+            throw new IllegalArgumentException("value is type of class");
+        }
+
         getBindings().getCurrent().put(index, value);
 
         return this;
@@ -472,7 +477,7 @@ public abstract class AbstractJdbcStatement implements Statement
      */
     protected void requireValidIndex(final int index)
     {
-        if (index < 0)
+        if ((index < 0) || (index > this.bindings.binds.size()))
         {
             throw new IndexOutOfBoundsException("Parameter index is non-positive: " + index);
         }

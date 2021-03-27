@@ -5,6 +5,7 @@ import static io.r2dbc.spi.IsolationLevel.READ_UNCOMMITTED;
 import static io.r2dbc.spi.IsolationLevel.REPEATABLE_READ;
 import static io.r2dbc.spi.IsolationLevel.SERIALIZABLE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
@@ -157,8 +158,6 @@ final class JdbcConnectionTest
     @Test
     void testCreateSavepoint()
     {
-        // new JdbcConnection(this.connection).createSavepoint("test").as(StepVerifier::create)
-        // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
         new JdbcConnection(this.connection).createSavepoint("test").as(StepVerifier::create).verifyComplete();
     }
 
@@ -168,9 +167,9 @@ final class JdbcConnectionTest
     @Test
     void testCreateSavepointNoName()
     {
-        // new
-        // JdbcConnection(this.connection).createSavepoint(null).as(StepVerifier::create).verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
-        new JdbcConnection(this.connection).createSavepoint(null).as(StepVerifier::create).verifyErrorMatches(NullPointerException.class::isInstance);
+        // new JdbcConnection(this.connection).createSavepoint(null).as(StepVerifier::create).verifyErrorMatches(IllegalArgumentException.class::isInstance);
+
+        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcConnection(this.connection).createSavepoint(null));
     }
 
     /**
@@ -206,7 +205,9 @@ final class JdbcConnectionTest
     {
         // new JdbcConnection(this.connection).releaseSavepoint(null).as(StepVerifier::create)
         // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
-        new JdbcConnection(this.connection).releaseSavepoint(null).as(StepVerifier::create).verifyErrorMatches(NullPointerException.class::isInstance);
+        // new JdbcConnection(this.connection).releaseSavepoint(null).as(StepVerifier::create).verifyErrorMatches(IllegalArgumentException.class::isInstance);
+
+        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcConnection(this.connection).releaseSavepoint(null));
     }
 
     /**

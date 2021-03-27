@@ -15,6 +15,11 @@ import io.r2dbc.spi.Nullability;
 public class JdbcColumnMetadata implements ColumnMetadata
 {
     /**
+    *
+    */
+    private final int column;
+
+    /**
      *
      */
     private final JDBCType jdbcType;
@@ -43,16 +48,18 @@ public class JdbcColumnMetadata implements ColumnMetadata
      * Erstellt ein neues {@link JdbcColumnMetadata} Object.
      *
      * @param name String
+     * @param column int
      * @param jdbcType {@link JDBCType}
      * @param nullability {@link Nullability}
      * @param precision int
      * @param scale int
      */
-    public JdbcColumnMetadata(final String name, final JDBCType jdbcType, final Nullability nullability, final int precision, final int scale)
+    public JdbcColumnMetadata(final String name, final int column, final JDBCType jdbcType, final Nullability nullability, final int precision, final int scale)
     {
         super();
 
         this.name = Objects.requireNonNull(name, "name required");
+        this.column = column;
         this.jdbcType = Objects.requireNonNull(jdbcType, "jdbcType required");
         this.nullability = Objects.requireNonNull(nullability, "nullability required");
         this.precision = precision;
@@ -77,8 +84,16 @@ public class JdbcColumnMetadata implements ColumnMetadata
 
         JdbcColumnMetadata other = (JdbcColumnMetadata) obj;
 
-        return (this.jdbcType == other.jdbcType) && Objects.equals(this.name, other.name) && (this.nullability == other.nullability)
-                && (this.precision == other.precision) && (this.scale == other.scale);
+        return (this.column == other.column) && (this.jdbcType == other.jdbcType) && Objects.equals(this.name, other.name)
+                && (this.nullability == other.nullability) && (this.precision == other.precision) && (this.scale == other.scale);
+    }
+
+    /**
+     * @return int
+     */
+    public int getColumn()
+    {
+        return this.column;
     }
 
     /**
@@ -132,6 +147,6 @@ public class JdbcColumnMetadata implements ColumnMetadata
     @Override
     public int hashCode()
     {
-        return Objects.hash(this.jdbcType, this.name, this.nullability, this.precision, this.scale);
+        return Objects.hash(this.column, this.jdbcType, this.name, this.nullability, this.precision, this.scale);
     }
 }

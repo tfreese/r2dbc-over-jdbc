@@ -18,18 +18,25 @@ public class JdbcRow implements Row
     /**
      *
      */
-    private Map<Object, Object> values;
+    private final JdbcRowMetadata rowMetadata;
+
+    /**
+     *
+     */
+    private final Map<Object, Object> values;
 
     /**
      * Erstellt ein neues {@link JdbcRow} Object.
      *
+     * @param rowMetadata {@link JdbcRowMetadata}
      * @param values {@link Map}
      */
-    public JdbcRow(final Map<Object, Object> values)
+    public JdbcRow(final JdbcRowMetadata rowMetadata, final Map<Object, Object> values)
     {
         super();
 
-        this.values = Objects.requireNonNull(values, "values must not be null");
+        this.rowMetadata = Objects.requireNonNull(rowMetadata, "rowMetadata required");
+        this.values = Objects.requireNonNull(values, "values required");
     }
 
     /**
@@ -38,17 +45,32 @@ public class JdbcRow implements Row
     @Override
     public <T> T get(final int index, final Class<T> type)
     {
+        if (type == null)
+        {
+            throw new IllegalArgumentException("type is null");
+        }
+
         Object value = this.values.get(index);
 
         if (value == null)
         {
-            throw new IllegalArgumentException(
-                    String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String column name.", index));
+            // throw new IllegalArgumentException(
+            // String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String column name.", index));
+            return null;
+        }
+
+        if (Object.class.equals(type))
+        {
+            // loosest possible match
+            ObjectTransformer<T> transformer = Converters.getTransformer(this.rowMetadata.getColumnMetadata(index).getJavaType());
+
+            return transformer.transform(value);
         }
 
         ObjectTransformer<T> transformer = Converters.getTransformer(type);
 
         return transformer.transform(value);
+
     }
 
     /**
@@ -67,16 +89,27 @@ public class JdbcRow implements Row
             throw new IllegalArgumentException("type is null");
         }
 
-        Object value = this.values.get(name.toLowerCase());
+        String key = name.toLowerCase();
+        Object value = this.values.get(key);
 
         if (value == null)
         {
-            value = this.values.get(name.toUpperCase());
+            key = name.toUpperCase();
+            value = this.values.get(key);
         }
 
         if (value == null)
         {
-            throw new IllegalArgumentException(String.format("Column identifier '%s' does not exist", name));
+            // throw new IllegalArgumentException(String.format("Column identifier '%s' does not exist", name));
+            return null;
+        }
+
+        if (Object.class.equals(type))
+        {
+            // loosest possible match
+            ObjectTransformer<T> transformer = Converters.getTransformer(this.rowMetadata.getColumnMetadata(key).getJavaType());
+
+            return transformer.transform(value);
         }
 
         ObjectTransformer<T> transformer = Converters.getTransformer(type);
