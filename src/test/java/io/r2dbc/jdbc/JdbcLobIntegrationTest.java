@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import io.r2dbc.jdbc.converter.Converters;
 import io.r2dbc.jdbc.util.AbstractIntegrationTestSupport;
 import io.r2dbc.spi.Blob;
 import io.r2dbc.spi.Clob;
@@ -20,8 +19,8 @@ import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-/***
- * Integration tests for{@link Converters} testing all known codecs with pre-defined values and {@code null} values.
+/**
+ * @author Thomas Freese
  */
 class JdbcLobIntegrationTest extends AbstractIntegrationTestSupport
 {

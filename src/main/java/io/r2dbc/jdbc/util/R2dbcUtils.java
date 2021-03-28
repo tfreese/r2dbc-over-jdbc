@@ -3,9 +3,11 @@ package io.r2dbc.jdbc.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +25,17 @@ import reactor.core.publisher.Mono;
  */
 public final class R2dbcUtils
 {
+    /**
+     * @param blob {@link Blob}
+     * @return {@link ByteBuffer}
+     */
+    public static final byte[] blobToByteArray(final Blob blob)
+    {
+        ByteBuffer byteBuffer = blobToByteBuffer(blob);
+
+        return byteBuffer.array();
+    }
+
     /**
      * @param blob {@link Blob}
      * @return {@link ByteBuffer}
@@ -46,6 +59,17 @@ public final class R2dbcUtils
 
     /**
      * @param blob {@link Blob}
+     * @return {@link InputStream}
+     */
+    public static InputStream blobToInputStream(final Blob blob)
+    {
+        ByteBuffer byteBuffer = blobToByteBuffer(blob);
+
+        return byteBufferToInputStream(byteBuffer);
+    }
+
+    /**
+     * @param blob {@link Blob}
      * @return String
      */
     public static final String blobToString(final Blob blob)
@@ -58,6 +82,39 @@ public final class R2dbcUtils
         String string = charBuffer.toString();
 
         return string;
+    }
+
+    /**
+     * @param bytes byte[]
+     * @return {@link Blob}
+     */
+    public static Blob byteArrayToBlob(final byte[] bytes)
+    {
+        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+
+        Blob blob = byteBufferToBlob(byteBuffer);
+
+        return blob;
+    }
+
+    /**
+     * @param byteBuffer {@link ByteBuffer}
+     * @return {@link Blob}
+     */
+    public static Blob byteBufferToBlob(final ByteBuffer byteBuffer)
+    {
+        Blob blob = Blob.from((Mono.just(byteBuffer)));
+
+        return blob;
+    }
+
+    /**
+     * @param byteBuffer {@link ByteBuffer}
+     * @return {@link InputStream}
+     */
+    public static InputStream byteBufferToInputStream(final ByteBuffer byteBuffer)
+    {
+        return new ByteArrayInputStream(byteBuffer.array());
     }
 
     /**
@@ -80,48 +137,72 @@ public final class R2dbcUtils
 
     /**
      * @param inputStream {@link InputStream}
-     * @return {@link ByteBuffer}
-     * @throws IOException Falls was schief geht.
+     * @return {@link Blob}
      */
-    public static final ByteBuffer inputStreamToByteBuffer(final InputStream inputStream) throws IOException
+    public static final Blob inputStreamToBlob(final InputStream inputStream)
     {
-        ByteBuffer byteBuffer = null;
+        ByteBuffer byteBuffer = inputStreamToByteBuffer(inputStream);
 
-        try (InputStream in = new BufferedInputStream(inputStream))
+        Blob blob = byteBufferToBlob(byteBuffer);
+
+        return blob;
+    }
+
+    /**
+     * @param inputStream {@link InputStream}
+     * @return {@link ByteBuffer}
+     */
+    public static final ByteBuffer inputStreamToByteBuffer(final InputStream inputStream)
+    {
+        try
         {
-            byte[] bytes = in.readAllBytes();
+            ByteBuffer byteBuffer = null;
 
-            byteBuffer = ByteBuffer.wrap(bytes);
+            try (InputStream in = new BufferedInputStream(inputStream))
+            {
+                byte[] bytes = in.readAllBytes();
+
+                byteBuffer = ByteBuffer.wrap(bytes);
+            }
+
+            byteBuffer.flip();
+
+            return byteBuffer;
         }
-
-        byteBuffer.flip();
-
-        return byteBuffer;
+        catch (IOException ex)
+        {
+            throw new UncheckedIOException(ex);
+        }
     }
 
     /**
      * @param reader {@link java.sql.Blob}
      * @return String
-     * @throws IOException Falls was schief geht.
      */
-    public static final String readerToString(final Reader reader) throws IOException
+    public static final String readerToString(final Reader reader)
     {
-        String string = null;
-
-        try (BufferedReader buffer = new BufferedReader(reader))
+        try
         {
-            string = buffer.lines().collect(Collectors.joining());
-        }
+            String string = null;
 
-        return string;
+            try (BufferedReader bufferedReader = new BufferedReader(reader))
+            {
+                string = bufferedReader.lines().collect(Collectors.joining());
+            }
+
+            return string;
+        }
+        catch (IOException ex)
+        {
+            throw new UncheckedIOException(ex);
+        }
     }
 
     /**
      * @param sqlBlob {@link java.sql.Blob}
      * @return {@link Blob}
-     * @throws SQLException Falls was schief geht.
      */
-    public static final Blob sqlBlobToBlob(final java.sql.Blob sqlBlob) throws SQLException
+    public static final Blob sqlBlobToBlob(final java.sql.Blob sqlBlob)
     {
         ByteBuffer byteBuffer = null;
 
@@ -131,10 +212,14 @@ public final class R2dbcUtils
         }
         catch (IOException ex)
         {
-            throw new SQLException(ex);
+            throw new UncheckedIOException(ex);
+        }
+        catch (SQLException ex)
+        {
+            throw new RuntimeException(ex);
         }
 
-        Blob blob = Blob.from((Mono.just(byteBuffer)));
+        Blob blob = byteBufferToBlob(byteBuffer);
 
         return blob;
     }
@@ -142,9 +227,8 @@ public final class R2dbcUtils
     /**
      * @param sqlClob {@link java.sql.Clob}
      * @return {@link Clob}
-     * @throws SQLException Falls was schief geht.
      */
-    public static final Clob sqlClobToClob(final java.sql.Clob sqlClob) throws SQLException
+    public static final Clob sqlClobToClob(final java.sql.Clob sqlClob)
     {
         String string = null;
 
@@ -154,10 +238,38 @@ public final class R2dbcUtils
         }
         catch (IOException ex)
         {
-            throw new SQLException(ex);
+            throw new UncheckedIOException(ex);
+        }
+        catch (SQLException ex)
+        {
+            throw new RuntimeException(ex);
         }
 
         Clob clob = Clob.from((Mono.just(string)));
+
+        return clob;
+    }
+
+    /**
+     * @param value String
+     * @return {@link Blob}
+     */
+    public static Blob stringToBlob(final String value)
+    {
+        ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(value);
+
+        Blob blob = byteBufferToBlob(byteBuffer);
+
+        return blob;
+    }
+
+    /**
+     * @param value String
+     * @return {@link Clob}
+     */
+    public static Clob stringToClob(final String value)
+    {
+        Clob clob = Clob.from((Mono.just(value)));
 
         return clob;
     }

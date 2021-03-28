@@ -178,15 +178,15 @@ public class JdbcConnection implements Connection
             throw new IllegalArgumentException("name is null");
         }
 
-        // Begin Transaction.
-        try
-        {
-            this.connection.setAutoCommit(false);
-        }
-        catch (SQLException ex)
-        {
-            // Ignore
-        }
+        // // Begin Transaction.
+        // try
+        // {
+        // this.connection.setAutoCommit(false);
+        // }
+        // catch (SQLException ex)
+        // {
+        // // Ignore
+        // }
 
         // return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
         return this.connectionMono.handle((con, sink) -> {
@@ -195,6 +195,8 @@ public class JdbcConnection implements Connection
                 Objects.requireNonNull(name, "name must not be null");
 
                 getLogger().debug("create savepoint: {}", name);
+
+                this.connection.setAutoCommit(false);
 
                 Savepoint savepoint = con.setSavepoint(name);
                 this.savePoints.put(name, savepoint);
@@ -220,7 +222,7 @@ public class JdbcConnection implements Connection
             throw new IllegalArgumentException("sql is null");
         }
 
-        return new JdbcStatement(this.connection, sql);
+        return new JdbcStatement(this.connection, sql, this.codecs);
         // return this.connectionMono.handle((connection, sink) -> {
         // try
         // {

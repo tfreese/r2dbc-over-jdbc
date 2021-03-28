@@ -18,5 +18,4 @@ final class JdbcConnectionFactoryMetadataTest
     {
         assertThat(JdbcConnectionFactoryMetadata.INSTANCE.getName()).isEqualTo(JdbcConnectionFactoryMetadata.NAME);
     }
-
 }

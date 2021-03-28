@@ -216,7 +216,6 @@ final class JdbcTestKit implements TestKit<Integer>
      */
     @Override
     @Test
-    @Disabled
     public void duplicateColumnNames()
     {
         TestKit.super.duplicateColumnNames();
@@ -323,7 +322,6 @@ final class JdbcTestKit implements TestKit<Integer>
     @Test
     public void returnGeneratedValuesFails()
     {
-        // TODO Auto-generated method stub
         TestKit.super.returnGeneratedValuesFails();
     }
 

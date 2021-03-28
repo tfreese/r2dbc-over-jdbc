@@ -1,28 +1,26 @@
-// Created: 14.06.2019
-package io.r2dbc.jdbc.converter.sql;
+// Created: 27.03.2021
+package io.r2dbc.jdbc.codecs;
 
 import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Set;
 
 /**
  * @author Thomas Freese
  */
-public class LongSqlMapper extends AbstractSqlMapper<Long>
+public class LongCodec extends AbstractNumberCodec<Long>
 {
     /**
-     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#getSupportedJdbcTypes()
+     * Erstellt ein neues {@link LongCodec} Object.
      */
-    @Override
-    public Set<JDBCType> getSupportedJdbcTypes()
+    public LongCodec()
     {
-        return Set.of(JDBCType.BIGINT, JDBCType.DECIMAL);
+        super(Long.class, JDBCType.BIGINT, JDBCType.DECIMAL);
     }
 
     /**
-     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#mapFromSql(java.sql.ResultSet, java.lang.String)
+     * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
      */
     @Override
     public Long mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException
@@ -38,7 +36,7 @@ public class LongSqlMapper extends AbstractSqlMapper<Long>
     }
 
     /**
-     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
+     * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
      */
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Long value) throws SQLException

@@ -1,28 +1,26 @@
-// Created: 14.06.2019
-package io.r2dbc.jdbc.converter.sql;
+// Created: 27.03.2021
+package io.r2dbc.jdbc.codecs;
 
 import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Set;
 
 /**
  * @author Thomas Freese
  */
-public class DoubleSqlMapper extends AbstractSqlMapper<Double>
+public class DoubleCodec extends AbstractNumberCodec<Double>
 {
     /**
-     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#getSupportedJdbcTypes()
+     * Erstellt ein neues {@link DoubleCodec} Object.
      */
-    @Override
-    public Set<JDBCType> getSupportedJdbcTypes()
+    public DoubleCodec()
     {
-        return Set.of(JDBCType.DOUBLE);
+        super(Double.class, JDBCType.DOUBLE);
     }
 
     /**
-     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#mapFromSql(java.sql.ResultSet, java.lang.String)
+     * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
      */
     @Override
     public Double mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException
@@ -38,7 +36,7 @@ public class DoubleSqlMapper extends AbstractSqlMapper<Double>
     }
 
     /**
-     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
+     * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
      */
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Double value) throws SQLException

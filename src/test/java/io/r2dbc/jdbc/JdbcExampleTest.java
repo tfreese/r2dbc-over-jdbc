@@ -10,7 +10,6 @@ import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -144,22 +143,6 @@ final class JdbcExampleTest
             .expectNext(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).as("values from insertions")
             .verifyComplete();
         // @formatter:on
-    }
-
-    /**
-     *
-     */
-    @Test
-    @Disabled
-    void testBatchExpectNextCount()
-    {
-        Mono.from(this.connectionFactory.create()).flatMapMany(connection -> {
-            Statement statement = connection.createStatement("INSERT INTO tbl VALUES (?)");
-
-            IntStream.range(0, 10).forEach(i -> statement.bind(0, i).add());
-
-            return Flux.from(statement.execute()).concatWith(TestKit.close(connection));
-        }).as(StepVerifier::create).expectNextCount(10).as("values from insertions").verifyComplete();
     }
 
     /**

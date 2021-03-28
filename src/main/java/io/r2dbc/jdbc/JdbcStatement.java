@@ -9,8 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-import io.r2dbc.jdbc.converter.Converters;
-import io.r2dbc.jdbc.converter.sql.SqlMapper;
+import io.r2dbc.jdbc.codecs.Codecs;
 import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Statement;
@@ -28,10 +27,11 @@ public class JdbcStatement extends AbstractJdbcStatement
      *
      * @param connection {@link java.sql.Connection}
      * @param sql String
+     * @param codecs {@link Codecs}
      */
-    public JdbcStatement(final java.sql.Connection connection, final String sql)
+    public JdbcStatement(final java.sql.Connection connection, final String sql, final Codecs codecs)
     {
-        super(connection, sql);
+        super(connection, sql, codecs);
     }
 
     /**
@@ -119,7 +119,7 @@ public class JdbcStatement extends AbstractJdbcStatement
      */
     protected Result createResult(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows) throws SQLException
     {
-        JdbcRowMetadata rowMetadata = JdbcRowMetadata.of(resultSet);
+        JdbcRowMetadata rowMetadata = JdbcRowMetadata.of(resultSet, getCodecs());
         Iterable<ColumnMetadata> columnMetaDatas = rowMetadata.getColumnMetadatas();
 
         Flux<JdbcRow> rows = Flux.generate((final SynchronousSink<JdbcRow> sink) -> {
@@ -127,7 +127,7 @@ public class JdbcStatement extends AbstractJdbcStatement
             {
                 if ((resultSet != null) && resultSet.next())
                 {
-                    Map<Object, Object> row = new HashMap<>();
+                    Map<Integer, Object> row = new HashMap<>();
 
                     int index = 0;
 
@@ -136,17 +136,13 @@ public class JdbcStatement extends AbstractJdbcStatement
                         String columnLabel = columnMetaData.getName();
                         JDBCType jdbcType = (JDBCType) columnMetaData.getNativeTypeMetadata();
 
-                        SqlMapper<?> mapper = Converters.getSqlMapper(jdbcType);
-                        Object value = mapper.mapFromSql(resultSet, columnLabel);
+                        Object value = getCodecs().mapFromSql(jdbcType, resultSet, columnLabel);
 
-                        row.put(columnLabel.toLowerCase(), value);
-                        row.put(columnLabel.toUpperCase(), value);
                         row.put(index, value);
                         index++;
                     }
 
-                    // sink.next(row);
-                    sink.next(new JdbcRow(rowMetadata, row));
+                    sink.next(new JdbcRow(rowMetadata, row, getCodecs()));
                 }
                 else
                 {
@@ -166,9 +162,7 @@ public class JdbcStatement extends AbstractJdbcStatement
             {
                 sink.error(sex);
             }
-        })
-                // .map(JdbcRow::new)
-                .onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create);
+        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create);
 
         Mono<Integer> rowsUpdated = affectedRows != null ? Mono.just(IntStream.of(affectedRows).sum()) : Mono.empty();
 

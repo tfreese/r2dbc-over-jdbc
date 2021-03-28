@@ -1,11 +1,12 @@
 // Created: 14.06.2019
 package io.r2dbc.jdbc;
 
+import java.sql.JDBCType;
 import java.util.Map;
 import java.util.Objects;
 
-import io.r2dbc.jdbc.converter.Converters;
-import io.r2dbc.jdbc.converter.transformer.ObjectTransformer;
+import io.r2dbc.jdbc.codecs.Codecs;
+import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Row;
 
 /**
@@ -16,6 +17,11 @@ import io.r2dbc.spi.Row;
 public class JdbcRow implements Row
 {
     /**
+    *
+    */
+    private final Codecs codecs;
+
+    /**
      *
      */
     private final JdbcRowMetadata rowMetadata;
@@ -23,20 +29,22 @@ public class JdbcRow implements Row
     /**
      *
      */
-    private final Map<Object, Object> values;
+    private final Map<Integer, Object> values;
 
     /**
      * Erstellt ein neues {@link JdbcRow} Object.
      *
      * @param rowMetadata {@link JdbcRowMetadata}
      * @param values {@link Map}
+     * @param codecs {@link Codecs}
      */
-    public JdbcRow(final JdbcRowMetadata rowMetadata, final Map<Object, Object> values)
+    public JdbcRow(final JdbcRowMetadata rowMetadata, final Map<Integer, Object> values, final Codecs codecs)
     {
         super();
 
         this.rowMetadata = Objects.requireNonNull(rowMetadata, "rowMetadata required");
         this.values = Objects.requireNonNull(values, "values required");
+        this.codecs = Objects.requireNonNull(codecs, "codecs required");
     }
 
     /**
@@ -54,23 +62,15 @@ public class JdbcRow implements Row
 
         if (value == null)
         {
-            // throw new IllegalArgumentException(
-            // String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String column name.", index));
             return null;
         }
 
-        if (Object.class.equals(type))
-        {
-            // loosest possible match
-            ObjectTransformer<T> transformer = Converters.getTransformer(this.rowMetadata.getColumnMetadata(index).getJavaType());
+        ColumnMetadata metadata = this.rowMetadata.getColumnMetadata(index);
+        JDBCType jdbcType = (JDBCType) metadata.getNativeTypeMetadata();
 
-            return transformer.transform(value);
-        }
+        T mappedValue = this.codecs.mapTo(jdbcType, type, value);
 
-        ObjectTransformer<T> transformer = Converters.getTransformer(type);
-
-        return transformer.transform(value);
-
+        return mappedValue;
     }
 
     /**
@@ -89,31 +89,10 @@ public class JdbcRow implements Row
             throw new IllegalArgumentException("type is null");
         }
 
-        String key = name.toLowerCase();
-        Object value = this.values.get(key);
+        ColumnMetadata metadata = this.rowMetadata.getColumnMetadata(name);
 
-        if (value == null)
-        {
-            key = name.toUpperCase();
-            value = this.values.get(key);
-        }
+        int column = ((JdbcColumnMetadata) metadata).getColumn();
 
-        if (value == null)
-        {
-            // throw new IllegalArgumentException(String.format("Column identifier '%s' does not exist", name));
-            return null;
-        }
-
-        if (Object.class.equals(type))
-        {
-            // loosest possible match
-            ObjectTransformer<T> transformer = Converters.getTransformer(this.rowMetadata.getColumnMetadata(key).getJavaType());
-
-            return transformer.transform(value);
-        }
-
-        ObjectTransformer<T> transformer = Converters.getTransformer(type);
-
-        return transformer.transform(value);
+        return get(column, type);
     }
 }

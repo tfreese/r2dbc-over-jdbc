@@ -6,30 +6,26 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import io.r2dbc.jdbc.util.R2dbcUtils;
-import io.r2dbc.spi.Blob;
-import io.r2dbc.spi.Clob;
-
 /**
  * @author Thomas Freese
  */
-public class StringCodec extends AbstractCodec<String>
+public class BooleanCodec extends AbstractCodec<Boolean>
 {
     /**
-     * Erstellt ein neues {@link StringCodec} Object.
+     * Erstellt ein neues {@link BooleanCodec} Object.
      */
-    public StringCodec()
+    public BooleanCodec()
     {
-        super(String.class, JDBCType.CHAR, JDBCType.VARCHAR);
+        super(Boolean.class, JDBCType.BIT, JDBCType.BOOLEAN);
     }
 
     /**
      * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    public String mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException
+    public Boolean mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException
     {
-        String value = resultSet.getString(columnLabel);
+        boolean value = resultSet.getBoolean(columnLabel);
 
         if (resultSet.wasNull())
         {
@@ -44,7 +40,7 @@ public class StringCodec extends AbstractCodec<String>
      */
     @SuppressWarnings("unchecked")
     @Override
-    public <M> M mapTo(final Class<M> javaType, final String value)
+    public <M> M mapTo(final Class<M> javaType, final Boolean value)
     {
         if (value == null)
         {
@@ -55,17 +51,11 @@ public class StringCodec extends AbstractCodec<String>
         {
             return (M) value;
         }
-        else if (Blob.class.isAssignableFrom(javaType))
+        else if (CharSequence.class.isAssignableFrom(javaType))
         {
-            Blob blob = R2dbcUtils.stringToBlob(value);
+            String s = value.toString();
 
-            return (M) blob;
-        }
-        else if (Clob.class.isAssignableFrom(javaType))
-        {
-            Clob clob = R2dbcUtils.stringToClob(value);
-
-            return (M) clob;
+            return (M) s;
         }
 
         throw throwCanNotMapException(value);
@@ -75,8 +65,8 @@ public class StringCodec extends AbstractCodec<String>
      * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
      */
     @Override
-    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final String value) throws SQLException
+    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Boolean value) throws SQLException
     {
-        preparedStatement.setString(parameterIndex, value);
+        preparedStatement.setBoolean(parameterIndex, value);
     }
 }

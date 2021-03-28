@@ -14,8 +14,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.r2dbc.jdbc.converter.Converters;
-import io.r2dbc.jdbc.converter.sql.SqlMapper;
+import io.r2dbc.jdbc.codecs.Codecs;
 import io.r2dbc.spi.Statement;
 
 /**
@@ -28,7 +27,7 @@ public abstract class AbstractJdbcStatement implements Statement
     /**
      * @author Thomas Freese
      */
-    static class Bindings
+    class Bindings
     {
         /**
          *
@@ -122,9 +121,7 @@ public abstract class AbstractJdbcStatement implements Statement
                 }
                 else
                 {
-                    SqlMapper<Object> mapper = Converters.getSqlMapper(value.getClass());
-
-                    mapper.mapToSql(preparedStatement, parameterIndex, value);
+                    getCodecs().mapToSql(value.getClass(), preparedStatement, parameterIndex, value);
                 }
             }
         }
@@ -228,6 +225,11 @@ public abstract class AbstractJdbcStatement implements Statement
     private final Bindings bindings = new Bindings();
 
     /**
+    *
+    */
+    private final Codecs codecs;
+
+    /**
      *
      */
     private final java.sql.Connection connection;
@@ -252,13 +254,15 @@ public abstract class AbstractJdbcStatement implements Statement
      *
      * @param connection {@link java.sql.Connection}
      * @param sql String
+     * @param codecs {@link Codecs}
      */
-    protected AbstractJdbcStatement(final java.sql.Connection connection, final String sql)
+    protected AbstractJdbcStatement(final java.sql.Connection connection, final String sql, final Codecs codecs)
     {
         super();
 
         this.connection = Objects.requireNonNull(connection, "connection required");
         this.sql = Objects.requireNonNull(sql, "sql required");
+        this.codecs = Objects.requireNonNull(codecs, "codecs required");
 
         // Determine SQL-Operation.
         String s = sql.substring(0, 6).toLowerCase();
@@ -435,6 +439,14 @@ public abstract class AbstractJdbcStatement implements Statement
     protected Bindings getBindings()
     {
         return this.bindings;
+    }
+
+    /**
+     * @return {@link Codecs}
+     */
+    protected Codecs getCodecs()
+    {
+        return this.codecs;
     }
 
     /**

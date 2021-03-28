@@ -1,11 +1,10 @@
-// Created: 14.06.2019
-package io.r2dbc.jdbc.converter.sql;
+// Created: 28.03.2021
+package io.r2dbc.jdbc.codecs;
 
 import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Set;
 
 import io.r2dbc.jdbc.util.R2dbcUtils;
 import io.r2dbc.spi.Clob;
@@ -14,19 +13,18 @@ import reactor.core.publisher.Mono;
 /**
  * @author Thomas Freese
  */
-public class ClobSqlMapper extends AbstractSqlMapper<Clob>
+public class ClobCodec extends AbstractCodec<Clob>
 {
     /**
-     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#getSupportedJdbcTypes()
+     * Erstellt ein neues {@link ClobCodec} Object.
      */
-    @Override
-    public Set<JDBCType> getSupportedJdbcTypes()
+    public ClobCodec()
     {
-        return Set.of(JDBCType.CLOB);
+        super(Clob.class, JDBCType.CLOB);
     }
 
     /**
-     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#mapFromSql(java.sql.ResultSet, java.lang.String)
+     * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
      */
     @Override
     public Clob mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException
@@ -44,9 +42,32 @@ public class ClobSqlMapper extends AbstractSqlMapper<Clob>
     }
 
     /**
-     * @see io.r2dbc.jdbc.converter.sql.SqlMapper#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
+     * @see io.r2dbc.jdbc.codecs.Codec#mapTo(java.lang.Class, java.lang.Object)
      */
-    @SuppressWarnings("resource")
+    @SuppressWarnings("unchecked")
+    @Override
+    public <M> M mapTo(final Class<M> javaType, final Clob value)
+    {
+        if (value == null)
+        {
+            return null;
+        }
+
+        if (getJavaType().equals(javaType) || Object.class.equals(javaType))
+        {
+            return (M) value;
+        }
+        else if (CharSequence.class.isAssignableFrom(javaType))
+        {
+            return (M) R2dbcUtils.clobToString(value);
+        }
+
+        throw throwCanNotMapException(value);
+    }
+
+    /**
+     * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
+     */
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Clob value) throws SQLException
     {

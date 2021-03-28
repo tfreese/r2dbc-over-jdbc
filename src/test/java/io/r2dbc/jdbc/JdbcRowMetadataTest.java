@@ -22,6 +22,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import io.r2dbc.jdbc.codecs.Codecs;
+import io.r2dbc.jdbc.codecs.DefaultCodecs;
+
 /**
  * @author Thomas Freese
  */
@@ -39,10 +42,16 @@ final class JdbcRowMetadataTest
     }
 
     /**
+    *
+    */
+    private final Codecs codecs = new DefaultCodecs();
+
+    /**
      *
      */
-    private final List<JdbcColumnMetadata> columnMetadatas = Arrays.asList(new JdbcColumnMetadata("TEST-NAME-1", 0, JDBCType.OTHER, NULLABLE, 100, 500),
-            new JdbcColumnMetadata("TEST-NAME-2", 1, JDBCType.OTHER, NULLABLE, 300, 600));
+    private final List<JdbcColumnMetadata> columnMetadatas =
+            Arrays.asList(new JdbcColumnMetadata("TEST-NAME-1", 0, Object.class, JDBCType.OTHER, NULLABLE, 100, 500),
+                    new JdbcColumnMetadata("TEST-NAME-2", 1, Object.class, JDBCType.OTHER, NULLABLE, 300, 600));
 
     /**
      *
@@ -90,7 +99,7 @@ final class JdbcRowMetadataTest
     @Test
     void testGetColumnMetadataIndex() throws SQLException
     {
-        assertThat(JdbcRowMetadata.of(this.resultSet).getColumnMetadata(0)).isEqualTo(this.columnMetadatas.get(0));
+        assertThat(JdbcRowMetadata.of(this.resultSet, this.codecs).getColumnMetadata(0)).isEqualTo(this.columnMetadatas.get(0));
     }
 
     /**
@@ -99,9 +108,8 @@ final class JdbcRowMetadataTest
     @Test
     void testGetColumnMetadataInvalidName() throws SQLException
     {
-        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata("test-name-3"));
-
-        // assertThat(JdbcRowMetadata.of(this.resultSet).getColumnMetadata("test-name-3")).isNull();
+        assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> JdbcRowMetadata.of(this.resultSet, this.codecs).getColumnMetadata("test-name-3"));
     }
 
     /**
@@ -110,7 +118,7 @@ final class JdbcRowMetadataTest
     @Test
     void testGetColumnMetadataName() throws SQLException
     {
-        assertThat(JdbcRowMetadata.of(this.resultSet).getColumnMetadata("TEST-NAME-2")).isEqualTo(this.columnMetadatas.get(1));
+        assertThat(JdbcRowMetadata.of(this.resultSet, this.codecs).getColumnMetadata("TEST-NAME-2")).isEqualTo(this.columnMetadatas.get(1));
     }
 
     /**
@@ -119,7 +127,8 @@ final class JdbcRowMetadataTest
     @Test
     void testGetColumnMetadataNoIdentifier()
     {
-        assertThatIllegalArgumentException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata(null)).withMessage("name is null");
+        assertThatIllegalArgumentException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet, this.codecs).getColumnMetadata(null))
+                .withMessage("name is null");
     }
 
     /**
@@ -130,12 +139,7 @@ final class JdbcRowMetadataTest
     {
         String identifier = "-";
 
-        // assertThat(JdbcRowMetadata.of(this.resultSet).getColumnMetadata(identifier)).isNull();
-
-        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata(identifier));
-
-        // assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> JdbcRowMetadata.of(this.resultSet).getColumnMetadata(identifier))
-        // .withMessage("Column identifier '%s' does not exist", identifier.toString());
+        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> JdbcRowMetadata.of(this.resultSet, this.codecs).getColumnMetadata(identifier));
     }
 
     /**

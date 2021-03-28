@@ -7,16 +7,9 @@ See https://github.com/oracle/oracle-r2dbc [window="_blank"] +
 
 
 == Type-Mapping
-Adapt the SqlMapper and ObjectTransformer to match your underlying Database !
+Adapt the `io.r2dbc.jdbc.codecs.Codec` Interface to match your needs !
 
-* `io.r2dbc.jdbc.converter.sql.SqlMapper<T>` +
-  Mapping for a SQL-Type from the java.sql.ResultSet to an Java-Object and vice versa.
-
-* `io.r2dbc.jdbc.converter.transformer.ObjectTransformer<T>` +
-  Transform an Object to the required Type for Method io.r2dbc.spi.Row.get(Object, Class<T>).
-
-* `io.r2dbc.jdbc.converter.Converters#register` +
-  For custom SqlConverter and ObjectTransformer.
+See `io.r2dbc.jdbc.codecs.DefaultCodecs`
 
 
 == Limitations

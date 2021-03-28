@@ -14,6 +14,14 @@ import java.sql.SQLException;
 public interface Codecs
 {
     /**
+     * Returns the JavaType for the {@link JDBCType}
+     *
+     * @param jdbcType {@link JDBCType}
+     * @return Class
+     */
+    public Class<?> getJavaType(final JDBCType jdbcType);
+
+    /**
      * Read an Object from a {@link ResultSet}.
      *
      * @param <T> Type
@@ -29,21 +37,20 @@ public interface Codecs
      * Map an Object into another one.
      *
      * @param jdbcType {@link JDBCType}
-     * @param type Class
+     * @param javaType Class
      * @param value Object
      * @return Object
      */
-    public <T> T mapTo(JDBCType jdbcType, Class<? extends T> type, Object value);
+    public <T> T mapTo(JDBCType jdbcType, Class<? extends T> javaType, Object value);
 
     /**
      * Write an Object in a {@link PreparedStatement}.
      *
-     * @param <T> Type
-     * @param jdbcType {@link JDBCType}
+     * @param javaType Class
      * @param preparedStatement {@link PreparedStatement}
      * @param parameterIndex int, ONE-Based
      * @param value Object
      * @throws SQLException Falls was schief geht.
      */
-    public <T> void mapToSql(JDBCType jdbcType, PreparedStatement preparedStatement, int parameterIndex, T value) throws SQLException;
+    public void mapToSql(Class<?> javaType, PreparedStatement preparedStatement, int parameterIndex, Object value) throws SQLException;
 }

@@ -29,6 +29,7 @@ import reactor.core.publisher.Mono;
  * This class implements methods that await, or block, until an asynchronous operation has completed. Test cases use these methods to execute asynchronous
  * operations in a consistent order. The maximum time that a method will spend blocked is configured by {@link DatabaseConfig#sqlTimeout()}.
  */
+@SuppressWarnings("javadoc")
 public final class Awaits
 {
     /**

@@ -5,6 +5,7 @@ import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Set;
 
 /**
  * Codex for a SQL-Type from the {@link ResultSet} to an Java-Object and vice versa.
@@ -15,38 +16,9 @@ import java.sql.SQLException;
 public interface Codec<T>
 {
     /**
-     * Can read this {@link JDBCType} from a {@link ResultSet} ?
-     *
-     * @param jdbcType {@link JDBCType}
-     * @return boolean
+     * @return Class
      */
-    public boolean canMapFromSql(JDBCType jdbcType);
-
-    /**
-     * Can map this {@link JDBCType} to another Object-Type ?
-     *
-     * @param jdbcType {@link JDBCType}
-     * @param type Class
-     * @return boolean
-     */
-    public boolean canMapTo(JDBCType jdbcType, Class<?> type);
-
-    /**
-     * Can write this {@link JDBCType} to a {@link PreparedStatement} ?
-     *
-     * @param jdbcType {@link JDBCType}
-     * @param value Object
-     * @return boolean
-     */
-    public boolean canMapToSql(JDBCType jdbcType, Object value);
-
-    /**
-     * Map an Object into another one.
-     *
-     * @param value Object
-     * @return Object
-     */
-    public T map(Object value);
+    public Class<T> getJavaType();
 
     /**
      * Read an Object from a {@link ResultSet}.
@@ -59,6 +31,15 @@ public interface Codec<T>
     public T mapFromSql(ResultSet resultSet, String columnLabel) throws SQLException;
 
     /**
+     * Map an Object into another one.
+     *
+     * @param javaType Class
+     * @param value Object
+     * @return Object
+     */
+    public <M> M mapTo(Class<M> javaType, T value);
+
+    /**
      * Write an Object in a {@link PreparedStatement}.
      *
      * @param preparedStatement {@link PreparedStatement}
@@ -67,4 +48,9 @@ public interface Codec<T>
      * @throws SQLException Falls was schief geht.
      */
     public void mapToSql(PreparedStatement preparedStatement, int parameterIndex, T value) throws SQLException;
+
+    /**
+     * @return {@link Set}
+     */
+    public Set<JDBCType> supportedJdbcTypes();
 }
