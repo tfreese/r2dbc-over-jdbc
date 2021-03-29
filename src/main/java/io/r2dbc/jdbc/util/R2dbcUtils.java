@@ -4,6 +4,7 @@ package io.r2dbc.jdbc.util;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -31,9 +32,39 @@ public final class R2dbcUtils
      */
     public static final byte[] blobToByteArray(final Blob blob)
     {
-        ByteBuffer byteBuffer = blobToByteBuffer(blob);
+        // ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        //
+        // Flux.from(blob.stream()).subscribe(byteBuffer -> {
+        // // baos.writeBytes(byteBuffer.array());
+        // while (byteBuffer.hasRemaining())
+        // {
+        // baos.write(byteBuffer.get());
+        // }
+        // });
+        //
+        // blob.discard();
+        //
+        // byte[] bytes = baos.toByteArray();
 
-        return byteBuffer.array();
+        // @formatter:off
+        byte[] bytes = Flux.from(blob.stream())
+                .reduce(new ByteArrayOutputStream(), (baos, byteBuffer) -> {
+                    // baos.writeBytes(byteBuffer.array());
+                    while (byteBuffer.hasRemaining())
+                    {
+                        baos.write(byteBuffer.get());
+                    }
+
+                    return baos;
+                })
+                .map(ByteArrayOutputStream::toByteArray)
+                .concatWith(Mono.from(blob.discard())
+                        .then(Mono.empty()))
+                .blockFirst()
+                ;
+        // @formatter:on
+
+        return bytes;
     }
 
     /**
@@ -42,17 +73,27 @@ public final class R2dbcUtils
      */
     public static final ByteBuffer blobToByteBuffer(final Blob blob)
     {
-        // @formatter:off
-        ByteBuffer byteBuffer = Flux.from(blob.stream())
-            .reduce(ByteBuffer::put)
-            .concatWith(Mono.from(blob.discard())
-                    .then(Mono.empty())
-                    )
-            .blockFirst();
-        // @formatter:on
+//        // @formatter:off
+//        ByteBuffer byteBuffer = Flux.from(blob.stream())
+//            .reduce(ByteBuffer::put)
+//            .concatWith(Mono.from(blob.discard())
+//                    .then(Mono.empty())
+//                    )
+//            .blockFirst();
+//        // @formatter:on
+        //
+        // byteBuffer.limit(byteBuffer.capacity());
+        // // byteBuffer.flip();
+        //
+        // return byteBuffer;
 
-        byteBuffer.limit(byteBuffer.capacity());
+        byte[] bytes = blobToByteArray(blob);
+
+        // ByteBuffer byteBuffer = ByteBuffer.allocateDirect(bytes.length);
+        // byteBuffer.put(bytes);
         // byteBuffer.flip();
+
+        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
 
         return byteBuffer;
     }
@@ -63,9 +104,9 @@ public final class R2dbcUtils
      */
     public static InputStream blobToInputStream(final Blob blob)
     {
-        ByteBuffer byteBuffer = blobToByteBuffer(blob);
+        byte[] bytes = blobToByteArray(blob);
 
-        return byteBufferToInputStream(byteBuffer);
+        return new ByteArrayInputStream(bytes);
     }
 
     /**
@@ -129,7 +170,8 @@ public final class R2dbcUtils
                 .map(StringBuilder::toString)
                 .concatWith(Mono.from(clob.discard())
                         .then(Mono.empty()))
-                .blockFirst();
+                .blockFirst()
+                ;
         // @formatter:on
 
         return string;
@@ -164,8 +206,6 @@ public final class R2dbcUtils
 
                 byteBuffer = ByteBuffer.wrap(bytes);
             }
-
-            byteBuffer.flip();
 
             return byteBuffer;
         }
@@ -245,7 +285,7 @@ public final class R2dbcUtils
             throw new RuntimeException(ex);
         }
 
-        Clob clob = Clob.from((Mono.just(string)));
+        Clob clob = stringToClob(string);
 
         return clob;
     }

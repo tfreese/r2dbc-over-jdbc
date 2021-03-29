@@ -17,6 +17,11 @@ import reactor.core.publisher.Mono;
  */
 public class JdbcResult implements Result
 {
+    // /**
+    // *
+    // */
+    // private final JdbcRowMetadata rowMetadata;
+
     /**
      *
      */
@@ -66,5 +71,6 @@ public class JdbcResult implements Result
         Objects.requireNonNull(function, "function must not be null");
 
         return this.rows.zipWith(this.rowMetadata.repeat()).map(tuple -> function.apply(tuple.getT1(), tuple.getT2()));
+        // return this.rows.map(row -> function.apply(row, this.rowMetadata.block()));
     }
 }

@@ -80,7 +80,7 @@ public final class DBServerExtension implements BeforeAllCallback, AfterAllCallb
         this.dataSource.setUsername("sa");
         this.dataSource.setPassword("");
 
-        this.dataSource.setMaximumPoolSize(2);
+        this.dataSource.setMaximumPoolSize(10);
         // this.dataSource.setConnectionTimeout(TimeUnit.MINUTES.toMillis(5));
 
         this.jdbcOperations = new JdbcTemplate(this.dataSource);

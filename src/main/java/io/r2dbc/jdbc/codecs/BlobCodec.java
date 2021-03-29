@@ -18,6 +18,11 @@ import reactor.core.publisher.Mono;
 public class BlobCodec extends AbstractCodec<Blob>
 {
     /**
+     *
+     */
+    public static final Blob NULL_BLOB = Blob.from(Mono.empty());
+
+    /**
      * Erstellt ein neues {@link BlobCodec} Object.
      */
     public BlobCodec()
@@ -35,7 +40,7 @@ public class BlobCodec extends AbstractCodec<Blob>
 
         if (resultSet.wasNull())
         {
-            return Blob.from(Mono.empty());
+            return NULL_BLOB;
         }
 
         Blob blob = R2dbcUtils.sqlBlobToBlob(value);
@@ -57,6 +62,11 @@ public class BlobCodec extends AbstractCodec<Blob>
 
         if (getJavaType().equals(javaType) || Object.class.equals(javaType))
         {
+            // if (NULL_BLOB.equals(value))
+            // {
+            // return null;
+            // }
+
             return (M) value;
         }
         else if (ByteBuffer.class.equals(javaType))
@@ -83,9 +93,9 @@ public class BlobCodec extends AbstractCodec<Blob>
     {
         java.sql.Blob blob = preparedStatement.getConnection().createBlob();
 
-        ByteBuffer byteBuffer = R2dbcUtils.blobToByteBuffer(value);
+        byte[] bytes = R2dbcUtils.blobToByteArray(value);
 
-        blob.setBytes(1, byteBuffer.array());
+        blob.setBytes(1, bytes);
 
         preparedStatement.setBlob(parameterIndex, blob);
     }

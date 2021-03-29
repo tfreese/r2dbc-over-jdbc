@@ -16,6 +16,11 @@ import reactor.core.publisher.Mono;
 public class ClobCodec extends AbstractCodec<Clob>
 {
     /**
+    *
+    */
+    public static final Clob NULL_CLOB = Clob.from(Mono.empty());
+
+    /**
      * Erstellt ein neues {@link ClobCodec} Object.
      */
     public ClobCodec()
@@ -33,7 +38,7 @@ public class ClobCodec extends AbstractCodec<Clob>
 
         if (resultSet.wasNull())
         {
-            return Clob.from(Mono.empty());
+            return NULL_CLOB;
         }
 
         Clob clob = R2dbcUtils.sqlClobToClob(value);
@@ -55,6 +60,11 @@ public class ClobCodec extends AbstractCodec<Clob>
 
         if (getJavaType().equals(javaType) || Object.class.equals(javaType))
         {
+            // if (NULL_CLOB.equals(value))
+            // {
+            // return null;
+            // }
+
             return (M) value;
         }
         else if (CharSequence.class.isAssignableFrom(javaType))
