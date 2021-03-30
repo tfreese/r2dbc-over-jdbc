@@ -15,13 +15,13 @@ import io.r2dbc.spi.Nullability;
 public class JdbcColumnMetadata implements ColumnMetadata
 {
     /**
-    *
-    */
+     *
+     */
     private final int column;
 
     /**
-    *
-    */
+     *
+     */
     private final Class<?> javaType;
 
     /**
@@ -127,7 +127,7 @@ public class JdbcColumnMetadata implements ColumnMetadata
      * @see io.r2dbc.spi.ColumnMetadata#getNativeTypeMetadata()
      */
     @Override
-    public Object getNativeTypeMetadata()
+    public JDBCType getNativeTypeMetadata()
     {
         return this.jdbcType;
     }

@@ -49,11 +49,11 @@ public final class JdbcR2dbcExceptionFactory
          * @param message String
          * @param sqlState String
          * @param errorCode int
-         * @param e {@link SQLException}
+         * @param cause {@link SQLException}
          */
-        JdbcR2dbcDataException(final String message, final String sqlState, final int errorCode, final SQLException e)
+        JdbcR2dbcDataException(final String message, final String sqlState, final int errorCode, final SQLException cause)
         {
-            super(message, sqlState, errorCode, e);
+            super(message, sqlState, errorCode, cause);
         }
     }
 
@@ -73,11 +73,11 @@ public final class JdbcR2dbcExceptionFactory
          * @param message String
          * @param sqlState String
          * @param errorCode int
-         * @param e {@link SQLException}
+         * @param cause {@link SQLException}
          */
-        JdbcR2dbcException(final String message, final String sqlState, final int errorCode, final SQLException e)
+        JdbcR2dbcException(final String message, final String sqlState, final int errorCode, final SQLException cause)
         {
-            super(message, sqlState, errorCode, e);
+            super(message, sqlState, errorCode, cause);
         }
     }
 
@@ -97,11 +97,11 @@ public final class JdbcR2dbcExceptionFactory
          * @param message String
          * @param sqlState String
          * @param errorCode int
-         * @param e {@link SQLException}
+         * @param cause {@link SQLException}
          */
-        JdbcR2dbcNonTransientException(final String message, final String sqlState, final int errorCode, final SQLException e)
+        JdbcR2dbcNonTransientException(final String message, final String sqlState, final int errorCode, final SQLException cause)
         {
-            super(message, sqlState, errorCode, e);
+            super(message, sqlState, errorCode, cause);
         }
     }
 
@@ -121,11 +121,11 @@ public final class JdbcR2dbcExceptionFactory
          * @param message String
          * @param sqlState String
          * @param errorCode int
-         * @param e {@link SQLException}
+         * @param cause {@link SQLException}
          */
-        JdbcR2dbcTransientException(final String message, final String sqlState, final int errorCode, final SQLException e)
+        JdbcR2dbcTransientException(final String message, final String sqlState, final int errorCode, final SQLException cause)
         {
-            super(message, sqlState, errorCode, e);
+            super(message, sqlState, errorCode, cause);
         }
     }
 

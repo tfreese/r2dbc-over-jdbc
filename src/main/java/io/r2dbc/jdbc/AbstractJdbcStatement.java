@@ -44,6 +44,8 @@ public abstract class AbstractJdbcStatement implements Statement
          */
         void finish()
         {
+            validateBinds();
+
             this.current = null;
         }
 
@@ -83,6 +85,7 @@ public abstract class AbstractJdbcStatement implements Statement
             if (this.binds.isEmpty())
             {
                 preparedStatement.addBatch();
+
                 return;
             }
 
@@ -123,6 +126,26 @@ public abstract class AbstractJdbcStatement implements Statement
                 {
                     getCodecs().mapToSql(value.getClass(), preparedStatement, parameterIndex, value);
                 }
+            }
+        }
+
+        /**
+         * Prüfen, ob alle Parameter gesetzt wurden.
+         */
+        void validateBinds()
+        {
+            if (this.current == null)
+            {
+                return;
+            }
+
+            long parameterCount = getSql().chars().filter(ch -> ch == '?').count();
+
+            int bindCount = this.current.size();
+
+            if (bindCount < parameterCount)
+            {
+                throw new IllegalStateException("Bindings do not match Parameters: " + bindCount + " != " + parameterCount);
             }
         }
     }

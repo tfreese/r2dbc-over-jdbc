@@ -65,6 +65,8 @@ public class ClobCodec extends AbstractCodec<Clob>
             // return null;
             // }
 
+            // return javaType.cast(R2dbcUtils.clobToString(value));
+
             return (M) value;
         }
         else if (CharSequence.class.isAssignableFrom(javaType))

@@ -12,7 +12,6 @@ import java.util.stream.IntStream;
 import io.r2dbc.jdbc.codecs.Codecs;
 import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Result;
-import io.r2dbc.spi.Statement;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SynchronousSink;
@@ -178,6 +177,8 @@ public class JdbcStatement extends AbstractJdbcStatement
     @Override
     public Flux<Result> execute()
     {
+        getBindings().validateBinds();
+
         // @formatter:off
         return Flux.fromArray(getSql().split(";"))
                 .map(String::trim)
@@ -202,25 +203,5 @@ public class JdbcStatement extends AbstractJdbcStatement
                     }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(JdbcResult.class)
         );
         // @formatter:on
-    }
-
-    /**
-     * @see io.r2dbc.spi.Statement#fetchSize(int)
-     */
-    @Override
-    public Statement fetchSize(final int rows)
-    {
-        // TODO Auto-generated method stub
-        return super.fetchSize(rows);
-    }
-
-    /**
-     * @see io.r2dbc.spi.Statement#returnGeneratedValues(java.lang.String[])
-     */
-    @Override
-    public Statement returnGeneratedValues(final String...columns)
-    {
-        // TODO Auto-generated method stub
-        return super.returnGeneratedValues(columns);
     }
 }

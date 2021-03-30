@@ -1,11 +1,14 @@
 // Created: 14.06.2019
 package io.r2dbc.jdbc;
 
+import java.nio.ByteBuffer;
 import java.sql.JDBCType;
 import java.util.Map;
 import java.util.Objects;
 
 import io.r2dbc.jdbc.codecs.Codecs;
+import io.r2dbc.spi.Blob;
+import io.r2dbc.spi.Clob;
 import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Row;
 
@@ -48,6 +51,28 @@ public class JdbcRow implements Row
     }
 
     /**
+     * @see io.r2dbc.spi.Row#get(int)
+     */
+    @Override
+    public Object get(final int index)
+    {
+        ColumnMetadata metadata = this.rowMetadata.getColumnMetadata(index);
+
+        if (Clob.class.equals(metadata.getJavaType()))
+        {
+            // Clobs immer als String liefern.
+            return get(index, String.class);
+        }
+        else if (Blob.class.equals(metadata.getJavaType()))
+        {
+            // Blobs immer als ByteBuffer liefern.
+            return get(index, ByteBuffer.class);
+        }
+
+        return get(index, Object.class);
+    }
+
+    /**
      * @see io.r2dbc.spi.Row#get(int, java.lang.Class)
      */
     @Override
@@ -71,6 +96,19 @@ public class JdbcRow implements Row
         T mappedValue = this.codecs.mapTo(jdbcType, type, value);
 
         return mappedValue;
+    }
+
+    /**
+     * @see io.r2dbc.spi.Row#get(java.lang.String)
+     */
+    @Override
+    public Object get(final String name)
+    {
+        ColumnMetadata metadata = this.rowMetadata.getColumnMetadata(name);
+
+        int column = ((JdbcColumnMetadata) metadata).getColumn();
+
+        return get(column);
     }
 
     /**

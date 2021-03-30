@@ -151,6 +151,18 @@ public final class R2dbcUtils
 
     /**
      * @param byteBuffer {@link ByteBuffer}
+     * @return byte[]
+     */
+    public static byte[] byteBufferToByteArray(final ByteBuffer byteBuffer)
+    {
+        byte[] bytes = new byte[byteBuffer.remaining()];
+        byteBuffer.get(bytes);
+
+        return bytes;
+    }
+
+    /**
+     * @param byteBuffer {@link ByteBuffer}
      * @return {@link InputStream}
      */
     public static InputStream byteBufferToInputStream(final ByteBuffer byteBuffer)
