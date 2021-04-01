@@ -126,6 +126,6 @@ final class JdbcR2dbcClientTest
             .verifyComplete()
 //            .subscribe(System.out::println)
             ;
-        // @formatter:o
+        // @formatter:on
     }
 }

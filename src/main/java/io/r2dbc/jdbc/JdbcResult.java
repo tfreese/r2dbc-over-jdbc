@@ -4,6 +4,8 @@ package io.r2dbc.jdbc;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
+import org.reactivestreams.Publisher;
+
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;
@@ -17,11 +19,6 @@ import reactor.core.publisher.Mono;
  */
 public class JdbcResult implements Result
 {
-    // /**
-    // *
-    // */
-    // private final JdbcRowMetadata rowMetadata;
-
     /**
      *
      */
@@ -35,16 +32,16 @@ public class JdbcResult implements Result
     /**
      *
      */
-    private final Mono<Integer> rowsUpdated;
+    private final Publisher<Integer> rowsUpdated;
 
     /**
      * Erstellt ein neues {@link JdbcResult} Object.
      *
      * @param rows {@link Flux}
      * @param rowMetadata {@link Mono}
-     * @param rowsUpdated {@link Mono}
+     * @param rowsUpdated {@link Publisher}
      */
-    public JdbcResult(final Flux<JdbcRow> rows, final Mono<JdbcRowMetadata> rowMetadata, final Mono<Integer> rowsUpdated)
+    public JdbcResult(final Flux<JdbcRow> rows, final Mono<JdbcRowMetadata> rowMetadata, final Publisher<Integer> rowsUpdated)
     {
         super();
 
@@ -57,7 +54,7 @@ public class JdbcResult implements Result
      * @see io.r2dbc.spi.Result#getRowsUpdated()
      */
     @Override
-    public Mono<Integer> getRowsUpdated()
+    public Publisher<Integer> getRowsUpdated()
     {
         return this.rowsUpdated;
     }

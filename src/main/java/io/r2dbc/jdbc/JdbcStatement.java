@@ -164,6 +164,7 @@ public class JdbcStatement extends AbstractJdbcStatement
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create);
 
         Mono<Integer> rowsUpdated = affectedRows != null ? Mono.just(IntStream.of(affectedRows).sum()) : Mono.empty();
+        // Flux<Integer> rowsUpdated = affectedRows != null ? Flux.fromStream(IntStream.of(affectedRows).boxed()) : Flux.empty();
 
         Result result = new JdbcResult(rows, Mono.just(rowMetadata), rowsUpdated);
 

@@ -7,7 +7,6 @@ import static io.r2dbc.spi.IsolationLevel.SERIALIZABLE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -154,10 +153,8 @@ final class JdbcConnectionTest
     @Test
     void testCreateBatch()
     {
-        JdbcConnection jdbcConnection = new JdbcConnection(this.connection, this.codecs);
-
-        // assertThat(new JdbcConnection(connection).createBatch()).isInstanceOf(JdbcBatch.class);
-        assertThatThrownBy(jdbcConnection::createBatch).isInstanceOf(UnsupportedOperationException.class);
+        assertThat(new JdbcConnection(this.connection, this.codecs).createBatch()).isInstanceOf(JdbcBatch.class);
+        // assertThatThrownBy(jdbcConnection::createBatch).isInstanceOf(UnsupportedOperationException.class);
     }
 
     /**

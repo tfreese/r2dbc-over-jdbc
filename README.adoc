@@ -13,5 +13,4 @@ See `io.r2dbc.jdbc.codecs.DefaultCodecs`
 
 
 == Limitations
-* No support for `io.r2dbc.spi.Batch` like: `insert ...; select ... `
 * No support for named parameters, only '?'

@@ -271,7 +271,7 @@ final class JdbcExampleTest
 
         try
         {
-            awaitUpdate(5, connection.createStatement("INSERT INTO tbl VALUES (100, 200, 300, 400, 500)"));
+            awaitUpdate(List.of(5), connection.createStatement("INSERT INTO tbl VALUES (100, 200, 300, 400, 500)"));
             awaitUpdate(2, connection.createStatement("DELETE FROM tbl where value = ?").bind(0, 300).add().bind(0, 400));
             awaitQuery(List.of(100, 200, 500), row -> row.get(0, Integer.class), connection.createStatement("SELECT value FROM tbl"));
             awaitQuery(List.of(100, 200, 500), row -> row.get("value", Integer.class), connection.createStatement("SELECT value FROM tbl"));

@@ -164,7 +164,7 @@ public class JdbcConnection implements Connection
     @Override
     public Batch createBatch()
     {
-        throw new UnsupportedOperationException();
+        return new JdbcBatch(this);
     }
 
     /**

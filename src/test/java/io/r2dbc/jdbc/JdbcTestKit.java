@@ -3,7 +3,6 @@ package io.r2dbc.jdbc;
 
 import java.util.stream.IntStream;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -32,17 +31,6 @@ final class JdbcTestKit implements TestKit<Integer>
     */
     @RegisterExtension
     static final DBServerExtension SERVER = new DBServerExtension();
-
-    /**
-     * @see io.r2dbc.spi.test.TestKit#batch()
-     */
-    @Override
-    @Test
-    @Disabled("Wird nicht unterstützt")
-    public void batch()
-    {
-        TestKit.super.batch();
-    }
 
     /**
      * @see io.r2dbc.spi.test.TestKit#doGetSql(io.r2dbc.spi.test.TestKit.TestStatement)
@@ -109,13 +97,13 @@ final class JdbcTestKit implements TestKit<Integer>
     {
         // TestKit.super.prepareStatement();
 
-        // Der Original Testfall erwartet 10 Inserts ... bei einem Parameter ?!
+        // Der Original Testfall erwartet 10 RowsUpdated ... expectNextCount(10)
         Mono.from(getConnectionFactory().create()).flatMapMany(connection -> {
             Statement statement = connection.createStatement(expand(TestStatement.INSERT_VALUE_PLACEHOLDER, getPlaceholder(0)));
 
             IntStream.range(0, 10).forEach(i -> TestKit.bind(statement, getIdentifier(0), i).add());
 
             return Flux.from(statement.execute()).flatMap(this::extractRowsUpdated).concatWith(TestKit.close(connection));
-        }).as(StepVerifier::create).expectNextCount(1).as("values from insertions").verifyComplete();
+        }).as(StepVerifier::create).expectNext(10).as("values from insertions").verifyComplete();
     }
 }

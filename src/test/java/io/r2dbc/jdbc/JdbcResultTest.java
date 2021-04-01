@@ -65,6 +65,6 @@ final class JdbcResultTest
 
         result.map((row, rowMetadata) -> row).as(StepVerifier::create).verifyError(R2dbcDataIntegrityViolationException.class);
 
-        result.getRowsUpdated().as(StepVerifier::create).verifyComplete();
+        Mono.from(result.getRowsUpdated()).as(StepVerifier::create).verifyComplete();
     }
 }
