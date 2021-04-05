@@ -12,6 +12,8 @@ import java.util.stream.IntStream;
 import io.r2dbc.jdbc.codecs.Codecs;
 import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Result;
+import io.r2dbc.spi.Row;
+import io.r2dbc.spi.RowMetadata;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SynchronousSink;
@@ -116,12 +118,13 @@ public class JdbcStatement extends AbstractJdbcStatement
      * @return {@link Result}
      * @throws SQLException Falls was schief geht.
      */
+    @SuppressWarnings("unchecked")
     protected Result createResult(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows) throws SQLException
     {
-        JdbcRowMetadata rowMetadata = JdbcRowMetadata.of(resultSet, getCodecs());
-        Iterable<ColumnMetadata> columnMetaDatas = rowMetadata.getColumnMetadatas();
+        RowMetadata rowMetadata = JdbcRowMetadata.of(resultSet, getCodecs());
+        Iterable<ColumnMetadata> columnMetaDatas = (Iterable<ColumnMetadata>) rowMetadata.getColumnMetadatas();
 
-        Flux<JdbcRow> rows = Flux.generate((final SynchronousSink<JdbcRow> sink) -> {
+        Flux<Row> rows = Flux.generate((final SynchronousSink<Row> sink) -> {
             try
             {
                 if ((resultSet != null) && resultSet.next())
@@ -184,7 +187,7 @@ public class JdbcStatement extends AbstractJdbcStatement
         return Flux.fromArray(getSql().split(";"))
                 .map(String::trim)
                 .flatMap(sql ->
-                     createExecuteMono(getConnection(), sql).handle((context, sink) -> {
+                     createExecuteMono(getJdbcConnection(), sql).handle((context, sink) -> {
                         try
                         {
                             PreparedStatement stmt = context.getStmt();

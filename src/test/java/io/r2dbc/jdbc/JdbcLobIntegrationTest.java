@@ -16,7 +16,9 @@ import io.r2dbc.jdbc.codecs.ClobCodec;
 import io.r2dbc.jdbc.util.DBServerExtension;
 import io.r2dbc.spi.Blob;
 import io.r2dbc.spi.Clob;
+import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactories;
+import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.test.TestKit;
@@ -38,7 +40,7 @@ class JdbcLobIntegrationTest
     /**
     *
     */
-    private static JdbcConnectionFactory connectionFactory;
+    private static ConnectionFactory connectionFactory;
 
     /**
     *
@@ -64,43 +66,48 @@ class JdbcLobIntegrationTest
     {
         ConnectionFactoryOptions options = ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, SERVER.getDataSource()).build();
 
-        connectionFactory = (JdbcConnectionFactory) ConnectionFactories.get(options);
+        connectionFactory = ConnectionFactories.get(options);
     }
 
     /**
-     * @return {@link JdbcConnection}
+     * @return {@link Connection}
      */
-    protected static JdbcConnection getConnection()
+    protected static Connection getConnection()
     {
-        return getConnectionFactory().create().block(DBServerExtension.getSqlTimeout());
+        return Mono.from(getConnectionFactory().create()).block(DBServerExtension.getSqlTimeout());
     }
 
     /**
-     * @return {@link JdbcConnectionFactory}
+     * @return {@link ConnectionFactory}
      */
-    protected static JdbcConnectionFactory getConnectionFactory()
+    protected static ConnectionFactory getConnectionFactory()
     {
         return connectionFactory;
     }
 
     /**
-     * @param connection {@link JdbcConnection}
+     * @param connection {@link Connection}
      * @param columnType String
      */
-    void createTable(final JdbcConnection connection, final String columnType)
+    void createTable(final Connection connection, final String columnType)
     {
+        // "DROP TABLE IF EXISTS lob_test"
+
         // @formatter:off
-        connection.createStatement("DROP TABLE IF EXISTS lob_test")
-            .execute()
-            .flatMap(Result::getRowsUpdated)
-            .onErrorResume(e -> Mono.empty())
-            .thenMany(connection.createStatement("CREATE TABLE lob_test (my_col " + columnType + ")")
-                    .execute()
-                    .flatMap(Result::getRowsUpdated)
-                    )
-            .as(StepVerifier::create)
-            .expectNext(0)
-            .verifyComplete();
+        Flux.from(connection.createStatement("DROP TABLE lob_test")
+                .execute()
+                )
+                .flatMap(Result::getRowsUpdated)
+                .onErrorResume(e -> Mono.empty())
+                .thenMany(
+                        Flux.from(connection.createStatement("CREATE TABLE lob_test (my_col " + columnType + ")")
+                                .execute()
+                                )
+                                .flatMap(Result::getRowsUpdated)
+                        )
+                .as(StepVerifier::create)
+                .expectNext(0)
+                .verifyComplete();
         // @formatter:on
     }
 
@@ -128,7 +135,7 @@ class JdbcLobIntegrationTest
         // awaitNone(connection.close());
         // }
 
-        JdbcConnection connection = getConnection();
+        Connection connection = getConnection();
 
         // @formatter:off
         Flux.from(connection.createStatement("INSERT INTO lob_test values(?)")
@@ -146,17 +153,18 @@ class JdbcLobIntegrationTest
 
         connection = getConnection();
 
-        connection.createStatement("SELECT my_col FROM lob_test")
-            .execute()
-            .flatMap(result -> result.map((row, rowMetadata) -> row.get("my_col", Blob.class)))
-            .flatMap(Blob::stream)
-            .doOnNext(it -> System.out.println(it.remaining()))
-            .map(Buffer::remaining)
-            .collect(Collectors.summingInt(value -> value))
-            .concatWith(TestKit.close(connection))
-            .as(StepVerifier::create)
-            .expectNext(i * ALL_BYTES.length)
-            .verifyComplete();
+        Flux.from(connection.createStatement("SELECT my_col FROM lob_test")
+                .execute()
+                )
+                .flatMap(result -> result.map((row, rowMetadata) -> row.get("my_col", Blob.class)))
+                .flatMap(Blob::stream)
+                .doOnNext(it -> System.out.println(it.remaining()))
+                .map(Buffer::remaining)
+                .collect(Collectors.summingInt(value -> value))
+                .concatWith(TestKit.close(connection))
+                .as(StepVerifier::create)
+                .expectNext(i * ALL_BYTES.length)
+                .verifyComplete();
         // @formatter:on
     }
 
@@ -185,12 +193,13 @@ class JdbcLobIntegrationTest
         // awaitNone(connection.close());
         // }
 
-        JdbcConnection connection = getConnection();
+        Connection connection = getConnection();
 
         // @formatter:off
         Flux.from(connection.createStatement("INSERT INTO lob_test values(?)")
                 .bind(0, Clob.from(Flux.range(0, i).map(it -> TEST_STRING)))
-                .execute())
+                .execute()
+                )
                 .flatMap(Result::getRowsUpdated)
                 .concatWith(TestKit.close(connection))
                 .as(StepVerifier::create)
@@ -200,8 +209,9 @@ class JdbcLobIntegrationTest
 
         connection = getConnection();
 
-        connection.createStatement("SELECT my_col FROM lob_test")
+        Flux.from(connection.createStatement("SELECT my_col FROM lob_test")
                 .execute()
+                )
                 .flatMap(it -> it.map((row, rowMetadata) -> row.get("my_col", Clob.class)))
                 .flatMap(Clob::stream)
                 .doOnNext(it -> System.out.println(it.toString()))
@@ -222,12 +232,13 @@ class JdbcLobIntegrationTest
     {
         createTable(getConnection(), "BLOB");
 
-        JdbcConnection connection = getConnection();
+        Connection connection = getConnection();
 
         // @formatter:off
         Flux.from(connection.createStatement("INSERT INTO lob_test values(?)")
                 .bindNull(0, Blob.class)
-                .execute())
+                .execute()
+                )
                 .flatMap(Result::getRowsUpdated)
                 .concatWith(TestKit.close(connection))
                 .as(StepVerifier::create)
@@ -238,13 +249,14 @@ class JdbcLobIntegrationTest
         connection = getConnection();
 
         // @formatter:off
-        connection.createStatement("SELECT my_col FROM lob_test")
-            .execute()
-            .flatMap(it -> it.map((row, rowMetadata) -> row.get("my_col", Blob.class)))
-            .concatWith(TestKit.close(connection))
-            .as(StepVerifier::create)
-            .consumeNextWith(actual -> Assertions.assertThat(actual).isSameAs(BlobCodec.NULL_BLOB))
-            .verifyComplete();
+        Flux.from(connection.createStatement("SELECT my_col FROM lob_test")
+                .execute()
+                )
+                .flatMap(it -> it.map((row, rowMetadata) -> row.get("my_col", Blob.class)))
+                .concatWith(TestKit.close(connection))
+                .as(StepVerifier::create)
+                .consumeNextWith(actual -> Assertions.assertThat(actual).isSameAs(BlobCodec.NULL_BLOB))
+                .verifyComplete();
         // @formatter:on
     }
 
@@ -256,12 +268,13 @@ class JdbcLobIntegrationTest
     {
         createTable(getConnection(), "CLOB");
 
-        JdbcConnection connection = getConnection();
+        Connection connection = getConnection();
 
         // @formatter:off
         Flux.from(connection.createStatement("INSERT INTO lob_test values(?)")
                 .bindNull(0, Clob.class)
-                .execute())
+                .execute()
+                )
                 .flatMap(Result::getRowsUpdated)
                 .concatWith(TestKit.close(connection))
                 .as(StepVerifier::create)
@@ -272,8 +285,9 @@ class JdbcLobIntegrationTest
         connection = getConnection();
 
         // @formatter:off
-        connection.createStatement("SELECT my_col FROM lob_test")
+        Flux.from(connection.createStatement("SELECT my_col FROM lob_test")
                 .execute()
+                )
                 .flatMap(it -> it.map((row, rowMetadata) -> row.get("my_col", Clob.class)))
                 .concatWith(TestKit.close(connection))
                 .as(StepVerifier::create)

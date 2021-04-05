@@ -1,0 +1,113 @@
+// Created: 14.06.2019
+package io.r2dbc.jdbc.clientTest;
+
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+
+import io.r2dbc.client.R2dbc;
+import io.r2dbc.jdbc.JdbcConnectionFactoryProvider;
+import io.r2dbc.jdbc.util.DBServerExtension;
+import io.r2dbc.jdbc.util.DatabaseExtension;
+import io.r2dbc.spi.ConnectionFactories;
+import io.r2dbc.spi.ConnectionFactoryOptions;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
+
+/**
+ * @author Thomas Freese
+ */
+// @ExtendWith(DatabaseExtension.class) // funktioniert nicht mit statischem Zugriff auf die Server -> werden sonst doppelt erzeugt !
+@ExtendWith(JanitorInvocationInterceptor.class)
+final class ParameterizedR2dbcClientTest
+{
+    /**
+     *
+     */
+    @RegisterExtension
+    static final DatabaseExtension DATABASE_EXTENSION = new DatabaseExtension();
+
+    /**
+     * @return {@link Stream}
+     */
+    private static Stream<Arguments> getDatabases()
+    {
+        return DATABASE_EXTENSION.getServers().stream().map(server -> Arguments.of(server.getDatabaseType(), server));
+    }
+
+    /**
+     * @param databaseType {@link EmbeddedDatabaseType}
+     * @param server {@link DBServerExtension}
+     */
+    @ParameterizedTest(name = "{index} -> {0}")
+    // @ArgumentsSource(DatabaseExtension.class)
+    @MethodSource("getDatabases")
+    void testInsert(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    {
+        R2dbc r2dbc = new R2dbc(
+                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build()));
+
+       // @formatter:off
+       r2dbc.inTransaction(handle -> handle.execute("INSERT INTO tbl VALUES (?)", 200))
+           .as(StepVerifier::create)
+           .expectNext(1).as("value from insertion")
+           .verifyComplete()
+           ;
+       // @formatter:on
+    }
+
+    /**
+     * @param databaseType {@link EmbeddedDatabaseType}
+     * @param server {@link DBServerExtension}
+     */
+    @ParameterizedTest(name = "{index} -> {0}")
+    @MethodSource("getDatabases")
+    void testInsertBatch(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    {
+        R2dbc r2dbc = new R2dbc(
+                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build()));
+
+       // @formatter:off
+       r2dbc.inTransaction(handle -> handle.execute("INSERT INTO tbl VALUES (?)", 100)
+               .concatWith(handle.execute("INSERT INTO tbl VALUES (?)", 200))
+               .concatWith(handle.execute("INSERT INTO tbl VALUES (?)", 300))
+               )
+           .as(StepVerifier::create)
+           .expectNext(1).as("value from insertion")
+           .expectNext(1).as("value from insertion")
+           .expectNext(1).as("value from insertion")
+           .verifyComplete()
+           ;
+       // @formatter:on
+    }
+
+    /**
+     * @param databaseType {@link EmbeddedDatabaseType}
+     * @param server {@link DBServerExtension}
+     */
+    @ParameterizedTest(name = "{index} -> {0}")
+    @MethodSource("getDatabases")
+    void testInsertWithSelect(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    {
+        R2dbc r2dbc = new R2dbc(
+                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build()));
+
+        // @formatter:off
+        r2dbc.inTransaction(handle -> handle.execute("INSERT INTO tbl VALUES (?)", 100))
+            .concatWith(r2dbc.inTransaction(handle -> handle.select("SELECT value FROM tbl")
+                .mapResult(result -> Flux.from(result.map((row, rowMetadata) -> row.get("value", Integer.class)))))
+                )
+            .as(StepVerifier::create)
+            .expectNext(1).as("value from insertion")
+            .expectNext(100).as("value from select")
+            .verifyComplete()
+//            .subscribe(System.out::println)
+            ;
+        // @formatter:on
+    }
+}

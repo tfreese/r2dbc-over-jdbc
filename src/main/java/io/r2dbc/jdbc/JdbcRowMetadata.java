@@ -351,7 +351,7 @@ public class JdbcRowMetadata implements RowMetadata
      * @return {@link List}
      * @throws SQLException Falls was schief geht.
      */
-    public static JdbcRowMetadata of(final ResultSet resultSet, final Codecs codecs) throws SQLException
+    public static RowMetadata of(final ResultSet resultSet, final Codecs codecs) throws SQLException
     {
         if (resultSet == null)
         {
@@ -359,7 +359,7 @@ public class JdbcRowMetadata implements RowMetadata
         }
 
         ResultSetMetaData metaData = resultSet.getMetaData();
-        List<JdbcColumnMetadata> list = new ArrayList<>();
+        List<ColumnMetadata> list = new ArrayList<>();
 
         for (int column = 1; column <= metaData.getColumnCount(); column++)
         {
@@ -388,12 +388,12 @@ public class JdbcRowMetadata implements RowMetadata
     /**
      *
      */
-    private final List<JdbcColumnMetadata> columnMetaDatas;
+    private final List<ColumnMetadata> columnMetaDatas;
 
     /**
     *
     */
-    private final Map<String, JdbcColumnMetadata> columnMetaDatasByName = new LinkedHashMap<>();
+    private final Map<String, ColumnMetadata> columnMetaDatasByName = new LinkedHashMap<>();
 
     /**
      *
@@ -405,7 +405,7 @@ public class JdbcRowMetadata implements RowMetadata
      *
      * @param columnMetaDatas {@link ResultSet}
      */
-    public JdbcRowMetadata(final List<JdbcColumnMetadata> columnMetaDatas)
+    public JdbcRowMetadata(final List<ColumnMetadata> columnMetaDatas)
     {
         super();
 
@@ -415,7 +415,7 @@ public class JdbcRowMetadata implements RowMetadata
             // Bei Spalten mit identischen Namen, immer den ersten nehmen, laut Spezifikation.
             String name = cmd.getName().toLowerCase();
 
-            JdbcColumnMetadata old = this.columnMetaDatasByName.put(name, cmd);
+            ColumnMetadata old = this.columnMetaDatasByName.put(name, cmd);
 
             if (old != null)
             {

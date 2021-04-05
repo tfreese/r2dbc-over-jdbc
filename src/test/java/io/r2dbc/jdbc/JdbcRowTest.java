@@ -24,11 +24,13 @@ import org.springframework.jdbc.core.JdbcOperations;
 import io.r2dbc.jdbc.codecs.Codecs;
 import io.r2dbc.jdbc.codecs.DefaultCodecs;
 import io.r2dbc.jdbc.util.DBServerExtension;
+import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
 import io.r2dbc.spi.Nullability;
+import io.r2dbc.spi.RowMetadata;
 import io.r2dbc.spi.test.TestKit;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -57,21 +59,21 @@ final class JdbcRowTest
             ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, SERVER.getDataSource()).build());
 
     /**
-     *
-     */
+    *
+    */
     @AfterEach
     void afterEach()
     {
-        getJdbcOperations().execute("DROP TABLE test");
+        getJdbcOperations().execute("DROP TABLE tbl");
     }
 
     /**
-     *
-     */
+    *
+    */
     @BeforeEach
     void beforeEach()
     {
-        getJdbcOperations().execute("CREATE TABLE test ( value INTEGER )");
+        getJdbcOperations().execute("CREATE TABLE tbl ( value INTEGER )");
     }
 
     /**
@@ -142,8 +144,8 @@ final class JdbcRowTest
     @Test
     void testGetInvalidIdentifier()
     {
-        JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
-        JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
+        ColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
+        RowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
         assertThat(new JdbcRow(rowMetadata, new HashMap<>(), this.codecs).get(3, Object.class)).isNull();
     }
@@ -198,11 +200,11 @@ final class JdbcRowTest
     @Test
     void testSelectWithAliases()
     {
-        getJdbcOperations().execute("INSERT INTO test VALUES (100)");
+        getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
 
         // @formatter:off
         Mono.from(this.connectionFactory.create())
-            .flatMapMany(connection -> Flux.from(connection .createStatement("SELECT value as ALIASED_VALUE FROM test").execute())
+            .flatMapMany(connection -> Flux.from(connection .createStatement("SELECT value as ALIASED_VALUE FROM tbl").execute())
                 .flatMap(result -> Flux.from(result.map((row, rowMetadata) ->
                             row.get("ALIASED_VALUE", Integer.class)
                             )
@@ -221,11 +223,11 @@ final class JdbcRowTest
     @Test
     void testSelectWithoutAliases()
     {
-        // getJdbcOperations().execute("INSERT INTO test VALUES (100)");
+        // getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
         //
         // @formatter:off
 //        Mono.from(this.connectionFactory.create())
-//            .flatMapMany(connection -> Flux.from(connection.createStatement("SELECT value FROM test").execute())
+//            .flatMapMany(connection -> Flux.from(connection.createStatement("SELECT value FROM tbl").execute())
 //                .flatMap(TestKit::extractColumns)
 //                .concatWith(TestKit.close(connection)))
 //        .as(StepVerifier::create)
@@ -237,12 +239,12 @@ final class JdbcRowTest
 
         try
         {
-            // awaitExecution(connection.createStatement("CREATE TABLE test ( value INTEGER )"));
+            // awaitExecution(connection.createStatement("CREATE TABLE tbl ( value INTEGER )"));
 
-            awaitUpdate(1, connection.createStatement("INSERT INTO test VALUES (100)"));
+            awaitUpdate(1, connection.createStatement("INSERT INTO tbl VALUES (100)"));
 
-            awaitQuery(List.of(100), row -> row.get(0, Integer.class), connection.createStatement("SELECT value FROM test"));
-            awaitQuery(List.of(100), row -> row.get("value", Integer.class), connection.createStatement("SELECT value FROM test"));
+            awaitQuery(List.of(100), row -> row.get(0, Integer.class), connection.createStatement("SELECT value FROM tbl"));
+            awaitQuery(List.of(100), row -> row.get("value", Integer.class), connection.createStatement("SELECT value FROM tbl"));
         }
         finally
         {

@@ -13,6 +13,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import org.junit.jupiter.api.Test;
 
 import io.r2dbc.spi.R2dbcDataIntegrityViolationException;
+import io.r2dbc.spi.Result;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -55,7 +56,7 @@ final class JdbcResultTest
     @Test
     void testToResultErrorResponse()
     {
-        JdbcResult result = mock(JdbcResult.class, RETURNS_SMART_NULLS);
+        Result result = mock(JdbcResult.class, RETURNS_SMART_NULLS);
 
         when(result.map(any())).thenAnswer(arg -> {
             return Flux.error(new SQLIntegrityConstraintViolationException("can't do something", "some state", 999)).onErrorMap(SQLException.class,
@@ -63,7 +64,7 @@ final class JdbcResultTest
         });
         when(result.getRowsUpdated()).thenReturn(Mono.empty());
 
-        result.map((row, rowMetadata) -> row).as(StepVerifier::create).verifyError(R2dbcDataIntegrityViolationException.class);
+        Flux.from(result.map((row, rowMetadata) -> row)).as(StepVerifier::create).verifyError(R2dbcDataIntegrityViolationException.class);
 
         Mono.from(result.getRowsUpdated()).as(StepVerifier::create).verifyComplete();
     }

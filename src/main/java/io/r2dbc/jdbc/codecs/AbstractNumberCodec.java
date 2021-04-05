@@ -48,6 +48,10 @@ abstract class AbstractNumberCodec<T extends Number> extends AbstractCodec<T>
         {
             return (M) (Float) value.floatValue();
         }
+        else if (Integer.class.equals(javaType))
+        {
+            return (M) (Integer) value.intValue();
+        }
         else if (Long.class.equals(javaType))
         {
             return (M) (Long) value.longValue();

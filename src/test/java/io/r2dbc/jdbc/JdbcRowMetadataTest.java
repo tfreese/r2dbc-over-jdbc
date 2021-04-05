@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import io.r2dbc.jdbc.codecs.Codecs;
 import io.r2dbc.jdbc.codecs.DefaultCodecs;
+import io.r2dbc.spi.ColumnMetadata;
 
 /**
  * @author Thomas Freese
@@ -49,7 +50,7 @@ final class JdbcRowMetadataTest
     /**
      *
      */
-    private final List<JdbcColumnMetadata> columnMetadatas =
+    private final List<ColumnMetadata> columnMetadatas =
             Arrays.asList(new JdbcColumnMetadata("TEST-NAME-1", 0, Object.class, JDBCType.OTHER, NULLABLE, 100, 500),
                     new JdbcColumnMetadata("TEST-NAME-2", 1, Object.class, JDBCType.OTHER, NULLABLE, 300, 600));
 

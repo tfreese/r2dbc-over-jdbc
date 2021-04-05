@@ -22,12 +22,12 @@ public class JdbcResult implements Result
     /**
      *
      */
-    private final Mono<JdbcRowMetadata> rowMetadata;
+    private final Mono<RowMetadata> rowMetadata;
 
     /**
      *
      */
-    private final Flux<JdbcRow> rows;
+    private final Flux<Row> rows;
 
     /**
      *
@@ -41,7 +41,7 @@ public class JdbcResult implements Result
      * @param rowMetadata {@link Mono}
      * @param rowsUpdated {@link Publisher}
      */
-    public JdbcResult(final Flux<JdbcRow> rows, final Mono<JdbcRowMetadata> rowMetadata, final Publisher<Integer> rowsUpdated)
+    public JdbcResult(final Flux<Row> rows, final Mono<RowMetadata> rowMetadata, final Publisher<Integer> rowsUpdated)
     {
         super();
 

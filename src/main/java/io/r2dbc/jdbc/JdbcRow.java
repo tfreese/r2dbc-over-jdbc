@@ -11,6 +11,7 @@ import io.r2dbc.spi.Blob;
 import io.r2dbc.spi.Clob;
 import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Row;
+import io.r2dbc.spi.RowMetadata;
 
 /**
  * R2DBC Adapter for JDBC.
@@ -27,7 +28,7 @@ public class JdbcRow implements Row
     /**
      *
      */
-    private final JdbcRowMetadata rowMetadata;
+    private final RowMetadata rowMetadata;
 
     /**
      *
@@ -41,7 +42,7 @@ public class JdbcRow implements Row
      * @param values {@link Map}
      * @param codecs {@link Codecs}
      */
-    public JdbcRow(final JdbcRowMetadata rowMetadata, final Map<Integer, Object> values, final Codecs codecs)
+    public JdbcRow(final RowMetadata rowMetadata, final Map<Integer, Object> values, final Codecs codecs)
     {
         super();
 

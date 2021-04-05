@@ -2,16 +2,19 @@
 package io.r2dbc.jdbc.util;
 
 import java.time.Duration;
+import java.util.Objects;
 
 import javax.sql.DataSource;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -36,6 +39,11 @@ public final class DBServerExtension implements BeforeAllCallback, AfterAllCallb
     /**
      *
      */
+    private final EmbeddedDatabaseType databaseType;
+
+    /**
+     *
+     */
     private HikariDataSource dataSource;
 
     /**
@@ -44,10 +52,30 @@ public final class DBServerExtension implements BeforeAllCallback, AfterAllCallb
     private JdbcOperations jdbcOperations;
 
     /**
+     * Die Junit-{@link Extension} braucht zwingend einen Default-Constructor !
+     */
+    public DBServerExtension()
+    {
+        this(EmbeddedDatabaseType.HSQL);
+    }
+
+    /**
+     * Erstellt ein neues {@link DBServerExtension} Object.
+     *
+     * @param databaseType {@link EmbeddedDatabaseType}
+     */
+    public DBServerExtension(final EmbeddedDatabaseType databaseType)
+    {
+        super();
+
+        this.databaseType = Objects.requireNonNull(databaseType, "databaseType required");
+    }
+
+    /**
      * @see org.junit.jupiter.api.extension.AfterAllCallback#afterAll(org.junit.jupiter.api.extension.ExtensionContext)
      */
     @Override
-    public void afterAll(final ExtensionContext context)
+    public void afterAll(final ExtensionContext context) throws Exception
     {
         this.dataSource.close();
     }
@@ -73,17 +101,47 @@ public final class DBServerExtension implements BeforeAllCallback, AfterAllCallb
         // ;MVCC=true;LOCK_MODE=0
 
         this.dataSource = new HikariDataSource();
-        this.dataSource.setDriverClassName("org.hsqldb.jdbc.JDBCDriver");
-        this.dataSource.setJdbcUrl("jdbc:hsqldb:mem:" + System.nanoTime());
-        // this.dataSource.setDriverClassName("org.h2.Driver");
-        // this.dataSource.setJdbcUrl("jdbc:h2:mem:%d" + System.nanoTime());
+
+        String databaseNameAndParams = System.nanoTime() + ";create=true";
+
+        switch (getDatabaseType())
+        {
+            case HSQL:
+                this.dataSource.setDriverClassName("org.hsqldb.jdbc.JDBCDriver");
+                this.dataSource.setJdbcUrl("jdbc:hsqldb:mem:" + databaseNameAndParams);
+
+                break;
+
+            case H2:
+                this.dataSource.setDriverClassName("org.h2.Driver");
+                this.dataSource.setJdbcUrl("jdbc:h2:mem:" + databaseNameAndParams);
+                break;
+
+            case DERBY:
+                this.dataSource.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
+                this.dataSource.setJdbcUrl("jdbc:derby:memory:" + databaseNameAndParams);
+                break;
+
+            default:
+                throw new IllegalArgumentException("unsupported databaseType: " + this.databaseType);
+        }
+
         this.dataSource.setUsername("sa");
         this.dataSource.setPassword("");
+        this.dataSource.setPoolName(getDatabaseType().name());
 
         this.dataSource.setMaximumPoolSize(10);
-        // this.dataSource.setConnectionTimeout(TimeUnit.MINUTES.toMillis(5));
+        // this.dataSource.setConnectionTimeout(TimeUnit.MILLISECONDS.toMillis(500));
 
         this.jdbcOperations = new JdbcTemplate(this.dataSource);
+    }
+
+    /**
+     * @return {@link EmbeddedDatabaseType}
+     */
+    public EmbeddedDatabaseType getDatabaseType()
+    {
+        return this.databaseType;
     }
 
     /**
@@ -95,27 +153,11 @@ public final class DBServerExtension implements BeforeAllCallback, AfterAllCallb
     }
 
     /**
-     * @return String
-     */
-    public String getDriver()
-    {
-        return this.dataSource.getDriverClassName();
-    }
-
-    /**
      * @return {@link JdbcOperations}
      */
     public JdbcOperations getJdbcOperations()
     {
         return this.jdbcOperations;
-    }
-
-    /**
-     * @return String
-     */
-    public String getPassword()
-    {
-        return this.dataSource.getPassword();
     }
 
     /**

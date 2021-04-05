@@ -255,7 +255,7 @@ public abstract class AbstractJdbcStatement implements Statement
     /**
      *
      */
-    private final java.sql.Connection connection;
+    private final java.sql.Connection jdbcConnection;
 
     /**
      *
@@ -275,15 +275,15 @@ public abstract class AbstractJdbcStatement implements Statement
     /**
      * Erstellt ein neues {@link AbstractJdbcStatement} Object.
      *
-     * @param connection {@link java.sql.Connection}
+     * @param jdbcConnection {@link java.sql.Connection}
      * @param sql String
      * @param codecs {@link Codecs}
      */
-    protected AbstractJdbcStatement(final java.sql.Connection connection, final String sql, final Codecs codecs)
+    protected AbstractJdbcStatement(final java.sql.Connection jdbcConnection, final String sql, final Codecs codecs)
     {
         super();
 
-        this.connection = Objects.requireNonNull(connection, "connection required");
+        this.jdbcConnection = Objects.requireNonNull(jdbcConnection, "jdbcConnection required");
         this.sql = Objects.requireNonNull(sql, "sql required");
         this.codecs = Objects.requireNonNull(codecs, "codecs required");
 
@@ -475,9 +475,9 @@ public abstract class AbstractJdbcStatement implements Statement
     /**
      * @return {@link java.sql.Connection}
      */
-    protected java.sql.Connection getConnection()
+    protected java.sql.Connection getJdbcConnection()
     {
-        return this.connection;
+        return this.jdbcConnection;
     }
 
     /**
