@@ -1,12 +1,12 @@
 // Created: 25.03.2021
-package io.r2dbc.jdbc;
+package io.r2dbc.jdbc.testKit;
 
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.jdbc.core.JdbcOperations;
 
+import io.r2dbc.jdbc.JdbcConnectionFactory;
 import io.r2dbc.jdbc.codecs.DefaultCodecs;
 import io.r2dbc.jdbc.util.DBServerExtension;
 import io.r2dbc.spi.ConnectionFactory;
@@ -19,18 +19,12 @@ import reactor.test.StepVerifier;
 /**
  * @author Thomas Freese
  */
-final class JdbcTestKit implements TestKit<Integer>
+abstract class AbstractTestKit implements TestKit<Integer>
 {
-    /**
-     *
-     */
-    private static ConnectionFactory connectionFactory;
-
     /**
     *
     */
-    @RegisterExtension
-    static final DBServerExtension SERVER = new DBServerExtension();
+    private ConnectionFactory connectionFactory;
 
     /**
      * @see io.r2dbc.spi.test.TestKit#doGetSql(io.r2dbc.spi.test.TestKit.TestStatement)
@@ -53,12 +47,12 @@ final class JdbcTestKit implements TestKit<Integer>
     @Override
     public ConnectionFactory getConnectionFactory()
     {
-        if (connectionFactory == null)
+        if (this.connectionFactory == null)
         {
-            connectionFactory = new JdbcConnectionFactory(SERVER.getDataSource(), new DefaultCodecs());
+            this.connectionFactory = new JdbcConnectionFactory(getServer().getDataSource(), new DefaultCodecs());
         }
 
-        return connectionFactory;
+        return this.connectionFactory;
     }
 
     /**
@@ -76,7 +70,7 @@ final class JdbcTestKit implements TestKit<Integer>
     @Override
     public JdbcOperations getJdbcOperations()
     {
-        return SERVER.getJdbcOperations();
+        return getServer().getJdbcOperations();
     }
 
     /**
@@ -87,6 +81,11 @@ final class JdbcTestKit implements TestKit<Integer>
     {
         return "?";
     }
+
+    /**
+     * @return {@link DBServerExtension}
+     */
+    abstract DBServerExtension getServer();
 
     /**
      * @see io.r2dbc.spi.test.TestKit#prepareStatement()

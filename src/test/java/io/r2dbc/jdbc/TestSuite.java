@@ -10,12 +10,11 @@ import org.junit.runner.RunWith;
  * @author Thomas Freese
  */
 @RunWith(JUnitPlatform.class)
-// @RunWith(Suite.class)
 @SuiteDisplayName("r2dbc-over-jdbc Test Suite")
 // @SelectPackages("io.r2dbc.jdbc")
 @SelectClasses(
 {
-        JdbcRowTest.class, JdbcResultTest.class
+        ParameterizedRowTest.class, JdbcResultTest.class
 })
 // @IncludePackages
 // @ExcludePackages

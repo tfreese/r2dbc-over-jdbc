@@ -5,15 +5,20 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Random;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import io.r2dbc.jdbc.codecs.BlobCodec;
 import io.r2dbc.jdbc.codecs.ClobCodec;
 import io.r2dbc.jdbc.util.DBServerExtension;
+import io.r2dbc.jdbc.util.DatabaseExtension;
 import io.r2dbc.spi.Blob;
 import io.r2dbc.spi.Clob;
 import io.r2dbc.spi.Connection;
@@ -30,7 +35,7 @@ import reactor.test.StepVerifier;
 /**
  * @author Thomas Freese
  */
-class JdbcLobIntegrationTest
+class ParameterizedLobTest
 {
     /**
     *
@@ -40,13 +45,8 @@ class JdbcLobIntegrationTest
     /**
     *
     */
-    private static ConnectionFactory connectionFactory;
-
-    /**
-    *
-    */
     @RegisterExtension
-    static final DBServerExtension SERVER = new DBServerExtension();
+    static final DatabaseExtension DATABASE_EXTENSION = new DatabaseExtension();
 
     static
     {
@@ -59,30 +59,20 @@ class JdbcLobIntegrationTest
     }
 
     /**
-    *
-    */
-    @BeforeAll
-    static void beforeAll()
-    {
-        ConnectionFactoryOptions options = ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, SERVER.getDataSource()).build();
-
-        connectionFactory = ConnectionFactories.get(options);
-    }
-
-    /**
+     * @param connectionFactory {@link ConnectionFactory}
      * @return {@link Connection}
      */
-    protected static Connection getConnection()
+    static Connection getConnection(final ConnectionFactory connectionFactory)
     {
-        return Mono.from(getConnectionFactory().create()).block(DBServerExtension.getSqlTimeout());
+        return Mono.from(connectionFactory.create()).block(DBServerExtension.getSqlTimeout());
     }
 
     /**
-     * @return {@link ConnectionFactory}
+     * @return {@link Stream}
      */
-    protected static ConnectionFactory getConnectionFactory()
+    static Stream<Arguments> getDatabases()
     {
-        return connectionFactory;
+        return DATABASE_EXTENSION.getServers().stream().map(server -> Arguments.of(server.getDatabaseType(), server));
     }
 
     /**
@@ -105,6 +95,7 @@ class JdbcLobIntegrationTest
                                 )
                                 .flatMap(Result::getRowsUpdated)
                         )
+                .concatWith(TestKit.close(connection))
                 .as(StepVerifier::create)
                 .expectNext(0)
                 .verifyComplete();
@@ -112,12 +103,18 @@ class JdbcLobIntegrationTest
     }
 
     /**
-    *
-    */
-    @Test
-    void testBigBlob()
+     * @param databaseType {@link EmbeddedDatabaseType}
+     * @param server {@link DBServerExtension}
+     */
+    @ParameterizedTest(name = "{index} -> {0}")
+    @DisplayName("testBigBlob") // Ohne Parameter
+    @MethodSource("getDatabases")
+    void testBigBlob(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
     {
-        createTable(getConnection(), "BLOB");
+        ConnectionFactory connectionFactory =
+                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+
+        createTable(getConnection(connectionFactory), "BLOB");
 
         int i = 50 + new Random().nextInt(1);
 
@@ -135,7 +132,7 @@ class JdbcLobIntegrationTest
         // awaitNone(connection.close());
         // }
 
-        Connection connection = getConnection();
+        Connection connection = getConnection(connectionFactory);
 
         // @formatter:off
         Flux.from(connection.createStatement("INSERT INTO lob_test values(?)")
@@ -151,14 +148,14 @@ class JdbcLobIntegrationTest
                 .verifyComplete();
 
 
-        connection = getConnection();
+        connection = getConnection(connectionFactory);
 
         Flux.from(connection.createStatement("SELECT my_col FROM lob_test")
                 .execute()
                 )
                 .flatMap(result -> result.map((row, rowMetadata) -> row.get("my_col", Blob.class)))
                 .flatMap(Blob::stream)
-                .doOnNext(it -> System.out.println(it.remaining()))
+                //.doOnNext(it -> System.out.println(it.remaining()))
                 .map(Buffer::remaining)
                 .collect(Collectors.summingInt(value -> value))
                 .concatWith(TestKit.close(connection))
@@ -169,18 +166,24 @@ class JdbcLobIntegrationTest
     }
 
     /**
-    *
-    */
-    @Test
-    void testBigClob()
+     * @param databaseType {@link EmbeddedDatabaseType}
+     * @param server {@link DBServerExtension}
+     */
+    @ParameterizedTest(name = "{index} -> {0}")
+    @DisplayName("testBigClob") // Ohne Parameter
+    @MethodSource("getDatabases")
+    void testBigClob(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
     {
-        createTable(getConnection(), "CLOB");
+        ConnectionFactory connectionFactory =
+                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+
+        createTable(getConnection(connectionFactory), "CLOB");
 
         int i = 50 + new Random().nextInt(100);
 
         String TEST_STRING = "foo你好bar";
 
-        // Connection connection = Mono.from(getConnectionFactory().create()).block(DBServerExtension.getSqlTimeout());
+        // Connection connection = getConnection(connectionFactory);
         //
         // try
         // {
@@ -193,7 +196,7 @@ class JdbcLobIntegrationTest
         // awaitNone(connection.close());
         // }
 
-        Connection connection = getConnection();
+        Connection connection = getConnection(connectionFactory);
 
         // @formatter:off
         Flux.from(connection.createStatement("INSERT INTO lob_test values(?)")
@@ -207,7 +210,7 @@ class JdbcLobIntegrationTest
                 .expectNextCount(1).as("clobs inserted")
                 .verifyComplete();
 
-        connection = getConnection();
+        connection = getConnection(connectionFactory);
 
         Flux.from(connection.createStatement("SELECT my_col FROM lob_test")
                 .execute()
@@ -225,14 +228,20 @@ class JdbcLobIntegrationTest
     }
 
     /**
-     *
+     * @param databaseType {@link EmbeddedDatabaseType}
+     * @param server {@link DBServerExtension}
      */
-    @Test
-    void testNullBlob()
+    @ParameterizedTest(name = "{index} -> {0}")
+    @DisplayName("testNullBlob") // Ohne Parameter
+    @MethodSource("getDatabases")
+    void testNullBlob(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
     {
-        createTable(getConnection(), "BLOB");
+        ConnectionFactory connectionFactory =
+                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
-        Connection connection = getConnection();
+        createTable(getConnection(connectionFactory), "BLOB");
+
+        Connection connection = getConnection(connectionFactory);
 
         // @formatter:off
         Flux.from(connection.createStatement("INSERT INTO lob_test values(?)")
@@ -246,7 +255,7 @@ class JdbcLobIntegrationTest
                 .verifyComplete();
         // @formatter:on
 
-        connection = getConnection();
+        connection = getConnection(connectionFactory);
 
         // @formatter:off
         Flux.from(connection.createStatement("SELECT my_col FROM lob_test")
@@ -261,14 +270,20 @@ class JdbcLobIntegrationTest
     }
 
     /**
-     *
+     * @param databaseType {@link EmbeddedDatabaseType}
+     * @param server {@link DBServerExtension}
      */
-    @Test
-    void testNullClob()
+    @ParameterizedTest(name = "{index} -> {0}")
+    @DisplayName("testNullClob") // Ohne Parameter
+    @MethodSource("getDatabases")
+    void testNullClob(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
     {
-        createTable(getConnection(), "CLOB");
+        ConnectionFactory connectionFactory =
+                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
-        Connection connection = getConnection();
+        createTable(getConnection(connectionFactory), "CLOB");
+
+        Connection connection = getConnection(connectionFactory);
 
         // @formatter:off
         Flux.from(connection.createStatement("INSERT INTO lob_test values(?)")
@@ -282,7 +297,7 @@ class JdbcLobIntegrationTest
                 .verifyComplete();
         // @formatter:on
 
-        connection = getConnection();
+        connection = getConnection(connectionFactory);
 
         // @formatter:off
         Flux.from(connection.createStatement("SELECT my_col FROM lob_test")

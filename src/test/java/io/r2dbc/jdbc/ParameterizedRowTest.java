@@ -8,22 +8,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.JDBCType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.springframework.jdbc.core.JdbcOperations;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import io.r2dbc.jdbc.codecs.Codecs;
 import io.r2dbc.jdbc.codecs.DefaultCodecs;
 import io.r2dbc.jdbc.util.DBServerExtension;
+import io.r2dbc.jdbc.util.DatabaseExtension;
+import io.r2dbc.jdbc.util.JanitorInvocationInterceptor;
 import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactories;
@@ -39,57 +46,27 @@ import reactor.test.StepVerifier;
 /**
  * @author Thomas Freese
  */
-final class JdbcRowTest
+@ExtendWith(JanitorInvocationInterceptor.class)
+final class ParameterizedRowTest
 {
     /**
-     *
-     */
+    *
+    */
     @RegisterExtension
-    static final DBServerExtension SERVER = new DBServerExtension();
+    static final DatabaseExtension DATABASE_EXTENSION = new DatabaseExtension();
+
+    /**
+     * @return {@link Stream}
+     */
+    static Stream<Arguments> getDatabases()
+    {
+        return DATABASE_EXTENSION.getServers().stream().map(server -> Arguments.of(server.getDatabaseType(), server));
+    }
 
     /**
      *
      */
     private final Codecs codecs = new DefaultCodecs();
-
-    /**
-     *
-     */
-    private final ConnectionFactory connectionFactory =
-            ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, SERVER.getDataSource()).build());
-
-    /**
-    *
-    */
-    @AfterEach
-    void afterEach()
-    {
-        getJdbcOperations().execute("DROP TABLE tbl");
-    }
-
-    /**
-    *
-    */
-    @BeforeEach
-    void beforeEach()
-    {
-        getJdbcOperations().execute("CREATE TABLE tbl ( value INTEGER )");
-    }
-
-    /**
-     * @return {@link JdbcOperations}
-     */
-    private JdbcOperations getJdbcOperations()
-    {
-        JdbcOperations jdbcOperations = SERVER.getJdbcOperations();
-
-        if (jdbcOperations == null)
-        {
-            throw new IllegalStateException("JdbcOperations not yet initialized");
-        }
-
-        return jdbcOperations;
-    }
 
     /**
      *
@@ -195,15 +172,21 @@ final class JdbcRowTest
     }
 
     /**
-     *
+     * @param databaseType {@link EmbeddedDatabaseType}
+     * @param server {@link DBServerExtension}
      */
-    @Test
-    void testSelectWithAliases()
+    @ParameterizedTest(name = "{index} -> {0}")
+    @DisplayName("testSelectWithAliases") // Ohne Parameter
+    @MethodSource("getDatabases")
+    void testSelectWithAliases(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
     {
-        getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
+        ConnectionFactory connectionFactory =
+                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+
+        server.getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
 
         // @formatter:off
-        Mono.from(this.connectionFactory.create())
+        Mono.from(connectionFactory.create())
             .flatMapMany(connection -> Flux.from(connection .createStatement("SELECT value as ALIASED_VALUE FROM tbl").execute())
                 .flatMap(result -> Flux.from(result.map((row, rowMetadata) ->
                             row.get("ALIASED_VALUE", Integer.class)
@@ -218,12 +201,18 @@ final class JdbcRowTest
     }
 
     /**
-    *
-    */
-    @Test
-    void testSelectWithoutAliases()
+     * @param databaseType {@link EmbeddedDatabaseType}
+     * @param server {@link DBServerExtension}
+     */
+    @ParameterizedTest(name = "{index} -> {0}")
+    @DisplayName("testSelectWithoutAliases") // Ohne Parameter
+    @MethodSource("getDatabases")
+    void testSelectWithoutAliases(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
     {
-        // getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
+        ConnectionFactory connectionFactory =
+                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+
+        // server.getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
         //
         // @formatter:off
 //        Mono.from(this.connectionFactory.create())
@@ -235,7 +224,7 @@ final class JdbcRowTest
 //        .verifyComplete();
         // @formatter:on
 
-        Connection connection = Mono.from(this.connectionFactory.create()).block(DBServerExtension.getSqlTimeout());
+        Connection connection = Mono.from(connectionFactory.create()).block(DBServerExtension.getSqlTimeout());
 
         try
         {
@@ -250,5 +239,7 @@ final class JdbcRowTest
         {
             awaitNone(connection.close());
         }
+
+        assertTrue(true);
     }
 }

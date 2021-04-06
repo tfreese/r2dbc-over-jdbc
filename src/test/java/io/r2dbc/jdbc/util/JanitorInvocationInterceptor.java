@@ -1,5 +1,5 @@
 // Created: 05.04.2021
-package io.r2dbc.jdbc.clientTest;
+package io.r2dbc.jdbc.util;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -9,8 +9,6 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
 import org.springframework.jdbc.core.JdbcOperations;
-
-import io.r2dbc.jdbc.util.DBServerExtension;
 
 /**
  * Erzeugt und Löscht die DB-Tabellen vor und nach jeder Test-Methode.

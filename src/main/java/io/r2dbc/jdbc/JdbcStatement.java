@@ -24,6 +24,11 @@ import reactor.core.publisher.SynchronousSink;
 public class JdbcStatement extends AbstractJdbcStatement
 {
     /**
+     *
+     */
+    private static final int DEBUG_SQL_LENGTH = 80;
+
+    /**
      * Erstellt ein neues {@link JdbcStatement} Object.
      *
      * @param connection {@link java.sql.Connection}
@@ -43,14 +48,12 @@ public class JdbcStatement extends AbstractJdbcStatement
     @SuppressWarnings("resource")
     protected Mono<Context> createExecuteMono(final java.sql.Connection connection, final String sql)
     {
-        final int DEBUG_SQL_LENGTH = 40;
-
         if (SQL_OPERATION.SELECT.equals(getSqlOperation()))
         {
             return Mono.fromCallable(() -> {
                 if (getLogger().isDebugEnabled())
                 {
-                    getLogger().debug("prepare statement: {}...", sql.substring(0, Math.min(sql.length(), DEBUG_SQL_LENGTH)));
+                    getLogger().debug("prepare statement: {}", prepareSqlForLog(sql));
                 }
 
                 PreparedStatement stmt = connection.prepareStatement(sql);
@@ -58,7 +61,7 @@ public class JdbcStatement extends AbstractJdbcStatement
 
                 if (getLogger().isDebugEnabled())
                 {
-                    getLogger().debug("execute statement: {}...", sql.substring(0, Math.min(sql.length(), DEBUG_SQL_LENGTH)));
+                    getLogger().debug("execute statement: {}", prepareSqlForLog(sql));
                 }
 
                 ResultSet resultSet = stmt.executeQuery();
@@ -71,7 +74,7 @@ public class JdbcStatement extends AbstractJdbcStatement
             return Mono.fromCallable(() -> {
                 if (getLogger().isDebugEnabled())
                 {
-                    getLogger().debug("prepare statement: {}...", sql.substring(0, Math.min(sql.length(), DEBUG_SQL_LENGTH)));
+                    getLogger().debug("prepare statement: {}", prepareSqlForLog(sql));
                 }
 
                 PreparedStatement stmt = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
@@ -79,7 +82,7 @@ public class JdbcStatement extends AbstractJdbcStatement
 
                 if (getLogger().isDebugEnabled())
                 {
-                    getLogger().debug("execute statement: {}...", sql.substring(0, Math.min(sql.length(), DEBUG_SQL_LENGTH)));
+                    getLogger().debug("execute statement: {}", prepareSqlForLog(sql));
                 }
 
                 int[] affectedRows = stmt.executeBatch();
@@ -93,7 +96,7 @@ public class JdbcStatement extends AbstractJdbcStatement
         return Mono.fromCallable(() -> {
             if (getLogger().isDebugEnabled())
             {
-                getLogger().debug("prepare statement: {}...", sql.substring(0, Math.min(sql.length(), DEBUG_SQL_LENGTH)));
+                getLogger().debug("prepare statement: {}", prepareSqlForLog(sql));
             }
 
             PreparedStatement stmt = connection.prepareStatement(sql);
@@ -101,7 +104,7 @@ public class JdbcStatement extends AbstractJdbcStatement
 
             if (getLogger().isDebugEnabled())
             {
-                getLogger().debug("execute statement: {}...", sql.substring(0, Math.min(sql.length(), DEBUG_SQL_LENGTH)));
+                getLogger().debug("execute statement: {}", prepareSqlForLog(sql));
             }
 
             int[] affectedRows = stmt.executeBatch();
@@ -207,5 +210,19 @@ public class JdbcStatement extends AbstractJdbcStatement
                     }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(JdbcResult.class)
         );
         // @formatter:on
+    }
+
+    /**
+     * @param sql String
+     * @return String
+     */
+    protected String prepareSqlForLog(final String sql)
+    {
+        if (sql.length() < DEBUG_SQL_LENGTH)
+        {
+            return sql;
+        }
+
+        return sql.substring(0, Math.min(sql.length(), DEBUG_SQL_LENGTH - 3)) + "...";
     }
 }

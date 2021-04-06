@@ -12,17 +12,25 @@ import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.HikariPoolMXBean;
 
 /**
  * @author Thomas Freese
  */
 public final class DBServerExtension implements BeforeAllCallback, AfterAllCallback
 {
+    /**
+     *
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DBServerExtension.class);
+
     /**
      *
      */
@@ -77,6 +85,11 @@ public final class DBServerExtension implements BeforeAllCallback, AfterAllCallb
     @Override
     public void afterAll(final ExtensionContext context) throws Exception
     {
+        HikariPoolMXBean poolMXBean = this.dataSource.getHikariPoolMXBean();
+
+        LOGGER.debug("{} - Connections: idle={}, active={}, waiting={}", getDatabaseType(), poolMXBean.getIdleConnections(), poolMXBean.getActiveConnections(),
+                poolMXBean.getThreadsAwaitingConnection());
+
         this.dataSource.close();
     }
 
@@ -132,6 +145,9 @@ public final class DBServerExtension implements BeforeAllCallback, AfterAllCallb
 
         this.dataSource.setMaximumPoolSize(10);
         // this.dataSource.setConnectionTimeout(TimeUnit.MILLISECONDS.toMillis(500));
+
+        // Initialisierung triggern.
+        this.dataSource.getConnection().close();
 
         this.jdbcOperations = new JdbcTemplate(this.dataSource);
     }
