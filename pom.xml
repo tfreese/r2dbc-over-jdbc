@@ -47,7 +47,6 @@
         <dependency>
             <groupId>de.freese</groupId>
             <artifactId>slf4j-adaptive</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>        
         <dependency>
