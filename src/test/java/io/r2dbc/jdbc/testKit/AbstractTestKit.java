@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcOperations;
 import io.r2dbc.jdbc.JdbcConnectionFactory;
 import io.r2dbc.jdbc.codecs.DefaultCodecs;
 import io.r2dbc.jdbc.util.DBServerExtension;
+import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Statement;
 import io.r2dbc.spi.test.TestKit;
@@ -21,6 +22,16 @@ import reactor.test.StepVerifier;
  */
 abstract class AbstractTestKit implements TestKit<Integer>
 {
+    /**
+     * @param <T> Type
+     * @param connection {@link Connection}
+     * @return {@link Mono}
+     */
+    public static <T> Mono<T> close(final Connection connection)
+    {
+        return Mono.from(connection.close()).then(Mono.empty());
+    }
+
     /**
     *
     */
