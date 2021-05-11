@@ -68,6 +68,7 @@
             <groupId>io.r2dbc</groupId>
             <artifactId>r2dbc-spi-test</artifactId>
             <scope>test</scope>
+            <!--version>0.8.4.RELEASE</version-->
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>

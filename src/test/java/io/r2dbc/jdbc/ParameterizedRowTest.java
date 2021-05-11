@@ -38,7 +38,6 @@ import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
 import io.r2dbc.spi.Nullability;
 import io.r2dbc.spi.RowMetadata;
-import io.r2dbc.spi.test.TestKit;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -186,14 +185,15 @@ final class ParameterizedRowTest
         server.getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
 
         // @formatter:off
-        Mono.from(connectionFactory.create())
-            .flatMapMany(connection -> Flux.from(connection .createStatement("SELECT value as ALIASED_VALUE FROM tbl").execute())
+        Flux.usingWhen(connectionFactory.create(),
+                connection ->  Flux.from(connection.createStatement("SELECT value as ALIASED_VALUE FROM tbl").execute())
                 .flatMap(result -> Flux.from(result.map((row, rowMetadata) ->
                             row.get("ALIASED_VALUE", Integer.class)
                             )
                         )
-                        .collectList())
-                .concatWith(TestKit.close(connection)))
+                        .collectList()
+                )
+            ,Connection::close)
             .as(StepVerifier::create)
             .expectNext(List.of(100))
             .verifyComplete();

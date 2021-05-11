@@ -26,7 +26,6 @@ import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
 import io.r2dbc.spi.Statement;
-import io.r2dbc.spi.test.TestKit;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -123,8 +122,8 @@ final class ParameterizedExampleTest
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         // @formatter:off
-        Mono.from(connectionFactory.create())
-            .flatMapMany(connection -> {
+        Flux.usingWhen(connectionFactory.create(),
+            connection -> {
                 Statement statement = connection.createStatement("INSERT INTO tbl_auto (value) VALUES (?)");
 
                 IntStream.range(0, 10).forEach(i -> statement.bind(0, i).add());
@@ -132,8 +131,9 @@ final class ParameterizedExampleTest
                 return Flux.from(statement.returnGeneratedValues().execute())
                         .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Integer.class)))
                                 .collectList())
-                        .concatWith(TestKit.close(connection));
-            })
+                        ;
+            }
+            , Connection::close)
             .as(StepVerifier::create)
 //            .expectNext(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).as("values from insertions")
 //            .expectNext(List.of(10)).as("values from insertions")
@@ -397,25 +397,24 @@ final class ParameterizedExampleTest
         server.getJdbcOperations().execute("INSERT INTO tbl VALUES (100), (200)");
 
         // @formatter:off
-        Mono.from(connectionFactory.create())
-            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-                    .<Object>thenMany(Flux.from(connection.createStatement("SELECT value FROM tbl")
+        Flux.usingWhen(connectionFactory.create(),
+                connection -> Mono.from(connection
+                        .beginTransaction())
+                        .<Object>thenMany(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
                             .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Integer.class)))
                                     .collectList()))
 
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+                        .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
                             .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, String.class)))
                                     .collectList()))
 
-                    .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
+                        .concatWith(Flux.from(connection.createStatement("SELECT value FROM tbl")
                                 .execute())
                             .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Double.class)))
                                     .collectList()))
-
-                    .concatWith(TestKit.close(connection))
-            )
+            , Connection::close)
             .as(StepVerifier::create)
             .expectNext(List.of(100, 200)).as("value from Integer select")
             .expectNext(List.of("100", "200")).as("values from String select")

@@ -108,12 +108,12 @@ abstract class AbstractTestKit implements TestKit<Integer>
         // TestKit.super.prepareStatement();
 
         // Der Original Testfall erwartet 10 RowsUpdated ... expectNextCount(10)
-        Mono.from(getConnectionFactory().create()).flatMapMany(connection -> {
+        Flux.usingWhen(getConnectionFactory().create(), connection -> {
             Statement statement = connection.createStatement(expand(TestStatement.INSERT_VALUE_PLACEHOLDER, getPlaceholder(0)));
 
             IntStream.range(0, 10).forEach(i -> TestKit.bind(statement, getIdentifier(0), i).add());
 
-            return Flux.from(statement.execute()).flatMap(this::extractRowsUpdated).concatWith(TestKit.close(connection));
-        }).as(StepVerifier::create).expectNext(10).as("values from insertions").verifyComplete();
+            return Flux.from(statement.execute()).flatMap(this::extractRowsUpdated);
+        }, Connection::close).as(StepVerifier::create).expectNext(10).as("values from insertions").verifyComplete();
     }
 }
