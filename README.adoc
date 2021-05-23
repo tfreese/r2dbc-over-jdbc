@@ -11,6 +11,8 @@ Adapt the `io.r2dbc.jdbc.codecs.Codec` Interface to match your needs !
 
 See `io.r2dbc.jdbc.codecs.DefaultCodecs`
 
+ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.CODECS, new MyCodecs())
+
 
 == Limitations
 * No support for named parameters, only '?'

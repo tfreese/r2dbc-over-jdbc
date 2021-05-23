@@ -51,8 +51,9 @@ final class ParameterizedR2dbcClientTest
     @MethodSource("getDatabases")
     void testInsert(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
     {
-        R2dbc r2dbc = new R2dbc(
-                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build()));
+        ConnectionFactoryOptions connectionFactoryOptions =
+                ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build();
+        R2dbc r2dbc = new R2dbc(ConnectionFactories.get(connectionFactoryOptions));
 
        // @formatter:off
        r2dbc.inTransaction(handle -> handle.execute("INSERT INTO tbl VALUES (?)", 200))
@@ -72,8 +73,9 @@ final class ParameterizedR2dbcClientTest
     @MethodSource("getDatabases")
     void testInsertBatch(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
     {
-        R2dbc r2dbc = new R2dbc(
-                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build()));
+        ConnectionFactoryOptions connectionFactoryOptions =
+                ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build();
+        R2dbc r2dbc = new R2dbc(ConnectionFactories.get(connectionFactoryOptions));
 
        // @formatter:off
        r2dbc.inTransaction(handle -> handle.execute("INSERT INTO tbl VALUES (?)", 100)
@@ -98,8 +100,9 @@ final class ParameterizedR2dbcClientTest
     @MethodSource("getDatabases")
     void testInsertWithSelect(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
     {
-        R2dbc r2dbc = new R2dbc(
-                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build()));
+        ConnectionFactoryOptions connectionFactoryOptions =
+                ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build();
+        R2dbc r2dbc = new R2dbc(ConnectionFactories.get(connectionFactoryOptions));
 
         // @formatter:off
         r2dbc.inTransaction(handle -> handle.execute("INSERT INTO tbl VALUES (?)", 100))
