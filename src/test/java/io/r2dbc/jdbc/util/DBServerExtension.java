@@ -177,9 +177,10 @@ public final class DBServerExtension implements BeforeAllCallback, AfterAllCallb
     }
 
     /**
-     * Test-Übergreifender Object-Store.
+     * Object-Store pro Test-Klasse.
      *
      * @param context {@link ExtensionContext}
+     *
      * @return {@link Store}
      */
     Store getStoreForClass(final ExtensionContext context)
@@ -188,9 +189,10 @@ public final class DBServerExtension implements BeforeAllCallback, AfterAllCallb
     }
 
     /**
-     * Test-Übergreifender Object-Store.
+     * Object-Store für den gesamten Test.
      *
      * @param context {@link ExtensionContext}
+     *
      * @return {@link Store}
      */
     Store getStoreForGlobal(final ExtensionContext context)
@@ -199,9 +201,10 @@ public final class DBServerExtension implements BeforeAllCallback, AfterAllCallb
     }
 
     /**
-     * Test-Übergreifender Object-Store.
+     * Object-Store pro Test-Methode.
      *
      * @param context {@link ExtensionContext}
+     *
      * @return {@link Store}
      */
     Store getStoreForMethod(final ExtensionContext context)
