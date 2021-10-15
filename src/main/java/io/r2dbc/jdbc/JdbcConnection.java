@@ -31,22 +31,18 @@ public class JdbcConnection implements Connection
      *
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcConnection.class);
-
     /**
     *
     */
     private final Codecs codecs;
-
     /**
     *
     */
     private final java.sql.Connection jdbcConnection;
-
     /**
      *
      */
     private final Mono<java.sql.Connection> jdbcConnectionMono;
-
     /**
      *
      */

@@ -33,7 +33,6 @@ public abstract class AbstractJdbcStatement implements Statement
          *
          */
         private final List<Map<Integer, Object>> binds = new ArrayList<>();
-
         /**
          *
          */
@@ -78,6 +77,7 @@ public abstract class AbstractJdbcStatement implements Statement
 
         /**
          * @param preparedStatement {@link java.sql.PreparedStatement}
+         *
          * @throws SQLException Falls was schief geht.
          */
         void prepareBatch(final PreparedStatement preparedStatement) throws SQLException
@@ -105,6 +105,7 @@ public abstract class AbstractJdbcStatement implements Statement
         /**
          * @param preparedStatement {@link java.sql.PreparedStatement}
          * @param bind {@link Map}
+         *
          * @throws SQLException Falls was schief geht.
          */
         void prepareStatement(final PreparedStatement preparedStatement, final Map<Integer, Object> bind) throws SQLException
@@ -159,12 +160,10 @@ public abstract class AbstractJdbcStatement implements Statement
          *
          */
         private final int[] affectedRows;
-
         /**
          *
          */
         private final ResultSet resultSet;
-
         /**
          *
          */
@@ -220,22 +219,18 @@ public abstract class AbstractJdbcStatement implements Statement
          *
          */
         DELETE,
-
         /**
          *
          */
         EXECUTE,
-
         /**
          *
          */
         INSERT,
-
         /**
          *
          */
         SELECT,
-
         /**
          *
          */
@@ -246,27 +241,22 @@ public abstract class AbstractJdbcStatement implements Statement
      *
      */
     private final Bindings bindings = new Bindings();
-
     /**
     *
     */
     private final Codecs codecs;
-
     /**
      *
      */
     private final java.sql.Connection jdbcConnection;
-
     /**
      *
      */
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
     /**
      *
      */
     private final String sql;
-
     /**
      *
      */
@@ -508,6 +498,7 @@ public abstract class AbstractJdbcStatement implements Statement
      * Checks that the specified 0-based {@code index} is within the range of valid parameter indexes for this statement.
      *
      * @param index A 0-based parameter index
+     *
      * @throws IndexOutOfBoundsException If the {@code index} is outside of the valid range.
      */
     protected void requireValidIndex(final int index)

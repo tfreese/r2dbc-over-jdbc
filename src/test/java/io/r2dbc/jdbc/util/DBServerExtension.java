@@ -30,7 +30,6 @@ public final class DBServerExtension implements BeforeAllCallback, AfterAllCallb
      *
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(DBServerExtension.class);
-
     /**
      *
      */
@@ -48,12 +47,10 @@ public final class DBServerExtension implements BeforeAllCallback, AfterAllCallb
      *
      */
     private final EmbeddedDatabaseType databaseType;
-
     /**
      *
      */
     private HikariDataSource dataSource;
-
     /**
      *
      */

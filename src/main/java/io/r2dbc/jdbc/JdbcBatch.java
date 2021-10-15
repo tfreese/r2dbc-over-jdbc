@@ -20,7 +20,6 @@ public class JdbcBatch implements Batch
      *
      */
     private final Connection connection;
-
     /**
      *
      */

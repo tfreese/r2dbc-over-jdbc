@@ -80,7 +80,9 @@ public class JdbcRowMetadata implements RowMetadata
          * </p>
          *
          * @param name A column name {@code String}, not null
+         *
          * @return True if a matching name is found
+         *
          * @throws NullPointerException If {@code name} is null
          * @throws ClassCastException If {@code name} is not a {@code String}
          */
@@ -348,7 +350,9 @@ public class JdbcRowMetadata implements RowMetadata
     /**
      * @param resultSet {@link ResultSet}
      * @param codecs {@link Codecs}
+     *
      * @return {@link List}
+     *
      * @throws SQLException Falls was schief geht.
      */
     public static RowMetadata of(final ResultSet resultSet, final Codecs codecs) throws SQLException
@@ -389,12 +393,10 @@ public class JdbcRowMetadata implements RowMetadata
      *
      */
     private final List<ColumnMetadata> columnMetaDatas;
-
     /**
     *
     */
     private final Map<String, ColumnMetadata> columnMetaDatasByName = new LinkedHashMap<>();
-
     /**
      *
      */

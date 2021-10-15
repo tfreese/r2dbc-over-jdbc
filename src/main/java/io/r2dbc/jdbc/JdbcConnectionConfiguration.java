@@ -24,7 +24,6 @@ final class JdbcConnectionConfiguration
         *
         */
         private Codecs codecs;
-
         /**
         *
         */
@@ -46,6 +45,7 @@ final class JdbcConnectionConfiguration
 
         /**
          * @param codecs {@link Codecs}
+         *
          * @return {@link Builder}
          */
         public Builder codecs(final Codecs codecs)
@@ -57,6 +57,7 @@ final class JdbcConnectionConfiguration
 
         /**
          * @param dataSource {@link DataSource}
+         *
          * @return {@link Builder}
          */
         public Builder dataSource(final DataSource dataSource)
@@ -94,7 +95,6 @@ final class JdbcConnectionConfiguration
     *
     */
     private final Codecs codecs;
-
     /**
     *
     */

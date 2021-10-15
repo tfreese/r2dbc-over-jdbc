@@ -14,7 +14,6 @@ public final class JdbcConnectionFactoryMetadata implements ConnectionFactoryMet
      *
      */
     static final JdbcConnectionFactoryMetadata INSTANCE = new JdbcConnectionFactoryMetadata();
-
     /**
      *
      */

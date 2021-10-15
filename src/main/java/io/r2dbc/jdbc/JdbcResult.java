@@ -23,12 +23,10 @@ public class JdbcResult implements Result
      *
      */
     private final Mono<RowMetadata> rowMetadata;
-
     /**
      *
      */
     private final Flux<Row> rows;
-
     /**
      *
      */

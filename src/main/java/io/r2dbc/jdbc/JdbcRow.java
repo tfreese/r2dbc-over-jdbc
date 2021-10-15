@@ -24,12 +24,10 @@ public class JdbcRow implements Row
     *
     */
     private final Codecs codecs;
-
     /**
      *
      */
     private final RowMetadata rowMetadata;
-
     /**
      *
      */
@@ -94,9 +92,7 @@ public class JdbcRow implements Row
         ColumnMetadata metadata = this.rowMetadata.getColumnMetadata(index);
         JDBCType jdbcType = (JDBCType) metadata.getNativeTypeMetadata();
 
-        T mappedValue = this.codecs.mapTo(jdbcType, type, value);
-
-        return mappedValue;
+        return this.codecs.mapTo(jdbcType, type, value);
     }
 
     /**

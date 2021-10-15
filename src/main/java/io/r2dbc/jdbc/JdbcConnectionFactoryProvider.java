@@ -22,7 +22,6 @@ public final class JdbcConnectionFactoryProvider implements ConnectionFactoryPro
      * {@link DataSource}
      */
     public static final Option<Codecs> CODECS = Option.valueOf("codecs");
-
     /**
      * {@link DataSource}
      */

@@ -43,9 +43,9 @@ public class JdbcStatement extends AbstractJdbcStatement
     /**
      * @param connection {@link java.sql.Connection}
      * @param sql String
+     *
      * @return {@link Mono}
      */
-    @SuppressWarnings("resource")
     protected Mono<Context> createExecuteMono(final java.sql.Connection connection, final String sql)
     {
         if (SQL_OPERATION.SELECT.equals(getSqlOperation()))
@@ -118,7 +118,9 @@ public class JdbcStatement extends AbstractJdbcStatement
      * @param stmt {@link PreparedStatement}
      * @param resultSet {@link ResultSet}, optional
      * @param affectedRows int[], optional
+     *
      * @return {@link Result}
+     *
      * @throws SQLException Falls was schief geht.
      */
     @SuppressWarnings("unchecked")
@@ -180,7 +182,6 @@ public class JdbcStatement extends AbstractJdbcStatement
     /**
      * @see io.r2dbc.spi.Statement#execute()
      */
-    @SuppressWarnings("resource")
     @Override
     public Flux<Result> execute()
     {
@@ -214,6 +215,7 @@ public class JdbcStatement extends AbstractJdbcStatement
 
     /**
      * @param sql String
+     *
      * @return String
      */
     protected String prepareSqlForLog(final String sql)

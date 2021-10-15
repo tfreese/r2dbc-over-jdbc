@@ -12,6 +12,7 @@ import java.util.stream.Stream;
  * Basic-Implementation for a {@link Codec}.
  *
  * @author Thomas Freese
+ *
  * @param <T> Type
  */
 public abstract class AbstractCodec<T> implements Codec<T>
@@ -20,7 +21,6 @@ public abstract class AbstractCodec<T> implements Codec<T>
     *
     */
     private final Class<T> javaType;
-
     /**
     *
     */
@@ -77,6 +77,7 @@ public abstract class AbstractCodec<T> implements Codec<T>
 
     /**
      * @param object Object
+     *
      * @return {@link RuntimeException}
      */
     protected RuntimeException throwCanNotMapException(final Object object)

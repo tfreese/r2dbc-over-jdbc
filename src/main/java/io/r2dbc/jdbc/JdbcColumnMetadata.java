@@ -18,32 +18,26 @@ public class JdbcColumnMetadata implements ColumnMetadata
      *
      */
     private final int column;
-
     /**
      *
      */
     private final Class<?> javaType;
-
     /**
      *
      */
     private final JDBCType jdbcType;
-
     /**
      *
      */
     private final String name;
-
     /**
      *
      */
     private final Nullability nullability;
-
     /**
      *
      */
     private final int precision;
-
     /**
      *
      */
@@ -85,12 +79,10 @@ public class JdbcColumnMetadata implements ColumnMetadata
             return true;
         }
 
-        if (!(obj instanceof JdbcColumnMetadata))
+        if (!(obj instanceof JdbcColumnMetadata other))
         {
             return false;
         }
-
-        JdbcColumnMetadata other = (JdbcColumnMetadata) obj;
 
         return (this.column == other.column) && Objects.equals(this.javaType, other.javaType) && (this.jdbcType == other.jdbcType)
                 && Objects.equals(this.name, other.name) && (this.nullability == other.nullability) && (this.precision == other.precision)

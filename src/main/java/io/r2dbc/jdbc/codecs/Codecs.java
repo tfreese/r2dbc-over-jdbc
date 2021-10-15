@@ -17,9 +17,10 @@ public interface Codecs
      * Returns the JavaType for the {@link JDBCType}
      *
      * @param jdbcType {@link JDBCType}
+     *
      * @return Class
      */
-    public Class<?> getJavaType(final JDBCType jdbcType);
+    Class<?> getJavaType(final JDBCType jdbcType);
 
     /**
      * Read an Object from a {@link ResultSet}.
@@ -28,10 +29,12 @@ public interface Codecs
      * @param jdbcType {@link JDBCType}
      * @param resultSet {@link ResultSet}
      * @param columnLabel String
+     *
      * @return Object
+     *
      * @throws SQLException Falls was schief geht.
      */
-    public <T> T mapFromSql(JDBCType jdbcType, ResultSet resultSet, String columnLabel) throws SQLException;
+    <T> T mapFromSql(JDBCType jdbcType, ResultSet resultSet, String columnLabel) throws SQLException;
 
     /**
      * Map an Object into another one.
@@ -39,9 +42,10 @@ public interface Codecs
      * @param jdbcType {@link JDBCType}
      * @param javaType Class
      * @param value Object
+     *
      * @return Object
      */
-    public <T> T mapTo(JDBCType jdbcType, Class<? extends T> javaType, Object value);
+    <T> T mapTo(JDBCType jdbcType, Class<? extends T> javaType, Object value);
 
     /**
      * Write an Object in a {@link PreparedStatement}.
@@ -50,7 +54,8 @@ public interface Codecs
      * @param preparedStatement {@link PreparedStatement}
      * @param parameterIndex int, ONE-Based
      * @param value Object
+     *
      * @throws SQLException Falls was schief geht.
      */
-    public void mapToSql(Class<?> javaType, PreparedStatement preparedStatement, int parameterIndex, Object value) throws SQLException;
+    void mapToSql(Class<?> javaType, PreparedStatement preparedStatement, int parameterIndex, Object value) throws SQLException;
 }

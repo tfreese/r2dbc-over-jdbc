@@ -4,7 +4,6 @@ package io.r2dbc.jdbc.util;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
@@ -17,14 +16,6 @@ import org.springframework.jdbc.core.JdbcOperations;
  */
 public class JanitorInvocationInterceptor implements InvocationInterceptor
 {
-    /**
-     * Die Junit-{@link Extension} braucht zwingend einen Default-Constructor !
-     */
-    public JanitorInvocationInterceptor()
-    {
-        super();
-    }
-
     /**
      * @param jdbcOperations {@link JdbcOperations}
      */

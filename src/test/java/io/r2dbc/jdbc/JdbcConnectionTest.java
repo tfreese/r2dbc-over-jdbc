@@ -36,7 +36,6 @@ final class JdbcConnectionTest
     *
     */
     private final Codecs codecs = new DefaultCodecs();
-
     /**
      *
      */
@@ -54,7 +53,6 @@ final class JdbcConnectionTest
     /**
      * @throws SQLException Falls was schief geht.
      */
-    @SuppressWarnings("resource")
     @Test
     void testBeginTransactionErrorResponse() throws SQLException
     {
@@ -115,7 +113,6 @@ final class JdbcConnectionTest
     /**
      * @throws SQLException Falls was schief geht.
      */
-    @SuppressWarnings("resource")
     @Test
     void testCommitTransactionErrorResponse() throws SQLException
     {
@@ -230,7 +227,6 @@ final class JdbcConnectionTest
     /**
      * @throws SQLException Falls was schief geht.
      */
-    @SuppressWarnings("resource")
     @Test
     void testRollbackTransactionErrorResponse() throws SQLException
     {

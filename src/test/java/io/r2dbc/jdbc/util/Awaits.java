@@ -6,7 +6,6 @@
  * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-
 package io.r2dbc.jdbc.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,6 +37,7 @@ public final class Awaits
      *
      * @param errorType Class
      * @param errorPublisher A publisher that emits an error.
+     *
      * @throws Throwable If the publisher emits {@code onError} with a {@code Throwable} that is not an instance of {@code errorType}.
      */
     public static void awaitError(final Class<? extends Throwable> errorType, final Publisher<?> errorPublisher)
@@ -50,6 +50,7 @@ public final class Awaits
      * updated rows.
      *
      * @param statement A statement that does not update rows.
+     *
      * @throws Throwable If the statement execution results in an error.
      */
     public static void awaitExecution(final Statement statement)
@@ -64,6 +65,7 @@ public final class Awaits
      *
      * @param expectedValues Values that the publisher emits
      * @param multiPublisher A publisher that emits 0 or more values.
+     *
      * @throws Throwable If the publisher emits {@code onError}.
      */
     public static <T> void awaitMany(final List<T> expectedValues, final Publisher<T> multiPublisher)
@@ -75,7 +77,9 @@ public final class Awaits
      * Subscribes to an {@code multiPublisher} and blocks until the publisher emits 0 or more {@code onNext} signals and then {@code onComplete}.
      *
      * @param multiPublisher A publisher that emits 0 or more values.
+     *
      * @return A list of items emitted with {@code onNext}.
+     *
      * @throws Throwable If the publisher emits {@code onError}.
      */
     public static <T> List<T> awaitMany(final Publisher<T> multiPublisher)
@@ -88,6 +92,7 @@ public final class Awaits
      * {@code onNext}.
      *
      * @param emptyPublisher A publisher that emits no values.
+     *
      * @throws Throwable If the publisher emits {@code onError}.
      */
     public static void awaitNone(final Publisher<?> emptyPublisher)
@@ -99,7 +104,9 @@ public final class Awaits
      * Subscribes to an {@code singlePublisher} and blocks until the publisher emits {@code onNext} and then {@code onComplete}.
      *
      * @param singlePublisher A publisher that emits one value.
+     *
      * @return An item emitted with {@code onNext}, or null if the publisher emits no item.
+     *
      * @throws Throwable If the publisher emits {@code onError} or does not emit one {@code onNext} signal.
      */
     public static <T> T awaitOne(final Publisher<T> singlePublisher)
@@ -113,6 +120,7 @@ public final class Awaits
      *
      * @param expectedValue Value that the publisher emits
      * @param singlePublisher A publisher that emits one value.
+     *
      * @throws Throwable If the publisher emits {@code onError} or does not emit one {@code onNext} signal.
      */
     public static <T> void awaitOne(final T expectedValue, final Publisher<T> singlePublisher)
@@ -127,6 +135,7 @@ public final class Awaits
      * @param expectedRows List of expected row data.
      * @param rowMapper Maps {@code Rows} to objects that are expected to match the {@code expectedRows}.
      * @param statement A statement that queries expectedRows.
+     *
      * @throws Throwable If the statement execution results in an error.
      */
     public static <T> void awaitQuery(final List<T> expectedRows, final Function<Row, T> rowMapper, final Statement statement)
@@ -141,6 +150,7 @@ public final class Awaits
      *
      * @param expectedCount Expected count of updated rows
      * @param statement A statement that updates rows.
+     *
      * @throws Throwable If the statement execution results in an error.
      */
     public static void awaitUpdate(final int expectedCount, final Statement statement)
@@ -154,6 +164,7 @@ public final class Awaits
      *
      * @param expectedCounts Expected counts of updated rows
      * @param statement A statement that updates rows.
+     *
      * @throws Throwable If the statement execution results in an error.
      */
     public static void awaitUpdate(final List<Integer> expectedCounts, final Statement statement)

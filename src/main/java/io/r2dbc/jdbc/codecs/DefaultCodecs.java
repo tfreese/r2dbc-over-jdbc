@@ -20,7 +20,6 @@ public class DefaultCodecs implements Codecs
     *
     */
     private final Map<Class<?>, Codec<?>> codecsForJavaType = new HashMap<>();
-
     /**
     *
     */
@@ -65,6 +64,7 @@ public class DefaultCodecs implements Codecs
      * Returns the {@link Codec} for the {@link JDBCType}
      *
      * @param javaType Class
+     *
      * @return {@link Codec}
      */
     @SuppressWarnings("unchecked")
@@ -91,6 +91,7 @@ public class DefaultCodecs implements Codecs
      * Returns the {@link Codec} for the {@link JDBCType}
      *
      * @param jdbcType {@link JDBCType}
+     *
      * @return {@link Codec}
      */
     @SuppressWarnings("unchecked")

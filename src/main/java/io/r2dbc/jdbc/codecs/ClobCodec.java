@@ -41,9 +41,7 @@ public class ClobCodec extends AbstractCodec<Clob>
             return NULL_CLOB;
         }
 
-        Clob clob = R2dbcUtils.sqlClobToClob(value);
-
-        return clob;
+        return R2dbcUtils.sqlClobToClob(value);
     }
 
     /**

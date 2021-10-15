@@ -24,7 +24,6 @@ public final class JdbcConnectionFactory implements ConnectionFactory
      *
      */
     private final Codecs codecs;
-
     /**
      *
      */

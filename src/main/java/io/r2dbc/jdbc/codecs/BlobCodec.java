@@ -43,9 +43,7 @@ public class BlobCodec extends AbstractCodec<Blob>
             return NULL_BLOB;
         }
 
-        Blob blob = R2dbcUtils.sqlBlobToBlob(value);
-
-        return blob;
+        return R2dbcUtils.sqlBlobToBlob(value);
     }
 
     /**

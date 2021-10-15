@@ -16,7 +16,6 @@ public class JdbcConnectionMetadata implements ConnectionMetadata
      *
      */
     private final String productName;
-
     /**
      *
      */
@@ -26,6 +25,7 @@ public class JdbcConnectionMetadata implements ConnectionMetadata
      * Erstellt ein neues {@link JdbcConnectionMetadata} Object.
      *
      * @param databaseMetaData {@link DatabaseMetaData}
+     *
      * @throws SQLException Falls was schief geht.
      */
     public JdbcConnectionMetadata(final DatabaseMetaData databaseMetaData) throws SQLException
