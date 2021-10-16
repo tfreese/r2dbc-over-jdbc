@@ -4,7 +4,7 @@ package io.r2dbc.jdbc.testKit;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
-import io.r2dbc.jdbc.util.DBServerExtension;
+import io.r2dbc.jdbc.util.DbServerExtension;
 
 /**
  * @author Thomas Freese
@@ -15,13 +15,13 @@ public class HsqldbTestKit extends AbstractTestKit
     *
     */
     @RegisterExtension
-    static final DBServerExtension SERVER = new DBServerExtension(EmbeddedDatabaseType.HSQL);
+    static final DbServerExtension SERVER = new DbServerExtension(EmbeddedDatabaseType.HSQL);
 
     /**
      * @see io.r2dbc.jdbc.testKit.AbstractTestKit#getServer()
      */
     @Override
-    DBServerExtension getServer()
+    DbServerExtension getServer()
     {
         return SERVER;
     }

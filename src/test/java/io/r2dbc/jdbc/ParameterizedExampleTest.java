@@ -18,8 +18,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
-import io.r2dbc.jdbc.util.DBServerExtension;
-import io.r2dbc.jdbc.util.DatabaseExtension;
+import io.r2dbc.jdbc.util.DbServerExtension;
+import io.r2dbc.jdbc.util.MultiDatabaseExtension;
 import io.r2dbc.jdbc.util.JanitorInvocationInterceptor;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactories;
@@ -40,7 +40,7 @@ final class ParameterizedExampleTest
     *
     */
     @RegisterExtension
-    static final DatabaseExtension DATABASE_EXTENSION = new DatabaseExtension();
+    static final MultiDatabaseExtension DATABASE_EXTENSION = new MultiDatabaseExtension();
 
     /**
      * @param connectionFactory {@link ConnectionFactory}
@@ -48,7 +48,7 @@ final class ParameterizedExampleTest
      */
     static Connection getConnection(final ConnectionFactory connectionFactory)
     {
-        return Mono.from(connectionFactory.create()).block(DBServerExtension.getSqlTimeout());
+        return Mono.from(connectionFactory.create()).block(DbServerExtension.getSqlTimeout());
     }
 
     /**
@@ -61,12 +61,12 @@ final class ParameterizedExampleTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testBatch") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testBatch(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testBatch(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
@@ -111,12 +111,12 @@ final class ParameterizedExampleTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testBatchAutoIncrement") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testBatchAutoIncrement(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testBatchAutoIncrement(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
@@ -144,12 +144,12 @@ final class ParameterizedExampleTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testBatchWithCommit") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testBatchWithCommit(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testBatchWithCommit(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
@@ -233,12 +233,12 @@ final class ParameterizedExampleTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testBatchWithRollback") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testBatchWithRollback(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testBatchWithRollback(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
@@ -276,12 +276,12 @@ final class ParameterizedExampleTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testDeleteBatch") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testDeleteBatch(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testDeleteBatch(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
@@ -331,12 +331,12 @@ final class ParameterizedExampleTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testInsert") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testInsert(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testInsert(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
@@ -384,12 +384,12 @@ final class ParameterizedExampleTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testSelectWithConverter") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testSelectWithConverter(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testSelectWithConverter(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
@@ -426,12 +426,12 @@ final class ParameterizedExampleTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testUpdate") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testUpdate(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testUpdate(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());

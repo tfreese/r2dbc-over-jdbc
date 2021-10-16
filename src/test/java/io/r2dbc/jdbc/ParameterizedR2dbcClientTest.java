@@ -12,8 +12,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import io.r2dbc.client.R2dbc;
-import io.r2dbc.jdbc.util.DBServerExtension;
-import io.r2dbc.jdbc.util.DatabaseExtension;
+import io.r2dbc.jdbc.util.DbServerExtension;
+import io.r2dbc.jdbc.util.MultiDatabaseExtension;
 import io.r2dbc.jdbc.util.JanitorInvocationInterceptor;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactoryOptions;
@@ -31,7 +31,7 @@ final class ParameterizedR2dbcClientTest
      *
      */
     @RegisterExtension
-    static final DatabaseExtension DATABASE_EXTENSION = new DatabaseExtension();
+    static final MultiDatabaseExtension DATABASE_EXTENSION = new MultiDatabaseExtension();
 
     /**
      * @return {@link Stream}
@@ -43,13 +43,13 @@ final class ParameterizedR2dbcClientTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testInsert") // Ohne Parameter
     // @ArgumentsSource(DatabaseExtension.class)
     @MethodSource("getDatabases")
-    void testInsert(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testInsert(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactoryOptions connectionFactoryOptions =
                 ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build();
@@ -66,12 +66,12 @@ final class ParameterizedR2dbcClientTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testInsertBatch") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testInsertBatch(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testInsertBatch(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactoryOptions connectionFactoryOptions =
                 ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build();
@@ -93,12 +93,12 @@ final class ParameterizedR2dbcClientTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testInsertWithSelect") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testInsertWithSelect(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testInsertWithSelect(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactoryOptions connectionFactoryOptions =
                 ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build();

@@ -16,8 +16,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
-import io.r2dbc.jdbc.util.DBServerExtension;
-import io.r2dbc.jdbc.util.DatabaseExtension;
+import io.r2dbc.jdbc.util.DbServerExtension;
+import io.r2dbc.jdbc.util.MultiDatabaseExtension;
 import reactor.test.StepVerifier;
 
 /**
@@ -29,7 +29,7 @@ final class ParameterizedConnectionFactoryTest
     *
     */
     @RegisterExtension
-    static final DatabaseExtension DATABASE_EXTENSION = new DatabaseExtension();
+    static final MultiDatabaseExtension DATABASE_EXTENSION = new MultiDatabaseExtension();
 
     /**
      * @return {@link Stream}
@@ -50,12 +50,12 @@ final class ParameterizedConnectionFactoryTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testCreate") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testCreate(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testCreate(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         JdbcConnectionConfiguration configuration = JdbcConnectionConfiguration.builder().dataSource(server.getDataSource()).build();
 
@@ -64,12 +64,12 @@ final class ParameterizedConnectionFactoryTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testGetMetadata") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testGetMetadata(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testGetMetadata(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         JdbcConnectionConfiguration configuration = JdbcConnectionConfiguration.builder().dataSource(server.getDataSource()).build();
 
@@ -78,12 +78,12 @@ final class ParameterizedConnectionFactoryTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testOptions") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testOptions(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testOptions(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         JdbcConnectionConfiguration configuration = JdbcConnectionConfiguration.builder().dataSource(server.getDataSource()).build();
 

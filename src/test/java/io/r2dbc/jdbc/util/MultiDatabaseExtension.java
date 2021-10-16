@@ -15,23 +15,23 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
  *
  * @author Thomas Freese
  */
-public class DatabaseExtension implements BeforeAllCallback, AfterAllCallback// , ArgumentsProvider
+public class MultiDatabaseExtension implements BeforeAllCallback, AfterAllCallback// , ArgumentsProvider
 {
     /**
      *
      */
-    private final List<DBServerExtension> servers = new ArrayList<>();
+    private final List<DbServerExtension> servers = new ArrayList<>();
 
     /**
      * Die Junit-{@link Extension} braucht zwingend einen Default-Constructor !
      */
-    public DatabaseExtension()
+    public MultiDatabaseExtension()
     {
         super();
 
-        this.servers.add(new DBServerExtension(EmbeddedDatabaseType.HSQL));
-        this.servers.add(new DBServerExtension(EmbeddedDatabaseType.H2));
-        this.servers.add(new DBServerExtension(EmbeddedDatabaseType.DERBY));
+        this.servers.add(new DbServerExtension(EmbeddedDatabaseType.HSQL));
+        this.servers.add(new DbServerExtension(EmbeddedDatabaseType.H2));
+        this.servers.add(new DbServerExtension(EmbeddedDatabaseType.DERBY));
     }
 
     /**
@@ -40,7 +40,7 @@ public class DatabaseExtension implements BeforeAllCallback, AfterAllCallback// 
     @Override
     public void afterAll(final ExtensionContext context) throws Exception
     {
-        for (DBServerExtension server : this.servers)
+        for (DbServerExtension server : this.servers)
         {
             server.afterAll(context);
         }
@@ -52,7 +52,7 @@ public class DatabaseExtension implements BeforeAllCallback, AfterAllCallback// 
     @Override
     public void beforeAll(final ExtensionContext context) throws Exception
     {
-        for (DBServerExtension server : this.servers)
+        for (DbServerExtension server : this.servers)
         {
             server.beforeAll(context);
         }
@@ -61,7 +61,7 @@ public class DatabaseExtension implements BeforeAllCallback, AfterAllCallback// 
     /**
      * @return {@link List}<DBServerExtension>
      */
-    public List<DBServerExtension> getServers()
+    public List<DbServerExtension> getServers()
     {
         return this.servers;
     }

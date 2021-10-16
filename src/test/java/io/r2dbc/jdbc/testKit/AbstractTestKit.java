@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.JdbcOperations;
 
 import io.r2dbc.jdbc.JdbcConnectionFactory;
 import io.r2dbc.jdbc.codecs.DefaultCodecs;
-import io.r2dbc.jdbc.util.DBServerExtension;
+import io.r2dbc.jdbc.util.DbServerExtension;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Statement;
@@ -94,9 +94,9 @@ abstract class AbstractTestKit implements TestKit<Integer>
     }
 
     /**
-     * @return {@link DBServerExtension}
+     * @return {@link DbServerExtension}
      */
-    abstract DBServerExtension getServer();
+    abstract DbServerExtension getServer();
 
     /**
      * @see io.r2dbc.spi.test.TestKit#prepareStatement()

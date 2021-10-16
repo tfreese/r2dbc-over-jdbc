@@ -65,11 +65,11 @@ public class JanitorInvocationInterceptor implements InvocationInterceptor
             lastArgument = arguments.get(arguments.size() - 1);
         }
 
-        DBServerExtension server = null;
+        DbServerExtension server = null;
 
-        if (lastArgument instanceof DBServerExtension)
+        if (lastArgument instanceof DbServerExtension)
         {
-            server = (DBServerExtension) lastArgument;
+            server = (DbServerExtension) lastArgument;
         }
 
         if (server != null)
@@ -107,11 +107,11 @@ public class JanitorInvocationInterceptor implements InvocationInterceptor
             lastArgument = arguments.get(arguments.size() - 1);
         }
 
-        DBServerExtension server = null;
+        DbServerExtension server = null;
 
-        if (lastArgument instanceof DBServerExtension)
+        if (lastArgument instanceof DbServerExtension)
         {
-            server = (DBServerExtension) lastArgument;
+            server = (DbServerExtension) lastArgument;
         }
 
         if (server != null)

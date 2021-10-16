@@ -17,8 +17,8 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import io.r2dbc.jdbc.codecs.BlobCodec;
 import io.r2dbc.jdbc.codecs.ClobCodec;
-import io.r2dbc.jdbc.util.DBServerExtension;
-import io.r2dbc.jdbc.util.DatabaseExtension;
+import io.r2dbc.jdbc.util.DbServerExtension;
+import io.r2dbc.jdbc.util.MultiDatabaseExtension;
 import io.r2dbc.spi.Blob;
 import io.r2dbc.spi.Clob;
 import io.r2dbc.spi.Connection;
@@ -46,7 +46,7 @@ class ParameterizedLobTest
     *
     */
     @RegisterExtension
-    static final DatabaseExtension DATABASE_EXTENSION = new DatabaseExtension();
+    static final MultiDatabaseExtension DATABASE_EXTENSION = new MultiDatabaseExtension();
 
     static
     {
@@ -60,11 +60,12 @@ class ParameterizedLobTest
 
     /**
      * @param connectionFactory {@link ConnectionFactory}
+     *
      * @return {@link Connection}
      */
     static Connection getConnection(final ConnectionFactory connectionFactory)
     {
-        return Mono.from(connectionFactory.create()).block(DBServerExtension.getSqlTimeout());
+        return Mono.from(connectionFactory.create()).block(DbServerExtension.getSqlTimeout());
     }
 
     /**
@@ -104,12 +105,12 @@ class ParameterizedLobTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testBigBlob") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testBigBlob(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testBigBlob(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
@@ -167,12 +168,12 @@ class ParameterizedLobTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testBigClob") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testBigClob(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testBigClob(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
@@ -217,7 +218,7 @@ class ParameterizedLobTest
                 )
                 .flatMap(it -> it.map((row, rowMetadata) -> row.get("my_col", Clob.class)))
                 .flatMap(Clob::stream)
-                .doOnNext(it -> System.out.println(it.toString()))
+                //.doOnNext(it -> System.out.println(it.toString()))
                 .map(CharSequence::length)
                 .collect(Collectors.summingInt(value -> value))
                 .concatWith(TestKit.close(connection))
@@ -229,12 +230,12 @@ class ParameterizedLobTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testNullBlob") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testNullBlob(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testNullBlob(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
@@ -271,12 +272,12 @@ class ParameterizedLobTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testNullClob") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testNullClob(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testNullClob(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());

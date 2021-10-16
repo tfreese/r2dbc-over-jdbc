@@ -28,8 +28,8 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import io.r2dbc.jdbc.codecs.Codecs;
 import io.r2dbc.jdbc.codecs.DefaultCodecs;
-import io.r2dbc.jdbc.util.DBServerExtension;
-import io.r2dbc.jdbc.util.DatabaseExtension;
+import io.r2dbc.jdbc.util.DbServerExtension;
+import io.r2dbc.jdbc.util.MultiDatabaseExtension;
 import io.r2dbc.jdbc.util.JanitorInvocationInterceptor;
 import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Connection;
@@ -52,7 +52,7 @@ final class ParameterizedRowTest
     *
     */
     @RegisterExtension
-    static final DatabaseExtension DATABASE_EXTENSION = new DatabaseExtension();
+    static final MultiDatabaseExtension DATABASE_EXTENSION = new MultiDatabaseExtension();
 
     /**
      * @return {@link Stream}
@@ -172,12 +172,12 @@ final class ParameterizedRowTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testSelectWithAliases") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testSelectWithAliases(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testSelectWithAliases(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
@@ -202,12 +202,12 @@ final class ParameterizedRowTest
 
     /**
      * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DBServerExtension}
+     * @param server {@link DbServerExtension}
      */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testSelectWithoutAliases") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testSelectWithoutAliases(final EmbeddedDatabaseType databaseType, final DBServerExtension server)
+    void testSelectWithoutAliases(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
@@ -224,7 +224,7 @@ final class ParameterizedRowTest
 //        .verifyComplete();
         // @formatter:on
 
-        Connection connection = Mono.from(connectionFactory.create()).block(DBServerExtension.getSqlTimeout());
+        Connection connection = Mono.from(connectionFactory.create()).block(DbServerExtension.getSqlTimeout());
 
         try
         {

@@ -178,7 +178,7 @@ public final class Awaits
      */
     private static Duration sqlTimeout()
     {
-        return DBServerExtension.getSqlTimeout();
+        return DbServerExtension.getSqlTimeout();
     }
 
     /**
