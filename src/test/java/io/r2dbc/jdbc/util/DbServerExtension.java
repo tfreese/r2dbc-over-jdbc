@@ -22,6 +22,7 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
+import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.HikariPoolMXBean;
 
@@ -134,7 +135,7 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
     public void afterTestExecution(final ExtensionContext context) throws Exception
     {
         // Method testMethod = context.getRequiredTestMethod();
-        // long startTime = getStoreForMethod(context).remove("start-time", long.class);
+        // long startTime = getStoreForMethod(context).get("start-time", long.class);
         // long duration = System.currentTimeMillis() - startTime;
         //
         // LOGGER.debug("{} - Method [{}] took {} ms.", this.databaseType, testMethod.getName(), duration);
@@ -151,7 +152,7 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
 
         getStoreForGlobal(context).put("start-time", System.currentTimeMillis());
 
-        this.dataSource = new HikariDataSource();
+        HikariConfig config = new HikariConfig();
 
         String databaseNameAndParams = ATOMIC_INTEGER.getAndIncrement() + ";create=true";
 
@@ -160,31 +161,34 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
             case HSQL:
                 // ;shutdown=true schliesst die DB nach Ende der letzten Connection.
                 // ;MVCC=true;LOCK_MODE=0
-                this.dataSource.setDriverClassName("org.hsqldb.jdbc.JDBCDriver");
-                this.dataSource.setJdbcUrl("jdbc:hsqldb:mem:" + databaseNameAndParams);
+                config.setDriverClassName("org.hsqldb.jdbc.JDBCDriver");
+                config.setJdbcUrl("jdbc:hsqldb:mem:" + databaseNameAndParams);
 
                 break;
 
             case H2:
                 // ;DB_CLOSE_DELAY=-1 schliesst NICHT die DB nach Ende der letzten Connection
-                this.dataSource.setDriverClassName("org.h2.Driver");
-                this.dataSource.setJdbcUrl("jdbc:h2:mem:" + databaseNameAndParams);
+                config.setDriverClassName("org.h2.Driver");
+                config.setJdbcUrl("jdbc:h2:mem:" + databaseNameAndParams);
                 break;
 
             case DERBY:
-                this.dataSource.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
-                this.dataSource.setJdbcUrl("jdbc:derby:memory:" + databaseNameAndParams);
+                config.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
+                config.setJdbcUrl("jdbc:derby:memory:" + databaseNameAndParams);
                 break;
 
             default:
                 throw new IllegalArgumentException("unsupported databaseType: " + this.databaseType);
         }
 
-        this.dataSource.setUsername("sa");
-        this.dataSource.setPassword("");
-        this.dataSource.setPoolName(getDatabaseType().name());
-        this.dataSource.setMaximumPoolSize(10);
-        this.dataSource.setConnectionTimeout(getSqlTimeout().toMillis());
+        config.setUsername("sa");
+        config.setPassword("");
+        config.setPoolName(getDatabaseType().name());
+        config.setMaximumPoolSize(10);
+        config.setConnectionTimeout(getSqlTimeout().toMillis());
+        config.setAutoCommit(false);
+
+        this.dataSource = new HikariDataSource(config);
 
         // Initialisierung triggern.
         this.dataSource.getConnection().close();

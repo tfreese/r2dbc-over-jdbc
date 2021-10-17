@@ -1,8 +1,9 @@
 // Created: 05.04.2021
 package io.r2dbc.jdbc.util;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -15,12 +16,12 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
  *
  * @author Thomas Freese
  */
-public class MultiDatabaseExtension implements BeforeAllCallback, AfterAllCallback// , ArgumentsProvider
+public class MultiDatabaseExtension implements BeforeAllCallback, AfterAllCallback // , ArgumentsProvider
 {
     /**
      *
      */
-    private final List<DbServerExtension> servers = new ArrayList<>();
+    private final Map<EmbeddedDatabaseType, DbServerExtension> servers = new HashMap<>();
 
     /**
      * Die Junit-{@link Extension} braucht zwingend einen Default-Constructor !
@@ -29,9 +30,9 @@ public class MultiDatabaseExtension implements BeforeAllCallback, AfterAllCallba
     {
         super();
 
-        this.servers.add(new DbServerExtension(EmbeddedDatabaseType.HSQL));
-        this.servers.add(new DbServerExtension(EmbeddedDatabaseType.H2));
-        this.servers.add(new DbServerExtension(EmbeddedDatabaseType.DERBY));
+        this.servers.computeIfAbsent(EmbeddedDatabaseType.H2, DbServerExtension::new);
+        this.servers.computeIfAbsent(EmbeddedDatabaseType.HSQL, DbServerExtension::new);
+        this.servers.computeIfAbsent(EmbeddedDatabaseType.DERBY, DbServerExtension::new);
     }
 
     /**
@@ -40,7 +41,7 @@ public class MultiDatabaseExtension implements BeforeAllCallback, AfterAllCallba
     @Override
     public void afterAll(final ExtensionContext context) throws Exception
     {
-        for (DbServerExtension server : this.servers)
+        for (DbServerExtension server : this.servers.values())
         {
             server.afterAll(context);
         }
@@ -52,18 +53,28 @@ public class MultiDatabaseExtension implements BeforeAllCallback, AfterAllCallba
     @Override
     public void beforeAll(final ExtensionContext context) throws Exception
     {
-        for (DbServerExtension server : this.servers)
+        for (DbServerExtension server : this.servers.values())
         {
             server.beforeAll(context);
         }
     }
 
     /**
-     * @return {@link List}<DBServerExtension>
+     * @param databaseType {@link EmbeddedDatabaseType}
+     *
+     * @return {@link DbServerExtension}
      */
-    public List<DbServerExtension> getServers()
+    public DbServerExtension getServer(final EmbeddedDatabaseType databaseType)
     {
-        return this.servers;
+        return this.servers.get(databaseType);
+    }
+
+    /**
+     * @return {@link Collection}
+     */
+    public Collection<DbServerExtension> getServers()
+    {
+        return this.servers.values();
     }
 
     // /**
