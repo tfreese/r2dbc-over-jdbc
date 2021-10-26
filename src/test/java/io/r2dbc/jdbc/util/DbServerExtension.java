@@ -154,27 +154,26 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
 
         HikariConfig config = new HikariConfig();
 
-        String databaseNameAndParams = ATOMIC_INTEGER.getAndIncrement() + ";create=true";
-
         switch (getDatabaseType())
         {
             case HSQL:
                 // ;shutdown=true schliesst die DB nach Ende der letzten Connection.
                 // ;MVCC=true;LOCK_MODE=0
                 config.setDriverClassName("org.hsqldb.jdbc.JDBCDriver");
-                config.setJdbcUrl("jdbc:hsqldb:mem:" + databaseNameAndParams);
+                config.setJdbcUrl("jdbc:hsqldb:mem:" + ATOMIC_INTEGER.getAndIncrement() + ";create=true;shutdown=false");
 
                 break;
 
             case H2:
                 // ;DB_CLOSE_DELAY=-1 schliesst NICHT die DB nach Ende der letzten Connection
+                // ;DB_CLOSE_ON_EXIT=FALSE:
                 config.setDriverClassName("org.h2.Driver");
-                config.setJdbcUrl("jdbc:h2:mem:" + databaseNameAndParams);
+                config.setJdbcUrl("jdbc:h2:mem:" + ATOMIC_INTEGER.getAndIncrement() + ";create=true;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
                 break;
 
             case DERBY:
                 config.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
-                config.setJdbcUrl("jdbc:derby:memory:" + databaseNameAndParams);
+                config.setJdbcUrl("jdbc:derby:memory:" + ATOMIC_INTEGER.getAndIncrement() + ";create=true");
                 break;
 
             default:
