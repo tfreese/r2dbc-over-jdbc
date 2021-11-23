@@ -185,7 +185,7 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
         config.setPoolName(getDatabaseType().name());
         config.setMaximumPoolSize(10);
         config.setConnectionTimeout(getSqlTimeout().toMillis());
-        config.setAutoCommit(false);
+        config.setAutoCommit(true); // Sonst funktioniert Derby nicht.
 
         this.dataSource = new HikariDataSource(config);
 
