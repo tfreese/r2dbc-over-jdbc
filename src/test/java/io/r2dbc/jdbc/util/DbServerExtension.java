@@ -183,7 +183,7 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
         config.setUsername("sa");
         config.setPassword("");
         config.setPoolName(getDatabaseType().name());
-        config.setMaximumPoolSize(10);
+        config.setMaximumPoolSize(16);
         config.setConnectionTimeout(getSqlTimeout().toMillis());
         config.setAutoCommit(true); // Sonst funktioniert Derby nicht.
 

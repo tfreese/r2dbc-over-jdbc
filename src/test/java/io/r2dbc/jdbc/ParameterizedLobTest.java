@@ -26,7 +26,6 @@ import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
 import io.r2dbc.spi.Result;
-import io.r2dbc.spi.test.TestKit;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
@@ -96,7 +95,6 @@ class ParameterizedLobTest
                                 )
                                 .flatMap(Result::getRowsUpdated)
                         )
-                .concatWith(TestKit.close(connection))
                 .as(StepVerifier::create)
                 .expectNext(0)
                 .verifyComplete();
@@ -142,7 +140,6 @@ class ParameterizedLobTest
                 .execute()
                 )
                 .flatMap(Result::getRowsUpdated)
-                .concatWith(TestKit.close(connection))
                 .as(StepVerifier::create)
                 //.expectNext(1)
                 .expectNextCount(1).as("blobs inserted")
@@ -159,7 +156,6 @@ class ParameterizedLobTest
                 //.doOnNext(it -> System.out.println(it.remaining()))
                 .map(Buffer::remaining)
                 .collect(Collectors.summingInt(value -> value))
-                .concatWith(TestKit.close(connection))
                 .as(StepVerifier::create)
                 .expectNext(i * ALL_BYTES.length)
                 .verifyComplete();
@@ -205,7 +201,6 @@ class ParameterizedLobTest
                 .execute()
                 )
                 .flatMap(Result::getRowsUpdated)
-                .concatWith(TestKit.close(connection))
                 .as(StepVerifier::create)
                 //.expectNext(1)
                 .expectNextCount(1).as("clobs inserted")
@@ -221,7 +216,6 @@ class ParameterizedLobTest
                 //.doOnNext(it -> System.out.println(it.toString()))
                 .map(CharSequence::length)
                 .collect(Collectors.summingInt(value -> value))
-                .concatWith(TestKit.close(connection))
                 .as(StepVerifier::create)
                 .expectNext(i * TEST_STRING.length())
                 .verifyComplete();
@@ -250,7 +244,6 @@ class ParameterizedLobTest
                 .execute()
                 )
                 .flatMap(Result::getRowsUpdated)
-                .concatWith(TestKit.close(connection))
                 .as(StepVerifier::create)
                 .expectNextCount(1).as("null blobs inserted")
                 .verifyComplete();
@@ -263,7 +256,6 @@ class ParameterizedLobTest
                 .execute()
                 )
                 .flatMap(it -> it.map((row, rowMetadata) -> row.get("my_col", Blob.class)))
-                .concatWith(TestKit.close(connection))
                 .as(StepVerifier::create)
                 .consumeNextWith(actual -> Assertions.assertThat(actual).isSameAs(BlobCodec.NULL_BLOB))
                 .verifyComplete();
@@ -292,7 +284,6 @@ class ParameterizedLobTest
                 .execute()
                 )
                 .flatMap(Result::getRowsUpdated)
-                .concatWith(TestKit.close(connection))
                 .as(StepVerifier::create)
                 .expectNextCount(1).as("null clobs inserted")
                 .verifyComplete();
@@ -305,7 +296,6 @@ class ParameterizedLobTest
                 .execute()
                 )
                 .flatMap(it -> it.map((row, rowMetadata) -> row.get("my_col", Clob.class)))
-                .concatWith(TestKit.close(connection))
                 .as(StepVerifier::create)
                 .consumeNextWith(actual -> Assertions.assertThat(actual).isSameAs(ClobCodec.NULL_CLOB))
                 .verifyComplete();
