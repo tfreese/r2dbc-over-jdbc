@@ -1,9 +1,12 @@
 // Created: 14.06.2019
 package io.r2dbc.jdbc.util;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.sql.DataSource;
@@ -34,7 +37,7 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
     /**
      *
      */
-    public static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger(1);
+    private static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger(1);
     /**
      *
      */
@@ -53,10 +56,30 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
     }
 
     /**
+     * @return String
+     */
+    public static String createDbName()
+    {
+        String dbName = "db-" + ATOMIC_INTEGER.getAndIncrement();
+
+        if (LOGGER.isDebugEnabled())
+        {
+            LOGGER.debug("Create DB: {}", dbName);
+        }
+
+        return dbName;
+    }
+
+    /**
      *
      */
     public static void showMemory()
     {
+        if (!LOGGER.isDebugEnabled())
+        {
+            return;
+        }
+
         Runtime runtime = Runtime.getRuntime();
         long maxMemory = runtime.maxMemory();
         long allocatedMemory = runtime.totalMemory();
@@ -112,20 +135,60 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
     @Override
     public void afterAll(final ExtensionContext context) throws Exception
     {
-        LOGGER.debug("{} - afterAll", this.databaseType);
+        if (LOGGER.isDebugEnabled())
+        {
+            LOGGER.debug("{} - afterAll", this.databaseType);
 
-        HikariPoolMXBean poolMXBean = this.dataSource.getHikariPoolMXBean();
+            HikariPoolMXBean poolMXBean = this.dataSource.getHikariPoolMXBean();
 
-        LOGGER.debug("{} - Connections: idle={}, active={}, waiting={}", this.databaseType, poolMXBean.getIdleConnections(), poolMXBean.getActiveConnections(),
-                poolMXBean.getThreadsAwaitingConnection());
+            LOGGER.debug("{} - Connections: idle={}, active={}, waiting={}", this.databaseType, poolMXBean.getIdleConnections(), poolMXBean.getActiveConnections(),
+                    poolMXBean.getThreadsAwaitingConnection());
+        }
 
         LOGGER.debug("{} - close datasource", this.databaseType);
+
+        switch (getDatabaseType())
+        {
+            case HSQL:
+            case H2:
+//                try (Connection connection = this.dataSource.getConnection();
+//                     Statement statement = connection.createStatement())
+//                {
+//                    statement.execute("SHUTDOWN");
+//                }
+//                catch (Exception ex)
+//                {
+//                    LOGGER.error(ex.getMessage());
+//                }
+                break;
+
+            case DERBY:
+                break;
+
+            default:
+                throw new IllegalArgumentException("unsupported databaseType: " + this.databaseType);
+        }
+
         this.dataSource.close();
 
-        long startTime = getStoreForGlobal(context).get("start-time", long.class);
-        long duration = System.currentTimeMillis() - startTime;
+        TimeUnit.MILLISECONDS.sleep(100);
 
-        LOGGER.debug("{} - All Tests took {} ms.", this.databaseType, duration);
+        if (!this.dataSource.isClosed())
+        {
+            this.dataSource.close();
+        }
+
+        if (LOGGER.isDebugEnabled())
+        {
+            long startTime = getStoreForGlobal(context).get("start-time", long.class);
+            long duration = System.currentTimeMillis() - startTime;
+
+            LOGGER.debug("{} - All Tests took {} ms.", this.databaseType, duration);
+        }
+
+        this.dataSource = null;
+
+        System.gc();
     }
 
     /**
@@ -160,20 +223,20 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
                 // ;shutdown=true schliesst die DB nach Ende der letzten Connection.
                 // ;MVCC=true;LOCK_MODE=0
                 config.setDriverClassName("org.hsqldb.jdbc.JDBCDriver");
-                config.setJdbcUrl("jdbc:hsqldb:mem:" + ATOMIC_INTEGER.getAndIncrement() + ";create=true;shutdown=false");
+                config.setJdbcUrl("jdbc:hsqldb:mem:" + createDbName() + ";shutdown=true");
 
                 break;
 
             case H2:
                 // ;DB_CLOSE_DELAY=-1 schliesst NICHT die DB nach Ende der letzten Connection
-                // ;DB_CLOSE_ON_EXIT=FALSE:
+                // ;DB_CLOSE_ON_EXIT=FALSE schliesst NICHT die DB nach Ende der Runtime
                 config.setDriverClassName("org.h2.Driver");
-                config.setJdbcUrl("jdbc:h2:mem:" + ATOMIC_INTEGER.getAndIncrement() + ";create=true;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
+                config.setJdbcUrl("jdbc:h2:mem:" + createDbName()+ ";DB_CLOSE_DELAY=0;DB_CLOSE_ON_EXIT=true");
                 break;
 
             case DERBY:
                 config.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
-                config.setJdbcUrl("jdbc:derby:memory:" + ATOMIC_INTEGER.getAndIncrement() + ";create=true");
+                config.setJdbcUrl("jdbc:derby:memory:" + createDbName() + ";create=true");
                 break;
 
             default:
@@ -183,42 +246,20 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
         config.setUsername("sa");
         config.setPassword("");
         config.setPoolName(getDatabaseType().name());
+        config.setMinimumIdle(1);
         config.setMaximumPoolSize(16);
         config.setConnectionTimeout(getSqlTimeout().toMillis());
-        config.setAutoCommit(true); // Sonst funktioniert Derby nicht.
+        config.setAutoCommit(true);
 
         this.dataSource = new HikariDataSource(config);
 
         // Initialisierung triggern.
-        this.dataSource.getConnection().close();
+        //this.dataSource.getConnection().close();
 
         this.jdbcOperations = new JdbcTemplate(this.dataSource);
 
         // Class.forName(getDriver(), true, getClass().getClassLoader());
 
-        // @formatter:off
-//        this.dataSource = DataSourceBuilder.create().type(HikariDataSource.class)
-//                .driverClassName("org.hsqldb.jdbc.JDBCDriver")
-//                .url("jdbc:hsqldb:mem:%d"+ System.nanoTime())
-//                .username("sa")
-//                .password("")
-//                .build()
-//                ;
-        // @formatter:on
-        //
-        // EmbeddedDatabase database = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.HSQL).setName("" +
-        // TestSuiteJdbc.ATOMIC_INTEGER.getAndIncrement()).build();
-        //
-        // // SingleConnectionDataSource singleConnectionDataSource = new SingleConnectionDataSource();
-        // // singleConnectionDataSource.setDriverClassName("org.generic.jdbc.JDBCDriver");
-        // // singleConnectionDataSource.setUrl("jdbc:generic:mem:" + TestSuiteJdbc.ATOMIC_INTEGER.getAndIncrement());
-        // // // singleConnectionDataSource.setUrl("jdbc:generic:file:db/generic/generic;create=false;shutdown=true");
-        // // singleConnectionDataSource.setSuppressClose(true);
-        // // singleConnectionDataSource.setAutoCommit(true);
-        //
-        // // DataSource dataSource = singleConnectionDataSource;
-        // dataSource = database;
-        //
         // ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
         // populator.addScript(new ClassPathResource("hsqldb-schema.sql"));
         // populator.addScript(new ClassPathResource("hsqldb-data.sql"));
