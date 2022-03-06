@@ -1,8 +1,6 @@
 // Created: 14.06.2019
 package io.r2dbc.jdbc.util;
 
-import java.sql.Connection;
-import java.sql.Statement;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.util.Objects;
@@ -11,6 +9,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.sql.DataSource;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.HikariPoolMXBean;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -24,10 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import com.zaxxer.hikari.HikariPoolMXBean;
 
 /**
  * @author Thomas Freese
@@ -48,14 +45,6 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
     private static final Duration SQL_TIMEOUT = Duration.ofSeconds(5);
 
     /**
-     * @return {@link Duration}
-     */
-    public static Duration getSqlTimeout()
-    {
-        return SQL_TIMEOUT;
-    }
-
-    /**
      * @return String
      */
     public static String createDbName()
@@ -68,6 +57,14 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
         }
 
         return dbName;
+    }
+
+    /**
+     * @return {@link Duration}
+     */
+    public static Duration getSqlTimeout()
+    {
+        return SQL_TIMEOUT;
     }
 
     /**
@@ -231,7 +228,7 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
                 // ;DB_CLOSE_DELAY=-1 schliesst NICHT die DB nach Ende der letzten Connection
                 // ;DB_CLOSE_ON_EXIT=FALSE schliesst NICHT die DB nach Ende der Runtime
                 config.setDriverClassName("org.h2.Driver");
-                config.setJdbcUrl("jdbc:h2:mem:" + createDbName()+ ";DB_CLOSE_DELAY=0;DB_CLOSE_ON_EXIT=true");
+                config.setJdbcUrl("jdbc:h2:mem:" + createDbName() + ";DB_CLOSE_DELAY=0;DB_CLOSE_ON_EXIT=true");
                 break;
 
             case DERBY:
@@ -276,19 +273,19 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
     }
 
     /**
-     * @return {@link EmbeddedDatabaseType}
-     */
-    public EmbeddedDatabaseType getDatabaseType()
-    {
-        return this.databaseType;
-    }
-
-    /**
      * @return {@link DataSource}
      */
     public DataSource getDataSource()
     {
         return this.dataSource;
+    }
+
+    /**
+     * @return {@link EmbeddedDatabaseType}
+     */
+    public EmbeddedDatabaseType getDatabaseType()
+    {
+        return this.databaseType;
     }
 
     /**
@@ -313,6 +310,22 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
     public String getPassword()
     {
         return this.dataSource.getPassword();
+    }
+
+    /**
+     * @return String
+     */
+    public String getUrl()
+    {
+        return this.dataSource.getJdbcUrl();
+    }
+
+    /**
+     * @return String
+     */
+    public String getUsername()
+    {
+        return this.dataSource.getUsername();
     }
 
     /**
@@ -349,21 +362,5 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
     Store getStoreForMethod(final ExtensionContext context)
     {
         return context.getStore(Namespace.create(getClass(), context.getRequiredTestMethod()));
-    }
-
-    /**
-     * @return String
-     */
-    public String getUrl()
-    {
-        return this.dataSource.getJdbcUrl();
-    }
-
-    /**
-     * @return String
-     */
-    public String getUsername()
-    {
-        return this.dataSource.getUsername();
     }
 }

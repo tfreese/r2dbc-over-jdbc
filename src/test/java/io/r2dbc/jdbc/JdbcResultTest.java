@@ -10,10 +10,9 @@ import static org.mockito.Mockito.when;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 
-import org.junit.jupiter.api.Test;
-
 import io.r2dbc.spi.R2dbcDataIntegrityViolationException;
 import io.r2dbc.spi.Result;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -58,10 +57,10 @@ final class JdbcResultTest
     {
         Result result = mock(JdbcResult.class, RETURNS_SMART_NULLS);
 
-        when(result.map(any())).thenAnswer(arg -> {
-            return Flux.error(new SQLIntegrityConstraintViolationException("can't do something", "some state", 999)).onErrorMap(SQLException.class,
-                    JdbcR2dbcExceptionFactory::create);
-        });
+        when(result.map(any())).thenAnswer(arg ->
+                Flux.error(new SQLIntegrityConstraintViolationException("can't do something", "some state", 999)).onErrorMap(SQLException.class,
+                        JdbcR2dbcExceptionFactory::create)
+        );
         when(result.getRowsUpdated()).thenReturn(Mono.empty());
 
         Flux.from(result.map((row, rowMetadata) -> row)).as(StepVerifier::create).verifyError(R2dbcDataIntegrityViolationException.class);
