@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -15,13 +15,13 @@
 
     <name>${project.groupId} - ${project.artifactId}</name>
     <description>Reactive Relational Database Connectivity over JDBC Implementation</description>
-    
+
     <properties>
         <version_io.r2dbc_r2dbc-spi>0.8.6.RELEASE</version_io.r2dbc_r2dbc-spi>
     </properties>
 
     <dependencies>
-		<!-- compile scope -->
+        <!-- compile scope -->
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
@@ -36,9 +36,9 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
 
-		<!-- runtime scope -->
-		<!-- provided scope -->
-		<!-- test scope -->
+        <!-- runtime scope -->
+        <!-- provided scope -->
+        <!-- test scope -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -49,11 +49,6 @@
             <artifactId>HikariCP</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>de.freese</groupId>
-            <artifactId>slf4j-adaptive</artifactId>
-            <scope>test</scope>
-        </dependency>        
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>
@@ -105,11 +100,11 @@
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
-        <!--dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <scope>test</scope>
-        </dependency-->
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
