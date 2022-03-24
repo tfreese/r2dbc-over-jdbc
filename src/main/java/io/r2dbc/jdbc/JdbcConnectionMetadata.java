@@ -26,7 +26,7 @@ public class JdbcConnectionMetadata implements ConnectionMetadata
      *
      * @param databaseMetaData {@link DatabaseMetaData}
      *
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     public JdbcConnectionMetadata(final DatabaseMetaData databaseMetaData) throws SQLException
     {

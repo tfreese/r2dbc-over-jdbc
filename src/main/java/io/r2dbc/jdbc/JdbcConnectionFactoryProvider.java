@@ -63,11 +63,6 @@ public final class JdbcConnectionFactoryProvider implements ConnectionFactoryPro
 
         DataSource dataSource = connectionFactoryOptions.getValue(DATASOURCE);
 
-        if (dataSource != null)
-        {
-            return true;
-        }
-
-        return false;
+        return dataSource != null;
     }
 }

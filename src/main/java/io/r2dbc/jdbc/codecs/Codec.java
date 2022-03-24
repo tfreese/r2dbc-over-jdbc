@@ -8,11 +8,11 @@ import java.sql.SQLException;
 import java.util.Set;
 
 /**
- * Codex for a SQL-Type from the {@link ResultSet} to an Java-Object and vice versa.
- *
- * @author Thomas Freese
+ * Codex for a SQL-Type from the {@link ResultSet} to a Java-Object and vice versa.
  *
  * @param <T> Type
+ *
+ * @author Thomas Freese
  */
 public interface Codec<T>
 {
@@ -29,7 +29,7 @@ public interface Codec<T>
      *
      * @return Object
      *
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     T mapFromSql(ResultSet resultSet, String columnLabel) throws SQLException;
 
@@ -50,7 +50,7 @@ public interface Codec<T>
      * @param parameterIndex int, ONE-Based
      * @param value Object
      *
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     void mapToSql(PreparedStatement preparedStatement, int parameterIndex, T value) throws SQLException;
 

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 /**
- * Dient zum starten und runterfahtren der DB-Instanzen.
+ * Dient zum Starten und runterfahren der DB-Instanzen.
  *
  * @author Thomas Freese
  */

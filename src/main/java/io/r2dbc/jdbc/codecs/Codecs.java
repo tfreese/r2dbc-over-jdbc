@@ -32,7 +32,7 @@ public interface Codecs
      *
      * @return Object
      *
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     <T> T mapFromSql(JDBCType jdbcType, ResultSet resultSet, String columnLabel) throws SQLException;
 
@@ -55,7 +55,7 @@ public interface Codecs
      * @param parameterIndex int, ONE-Based
      * @param value Object
      *
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     void mapToSql(Class<?> javaType, PreparedStatement preparedStatement, int parameterIndex, Object value) throws SQLException;
 }

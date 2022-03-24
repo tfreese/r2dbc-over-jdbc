@@ -18,13 +18,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import io.r2dbc.jdbc.codecs.Codecs;
 import io.r2dbc.jdbc.codecs.DefaultCodecs;
 import io.r2dbc.spi.ColumnMetadata;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Thomas Freese
@@ -43,8 +42,8 @@ final class JdbcRowMetadataTest
     }
 
     /**
-    *
-    */
+     *
+     */
     private final Codecs codecs = new DefaultCodecs();
     /**
      *
@@ -62,7 +61,7 @@ final class JdbcRowMetadataTest
     private final ResultSetMetaData resultSetMetaData = mock(ResultSetMetaData.class, RETURNS_SMART_NULLS);
 
     /**
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     @BeforeEach
     void beforeEach() throws SQLException
@@ -92,7 +91,7 @@ final class JdbcRowMetadataTest
     }
 
     /**
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     @Test
     void testGetColumnMetadataIndex() throws SQLException
@@ -101,7 +100,7 @@ final class JdbcRowMetadataTest
     }
 
     /**
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     @Test
     void testGetColumnMetadataInvalidName() throws SQLException
@@ -111,7 +110,7 @@ final class JdbcRowMetadataTest
     }
 
     /**
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     @Test
     void testGetColumnMetadataName() throws SQLException
@@ -130,7 +129,7 @@ final class JdbcRowMetadataTest
     }
 
     /**
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     @Test
     void testGetColumnMetadataWrongIdentifierType() throws SQLException

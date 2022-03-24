@@ -11,11 +11,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.r2dbc.jdbc.codecs.Codecs;
 import io.r2dbc.spi.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * R2DBC Adapter for JDBC.
@@ -27,128 +26,28 @@ public abstract class AbstractJdbcStatement implements Statement
     /**
      * @author Thomas Freese
      */
-    class Bindings
+    enum SQL_OPERATION
     {
         /**
          *
          */
-        private final List<Map<Integer, Object>> binds = new ArrayList<>();
+        DELETE,
         /**
          *
          */
-        private Map<Integer, Object> current;
-
+        EXECUTE,
         /**
          *
          */
-        void finish()
-        {
-            validateBinds();
-
-            this.current = null;
-        }
-
+        INSERT,
         /**
-         * @return {@link Map}
-         */
-        Map<Integer, Object> getCurrent()
-        {
-            if (this.current == null)
-            {
-                this.current = new HashMap<>();
-                this.binds.add(this.current);
-            }
-
-            return this.current;
-        }
-
-        /**
-         * @return {@link Map}
-         */
-        Map<Integer, Object> getLast()
-        {
-            if (this.binds.isEmpty())
-            {
-                return getCurrent();
-            }
-
-            return this.binds.get(this.binds.size() - 1);
-        }
-
-        /**
-         * @param preparedStatement {@link java.sql.PreparedStatement}
          *
-         * @throws SQLException Falls was schief geht.
          */
-        void prepareBatch(final PreparedStatement preparedStatement) throws SQLException
-        {
-            if (this.binds.isEmpty())
-            {
-                preparedStatement.addBatch();
-
-                return;
-            }
-
-            for (Map<Integer, Object> bind : this.binds)
-            {
-                if (bind.isEmpty())
-                {
-                    continue;
-                }
-
-                prepareStatement(preparedStatement, bind);
-
-                preparedStatement.addBatch();
-            }
-        }
-
+        SELECT,
         /**
-         * @param preparedStatement {@link java.sql.PreparedStatement}
-         * @param bind {@link Map}
          *
-         * @throws SQLException Falls was schief geht.
          */
-        void prepareStatement(final PreparedStatement preparedStatement, final Map<Integer, Object> bind) throws SQLException
-        {
-            for (Entry<Integer, Object> entry : bind.entrySet())
-            {
-                Integer index = entry.getKey();
-                Object value = entry.getValue();
-
-                // JDBC fängt bei 1 an !
-                int parameterIndex = index + 1;
-
-                if (value == null)
-                {
-                    // preparedStatement.setNull(parameterIndex, sqlType);
-                    preparedStatement.setObject(parameterIndex, null);
-                }
-                else
-                {
-                    getCodecs().mapToSql(value.getClass(), preparedStatement, parameterIndex, value);
-                }
-            }
-        }
-
-        /**
-         * Prüfen, ob alle Parameter gesetzt wurden.
-         */
-        void validateBinds()
-        {
-            if (this.current == null)
-            {
-                return;
-            }
-
-            long parameterCount = getSql().chars().filter(ch -> ch == '?').count();
-
-            int bindCount = this.current.size();
-
-            if (bindCount < parameterCount)
-            {
-                throw new IllegalStateException("Bindings do not match Parameters: " + bindCount + " != " + parameterCount);
-            }
-        }
+        UPDATE
     }
 
     /**
@@ -213,37 +112,136 @@ public abstract class AbstractJdbcStatement implements Statement
     /**
      * @author Thomas Freese
      */
-    enum SQL_OPERATION
+    class Bindings
     {
         /**
          *
          */
-        DELETE,
+        private final List<Map<Integer, Object>> binds = new ArrayList<>();
         /**
          *
          */
-        EXECUTE,
-        /**
-         *
-         */
-        INSERT,
-        /**
-         *
-         */
-        SELECT,
-        /**
-         *
-         */
-        UPDATE;
-    }
+        private Map<Integer, Object> current;
 
+        /**
+         *
+         */
+        void finish()
+        {
+            validateBinds();
+
+            this.current = null;
+        }
+
+        /**
+         * @return {@link Map}
+         */
+        Map<Integer, Object> getCurrent()
+        {
+            if (this.current == null)
+            {
+                this.current = new HashMap<>();
+                this.binds.add(this.current);
+            }
+
+            return this.current;
+        }
+
+        /**
+         * @return {@link Map}
+         */
+        Map<Integer, Object> getLast()
+        {
+            if (this.binds.isEmpty())
+            {
+                return getCurrent();
+            }
+
+            return this.binds.get(this.binds.size() - 1);
+        }
+
+        /**
+         * @param preparedStatement {@link java.sql.PreparedStatement}
+         *
+         * @throws SQLException Falls was schiefgeht.
+         */
+        void prepareBatch(final PreparedStatement preparedStatement) throws SQLException
+        {
+            if (this.binds.isEmpty())
+            {
+                preparedStatement.addBatch();
+
+                return;
+            }
+
+            for (Map<Integer, Object> bind : this.binds)
+            {
+                if (bind.isEmpty())
+                {
+                    continue;
+                }
+
+                prepareStatement(preparedStatement, bind);
+
+                preparedStatement.addBatch();
+            }
+        }
+
+        /**
+         * @param preparedStatement {@link java.sql.PreparedStatement}
+         * @param bind {@link Map}
+         *
+         * @throws SQLException Falls was schiefgeht.
+         */
+        void prepareStatement(final PreparedStatement preparedStatement, final Map<Integer, Object> bind) throws SQLException
+        {
+            for (Entry<Integer, Object> entry : bind.entrySet())
+            {
+                Integer index = entry.getKey();
+                Object value = entry.getValue();
+
+                // JDBC fängt bei 1 an !
+                int parameterIndex = index + 1;
+
+                if (value == null)
+                {
+                    // preparedStatement.setNull(parameterIndex, sqlType);
+                    preparedStatement.setObject(parameterIndex, null);
+                }
+                else
+                {
+                    getCodecs().mapToSql(value.getClass(), preparedStatement, parameterIndex, value);
+                }
+            }
+        }
+
+        /**
+         * Prüfen, ob alle Parameter gesetzt wurden.
+         */
+        void validateBinds()
+        {
+            if (this.current == null)
+            {
+                return;
+            }
+
+            long parameterCount = getSql().chars().filter(ch -> ch == '?').count();
+
+            int bindCount = this.current.size();
+
+            if (bindCount < parameterCount)
+            {
+                throw new IllegalStateException("Bindings do not match Parameters: " + bindCount + " != " + parameterCount);
+            }
+        }
+    }
     /**
      *
      */
     private final Bindings bindings = new Bindings();
     /**
-    *
-    */
+     *
+     */
     private final Codecs codecs;
     /**
      *
@@ -499,7 +497,7 @@ public abstract class AbstractJdbcStatement implements Statement
      *
      * @param index A 0-based parameter index
      *
-     * @throws IndexOutOfBoundsException If the {@code index} is outside of the valid range.
+     * @throws IndexOutOfBoundsException If the {@code index} is outside the valid range.
      */
     protected void requireValidIndex(final int index)
     {

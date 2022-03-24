@@ -12,16 +12,70 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcOperations;
 
 /**
- * Erzeugt und Löscht die DB-Tabellen vor und nach jeder Test-Methode.
+ * Erzeugt und löscht die DB-Tabellen vor und nach jeder Test-Methode.
  *
  * @author Thomas Freese
  */
 public class JanitorInvocationInterceptor implements InvocationInterceptor
 {
     /**
-    *
-    */
+     *
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(JanitorInvocationInterceptor.class);
+
+    /**
+     * @see org.junit.jupiter.api.extension.InvocationInterceptor#interceptTestMethod(org.junit.jupiter.api.extension.InvocationInterceptor.Invocation,
+     * org.junit.jupiter.api.extension.ReflectiveInvocationContext, org.junit.jupiter.api.extension.ExtensionContext)
+     */
+    @Override
+    public void interceptTestMethod(final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext,
+                                    final ExtensionContext extensionContext)
+            throws Throwable
+    {
+        List<Object> arguments = invocationContext.getArguments();
+        Object lastArgument = null;
+
+        if (!arguments.isEmpty())
+        {
+            lastArgument = arguments.get(arguments.size() - 1);
+        }
+
+        DbServerExtension server = null;
+
+        if (lastArgument instanceof DbServerExtension)
+        {
+            server = (DbServerExtension) lastArgument;
+        }
+
+        if (server != null)
+        {
+            createTable(server.getJdbcOperations());
+        }
+
+        try
+        {
+            invocation.proceed();
+        }
+        finally
+        {
+            if (server != null)
+            {
+                dropTable(server.getJdbcOperations());
+            }
+        }
+    }
+
+    /**
+     * @see org.junit.jupiter.api.extension.InvocationInterceptor#interceptTestTemplateMethod(org.junit.jupiter.api.extension.InvocationInterceptor.Invocation,
+     * org.junit.jupiter.api.extension.ReflectiveInvocationContext, org.junit.jupiter.api.extension.ExtensionContext)
+     */
+    @Override
+    public void interceptTestTemplateMethod(final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext,
+                                            final ExtensionContext extensionContext)
+            throws Throwable
+    {
+        interceptTestMethod(invocation, invocationContext, extensionContext);
+    }
 
     /**
      * @param jdbcOperations {@link JdbcOperations}
@@ -91,59 +145,5 @@ public class JanitorInvocationInterceptor implements InvocationInterceptor
         // jdbcOperations.execute("DROP TABLE tbl if exists");
         // jdbcOperations.execute("DROP TABLE tbl_auto if exists");
         // }
-    }
-
-    /**
-     * @see org.junit.jupiter.api.extension.InvocationInterceptor#interceptTestMethod(org.junit.jupiter.api.extension.InvocationInterceptor.Invocation,
-     *      org.junit.jupiter.api.extension.ReflectiveInvocationContext, org.junit.jupiter.api.extension.ExtensionContext)
-     */
-    @Override
-    public void interceptTestMethod(final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext,
-                                    final ExtensionContext extensionContext)
-        throws Throwable
-    {
-        List<Object> arguments = invocationContext.getArguments();
-        Object lastArgument = null;
-
-        if (!arguments.isEmpty())
-        {
-            lastArgument = arguments.get(arguments.size() - 1);
-        }
-
-        DbServerExtension server = null;
-
-        if (lastArgument instanceof DbServerExtension)
-        {
-            server = (DbServerExtension) lastArgument;
-        }
-
-        if (server != null)
-        {
-            createTable(server.getJdbcOperations());
-        }
-
-        try
-        {
-            invocation.proceed();
-        }
-        finally
-        {
-            if (server != null)
-            {
-                dropTable(server.getJdbcOperations());
-            }
-        }
-    }
-
-    /**
-     * @see org.junit.jupiter.api.extension.InvocationInterceptor#interceptTestTemplateMethod(org.junit.jupiter.api.extension.InvocationInterceptor.Invocation,
-     *      org.junit.jupiter.api.extension.ReflectiveInvocationContext, org.junit.jupiter.api.extension.ExtensionContext)
-     */
-    @Override
-    public void interceptTestTemplateMethod(final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext,
-                                            final ExtensionContext extensionContext)
-        throws Throwable
-    {
-        interceptTestMethod(invocation, invocationContext, extensionContext);
     }
 }

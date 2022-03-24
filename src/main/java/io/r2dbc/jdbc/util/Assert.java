@@ -11,7 +11,8 @@ public final class Assert
     /**
      * @param value Object
      * @param message String
-     * @throws SQLException Falls was schief geht.
+     *
+     * @throws SQLException Falls was schiefgeht.
      */
     public static void assertNotNull(final Object value, final String message) throws SQLException
     {
@@ -24,7 +25,8 @@ public final class Assert
     /**
      * @param value String
      * @param message String
-     * @throws SQLException Falls was schief geht.
+     *
+     * @throws SQLException Falls was schiefgeht.
      */
     public static void assertNotNullOrBlank(final String value, final String message) throws SQLException
     {

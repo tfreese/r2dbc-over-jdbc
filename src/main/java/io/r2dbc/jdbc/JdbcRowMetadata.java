@@ -31,9 +31,50 @@ import io.r2dbc.spi.RowMetadata;
 public class JdbcRowMetadata implements RowMetadata
 {
     /**
+     * @param resultSet {@link ResultSet}
+     * @param codecs {@link Codecs}
+     *
+     * @return {@link List}
+     *
+     * @throws SQLException Falls was schiefgeht.
+     */
+    public static RowMetadata of(final ResultSet resultSet, final Codecs codecs) throws SQLException
+    {
+        if (resultSet == null)
+        {
+            return new JdbcRowMetadata(Collections.emptyList());
+        }
+
+        ResultSetMetaData metaData = resultSet.getMetaData();
+        List<ColumnMetadata> list = new ArrayList<>();
+
+        for (int column = 1; column <= metaData.getColumnCount(); column++)
+        {
+            String name = metaData.getColumnLabel(column);
+            int sqlType = metaData.getColumnType(column);
+            JDBCType jdbcType = JDBCType.valueOf(sqlType);
+            int precision = metaData.getPrecision(column);
+            int scale = metaData.getScale(column);
+
+            Nullability nullability = switch (metaData.isNullable(column))
+                    {
+                        case ResultSetMetaData.columnNoNulls -> Nullability.NON_NULL;
+                        case ResultSetMetaData.columnNullable -> Nullability.NULLABLE;
+
+                        default -> Nullability.UNKNOWN;
+                    };
+
+            Class<?> javaType = codecs.getJavaType(jdbcType);
+
+            list.add(new JdbcColumnMetadata(name, column - 1, javaType, jdbcType, nullability, precision, scale));
+        }
+
+        return new JdbcRowMetadata(list);
+    }
+
+    /**
      * View of column metadata objects, with each object entry mapped to {@link ColumnMetadata#getName()}. In compliance with the {@link #getColumnNames()} SPI
-     * method specification, this collection is unmodifiable, imposes the same column ordering as the column metadata objects list, and supports case
-     * insensitive look ups.
+     * method specification, this collection is unmodifiable, imposes the same column ordering as the column metadata objects list, and supports case-insensitive lookups.
      */
     private final class ColumnNamesCollection implements Collection<String>
     {
@@ -191,17 +232,6 @@ public class JdbcRowMetadata implements RowMetadata
         }
 
         /**
-         * Returns an {@code UnsupportedOperationException} with a message indicating that {@link #getColumnNames()} returns a collection which is not
-         * modifiable.
-         *
-         * @return A exception indicating that this collection is not modifiable.
-         */
-        private UnsupportedOperationException modificationNotSupported()
-        {
-            return new UnsupportedOperationException("The getColumnNames() Collection is unmodifiable");
-        }
-
-        /**
          * {@inheritDoc}
          * <p>
          * Prevents modification by throwing {@code UnsupportedOperationException}
@@ -289,7 +319,7 @@ public class JdbcRowMetadata implements RowMetadata
          * </p>
          *
          * @implNote Unchecked class cast warnings are suppressed for casting the column name {@cod String} objects as {@code (T)} type objects which are stored
-         *           in a {@code T[]} array. An {@code ArrayStoreException} results at runtime if {@code T} is not {@code String}.
+         * in a {@code T[]} array. An {@code ArrayStoreException} results at runtime if {@code T} is not {@code String}.
          */
         @Override
         @SuppressWarnings("unchecked")
@@ -314,12 +344,12 @@ public class JdbcRowMetadata implements RowMetadata
          * </p>
          *
          * @implNote As specified by the {@code Collection} interface, the the {@code array} object is returned if it has capacity to store all column names. A
-         *           null value is set after the last column name if the {@code array} capacity exceeds the number of column names. Otherwise, a newly allocated
-         *           array is returned if the {@code array} does not have capacity to store all column names.
+         * null value is set after the last column name if the {@code array} capacity exceeds the number of column names. Otherwise, a newly allocated
+         * array is returned if the {@code array} does not have capacity to store all column names.
          * @implNote Unchecked class cast warnings are suppressed for invocations of {@link java.lang.reflect.Array#newInstance(Class, int)} which returns a
-         *           {@code T[]} as {@code Object}.
+         * {@code T[]} as {@code Object}.
          * @implNote Unchecked class cast warnings are suppressed for casting the column name {@cod String} objects as {@code (T)} type objects which are stored
-         *           in a {@code T[]} array. An {@code ArrayStoreException} results at runtime if {@code T} is not {@code String}.
+         * in a {@code T[]} array. An {@code ArrayStoreException} results at runtime if {@code T} is not {@code String}.
          */
         @Override
         @SuppressWarnings("unchecked")
@@ -345,48 +375,17 @@ public class JdbcRowMetadata implements RowMetadata
 
             return array;
         }
-    }
 
-    /**
-     * @param resultSet {@link ResultSet}
-     * @param codecs {@link Codecs}
-     *
-     * @return {@link List}
-     *
-     * @throws SQLException Falls was schief geht.
-     */
-    public static RowMetadata of(final ResultSet resultSet, final Codecs codecs) throws SQLException
-    {
-        if (resultSet == null)
+        /**
+         * Returns an {@code UnsupportedOperationException} with a message indicating that {@link #getColumnNames()} returns a collection which is not
+         * modifiable.
+         *
+         * @return an exception indicating that this collection is not modifiable.
+         */
+        private UnsupportedOperationException modificationNotSupported()
         {
-            return new JdbcRowMetadata(Collections.emptyList());
+            return new UnsupportedOperationException("The getColumnNames() Collection is unmodifiable");
         }
-
-        ResultSetMetaData metaData = resultSet.getMetaData();
-        List<ColumnMetadata> list = new ArrayList<>();
-
-        for (int column = 1; column <= metaData.getColumnCount(); column++)
-        {
-            String name = metaData.getColumnLabel(column);
-            int sqlType = metaData.getColumnType(column);
-            JDBCType jdbcType = JDBCType.valueOf(sqlType);
-            int precision = metaData.getPrecision(column);
-            int scale = metaData.getScale(column);
-
-            Nullability nullability = switch (metaData.isNullable(column))
-            {
-                case ResultSetMetaData.columnNoNulls -> Nullability.NON_NULL;
-                case ResultSetMetaData.columnNullable -> Nullability.NULLABLE;
-
-                default -> Nullability.UNKNOWN;
-            };
-
-            Class<?> javaType = codecs.getJavaType(jdbcType);
-
-            list.add(new JdbcColumnMetadata(name, column - 1, javaType, jdbcType, nullability, precision, scale));
-        }
-
-        return new JdbcRowMetadata(list);
     }
 
     /**
@@ -394,8 +393,8 @@ public class JdbcRowMetadata implements RowMetadata
      */
     private final List<ColumnMetadata> columnMetaDatas;
     /**
-    *
-    */
+     *
+     */
     private final Map<String, ColumnMetadata> columnMetaDatasByName = new LinkedHashMap<>();
     /**
      *
@@ -413,7 +412,8 @@ public class JdbcRowMetadata implements RowMetadata
 
         this.columnMetaDatas = Objects.requireNonNull(columnMetaDatas, "columnMetaDatas must not be null");
 
-        columnMetaDatas.forEach(cmd -> {
+        columnMetaDatas.forEach(cmd ->
+        {
             // Bei Spalten mit identischen Namen, immer den ersten nehmen, laut Spezifikation.
             String name = cmd.getName().toLowerCase();
 

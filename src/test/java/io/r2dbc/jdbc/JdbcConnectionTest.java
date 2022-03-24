@@ -18,13 +18,12 @@ import java.sql.SQLException;
 import java.sql.SQLNonTransientConnectionException;
 import java.sql.SQLTransactionRollbackException;
 
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-
 import io.r2dbc.jdbc.codecs.Codecs;
 import io.r2dbc.jdbc.codecs.DefaultCodecs;
 import io.r2dbc.spi.R2dbcNonTransientResourceException;
 import io.r2dbc.spi.R2dbcRollbackException;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import reactor.test.StepVerifier;
 
 /**
@@ -33,8 +32,8 @@ import reactor.test.StepVerifier;
 final class JdbcConnectionTest
 {
     /**
-    *
-    */
+     *
+     */
     private final Codecs codecs = new DefaultCodecs();
     /**
      *
@@ -51,7 +50,7 @@ final class JdbcConnectionTest
     }
 
     /**
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     @Test
     void testBeginTransactionErrorResponse() throws SQLException
@@ -65,7 +64,7 @@ final class JdbcConnectionTest
     }
 
     /**
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     @Test
     void testBeginTransactionInTransaction() throws SQLException
@@ -77,7 +76,7 @@ final class JdbcConnectionTest
     }
 
     /**
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     @Test
     void testClose() throws SQLException
@@ -88,7 +87,7 @@ final class JdbcConnectionTest
     }
 
     /**
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     @Test
     void testCloseWhenClosed() throws SQLException
@@ -100,7 +99,7 @@ final class JdbcConnectionTest
     }
 
     /**
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     @Test
     void testCommitTransaction() throws SQLException
@@ -111,7 +110,7 @@ final class JdbcConnectionTest
     }
 
     /**
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     @Test
     void testCommitTransactionErrorResponse() throws SQLException
@@ -124,7 +123,7 @@ final class JdbcConnectionTest
     }
 
     /**
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     @Test
     void testCommitTransactionNonOpen() throws SQLException
@@ -214,7 +213,7 @@ final class JdbcConnectionTest
     }
 
     /**
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     @Test
     void testRollbackTransaction() throws SQLException
@@ -225,7 +224,7 @@ final class JdbcConnectionTest
     }
 
     /**
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     @Test
     void testRollbackTransactionErrorResponse() throws SQLException
@@ -238,7 +237,7 @@ final class JdbcConnectionTest
     }
 
     /**
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     @Test
     void testRollbackTransactionNonOpen() throws SQLException

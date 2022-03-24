@@ -41,6 +41,40 @@ public class JdbcStatement extends AbstractJdbcStatement
     }
 
     /**
+     * @see io.r2dbc.spi.Statement#execute()
+     */
+    @Override
+    public Flux<Result> execute()
+    {
+        getBindings().validateBinds();
+
+        // @formatter:off
+        return Flux.fromArray(getSql().split(";"))
+                .map(String::trim)
+                .flatMap(sql ->
+                     createExecuteMono(getJdbcConnection(), sql).handle((context, sink) -> {
+                        try
+                        {
+                            PreparedStatement stmt = context.getStmt();
+                            ResultSet resultSet = context.getResultSet();
+                            int[] affectedRows = context.getAffectedRows();
+
+                            Result result = createResult(stmt, resultSet, affectedRows);
+
+                            sink.next(result);
+
+                            sink.complete();
+                        }
+                        catch (SQLException sex)
+                        {
+                            sink.error(sex);
+                        }
+                    }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(JdbcResult.class)
+        );
+        // @formatter:on
+    }
+
+    /**
      * @param connection {@link java.sql.Connection}
      * @param sql String
      *
@@ -50,7 +84,8 @@ public class JdbcStatement extends AbstractJdbcStatement
     {
         if (SQL_OPERATION.SELECT.equals(getSqlOperation()))
         {
-            return Mono.fromCallable(() -> {
+            return Mono.fromCallable(() ->
+            {
                 if (getLogger().isDebugEnabled())
                 {
                     getLogger().debug("prepare statement: {}", prepareSqlForLog(sql));
@@ -71,7 +106,8 @@ public class JdbcStatement extends AbstractJdbcStatement
         }
         else if (SQL_OPERATION.INSERT.equals(getSqlOperation()))
         {
-            return Mono.fromCallable(() -> {
+            return Mono.fromCallable(() ->
+            {
                 if (getLogger().isDebugEnabled())
                 {
                     getLogger().debug("prepare statement: {}", prepareSqlForLog(sql));
@@ -93,7 +129,8 @@ public class JdbcStatement extends AbstractJdbcStatement
             });
         }
 
-        return Mono.fromCallable(() -> {
+        return Mono.fromCallable(() ->
+        {
             if (getLogger().isDebugEnabled())
             {
                 getLogger().debug("prepare statement: {}", prepareSqlForLog(sql));
@@ -121,7 +158,7 @@ public class JdbcStatement extends AbstractJdbcStatement
      *
      * @return {@link Result}
      *
-     * @throws SQLException Falls was schief geht.
+     * @throws SQLException Falls was schiefgeht.
      */
     @SuppressWarnings("unchecked")
     protected Result createResult(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows) throws SQLException
@@ -129,7 +166,8 @@ public class JdbcStatement extends AbstractJdbcStatement
         RowMetadata rowMetadata = JdbcRowMetadata.of(resultSet, getCodecs());
         Iterable<ColumnMetadata> columnMetaDatas = (Iterable<ColumnMetadata>) rowMetadata.getColumnMetadatas();
 
-        Flux<Row> rows = Flux.generate((final SynchronousSink<Row> sink) -> {
+        Flux<Row> rows = Flux.generate((final SynchronousSink<Row> sink) ->
+        {
             try
             {
                 if ((resultSet != null) && resultSet.next())
@@ -175,40 +213,6 @@ public class JdbcStatement extends AbstractJdbcStatement
         // Flux<Integer> rowsUpdated = affectedRows != null ? Flux.fromStream(IntStream.of(affectedRows).boxed()) : Flux.empty();
 
         return new JdbcResult(rows, Mono.just(rowMetadata), rowsUpdated);
-    }
-
-    /**
-     * @see io.r2dbc.spi.Statement#execute()
-     */
-    @Override
-    public Flux<Result> execute()
-    {
-        getBindings().validateBinds();
-
-        // @formatter:off
-        return Flux.fromArray(getSql().split(";"))
-                .map(String::trim)
-                .flatMap(sql ->
-                     createExecuteMono(getJdbcConnection(), sql).handle((context, sink) -> {
-                        try
-                        {
-                            PreparedStatement stmt = context.getStmt();
-                            ResultSet resultSet = context.getResultSet();
-                            int[] affectedRows = context.getAffectedRows();
-
-                            Result result = createResult(stmt, resultSet, affectedRows);
-
-                            sink.next(result);
-
-                            sink.complete();
-                        }
-                        catch (SQLException sex)
-                        {
-                            sink.error(sex);
-                        }
-                    }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(JdbcResult.class)
-        );
-        // @formatter:on
     }
 
     /**
