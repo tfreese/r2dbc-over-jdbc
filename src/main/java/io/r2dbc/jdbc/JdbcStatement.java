@@ -50,7 +50,7 @@ public class JdbcStatement extends AbstractJdbcStatement
 
         // @formatter:off
         return Flux.fromArray(getSql().split(";"))
-                .map(String::trim)
+                .map(String::strip)
                 .flatMap(sql ->
                      createExecuteMono(getJdbcConnection(), sql).handle((context, sink) -> {
                         try
