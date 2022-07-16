@@ -14,7 +14,7 @@
     <packaging>jar</packaging>
 
     <name>${project.groupId} - ${project.artifactId}</name>
-    <description>Reactive Relational Database Connectivity over JDBC Implementation</description>
+    <description>Reactive Relational Database Connectivity over JDBC Implementation.</description>
 
     <properties>
         <version_io.r2dbc_r2dbc-spi>0.8.6.RELEASE</version_io.r2dbc_r2dbc-spi>
