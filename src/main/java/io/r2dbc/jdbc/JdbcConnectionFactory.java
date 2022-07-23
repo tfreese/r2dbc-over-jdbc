@@ -41,7 +41,7 @@ public final class JdbcConnectionFactory implements ConnectionFactory
 
         Objects.requireNonNull(dataSource, "dataSource must not be null");
 
-        this.jdbcConnectionFactory = Mono.fromCallable(dataSource::getConnection).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create);
+        this.jdbcConnectionFactory = Mono.fromCallable(dataSource::getConnection).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert);
         this.codecs = new DefaultCodecs();
     }
 

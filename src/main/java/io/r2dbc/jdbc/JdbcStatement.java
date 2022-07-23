@@ -69,7 +69,7 @@ public class JdbcStatement extends AbstractJdbcStatement
                         {
                             sink.error(sex);
                         }
-                    }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(JdbcResult.class)
+                    }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).cast(JdbcResult.class)
         );
         // @formatter:on
     }
@@ -207,7 +207,7 @@ public class JdbcStatement extends AbstractJdbcStatement
             {
                 sink.error(sex);
             }
-        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create);
+        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert);
 
         Mono<Integer> rowsUpdated = affectedRows != null ? Mono.just(IntStream.of(affectedRows).sum()) : Mono.empty();
         // Flux<Integer> rowsUpdated = affectedRows != null ? Flux.fromStream(IntStream.of(affectedRows).boxed()) : Flux.empty();

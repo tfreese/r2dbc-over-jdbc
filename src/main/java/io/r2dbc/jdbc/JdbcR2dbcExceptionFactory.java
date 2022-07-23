@@ -131,9 +131,10 @@ public final class JdbcR2dbcExceptionFactory
 
     /**
      * @param ex {@link SQLException}
+     *
      * @return {@link R2dbcException}
      */
-    public static R2dbcException create(final SQLException ex)
+    public static R2dbcException convert(final SQLException ex)
     {
         if (ex.getClass() == SQLDataException.class)
         {

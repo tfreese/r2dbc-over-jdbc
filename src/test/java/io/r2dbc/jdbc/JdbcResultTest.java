@@ -59,7 +59,7 @@ final class JdbcResultTest
 
         when(result.map(any())).thenAnswer(arg ->
                 Flux.error(new SQLIntegrityConstraintViolationException("can't do something", "some state", 999)).onErrorMap(SQLException.class,
-                        JdbcR2dbcExceptionFactory::create)
+                        JdbcR2dbcExceptionFactory::convert)
         );
         when(result.getRowsUpdated()).thenReturn(Mono.empty());
 
