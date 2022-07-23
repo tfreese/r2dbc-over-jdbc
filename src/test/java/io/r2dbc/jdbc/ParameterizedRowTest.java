@@ -17,6 +17,18 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
+import io.r2dbc.jdbc.codecs.Codecs;
+import io.r2dbc.jdbc.codecs.DefaultCodecs;
+import io.r2dbc.jdbc.util.DbServerExtension;
+import io.r2dbc.jdbc.util.JanitorInvocationInterceptor;
+import io.r2dbc.jdbc.util.MultiDatabaseExtension;
+import io.r2dbc.spi.ColumnMetadata;
+import io.r2dbc.spi.Connection;
+import io.r2dbc.spi.ConnectionFactories;
+import io.r2dbc.spi.ConnectionFactory;
+import io.r2dbc.spi.ConnectionFactoryOptions;
+import io.r2dbc.spi.Nullability;
+import io.r2dbc.spi.RowMetadata;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,19 +37,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-
-import io.r2dbc.jdbc.codecs.Codecs;
-import io.r2dbc.jdbc.codecs.DefaultCodecs;
-import io.r2dbc.jdbc.util.DbServerExtension;
-import io.r2dbc.jdbc.util.MultiDatabaseExtension;
-import io.r2dbc.jdbc.util.JanitorInvocationInterceptor;
-import io.r2dbc.spi.ColumnMetadata;
-import io.r2dbc.spi.Connection;
-import io.r2dbc.spi.ConnectionFactories;
-import io.r2dbc.spi.ConnectionFactory;
-import io.r2dbc.spi.ConnectionFactoryOptions;
-import io.r2dbc.spi.Nullability;
-import io.r2dbc.spi.RowMetadata;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -49,8 +48,8 @@ import reactor.test.StepVerifier;
 final class ParameterizedRowTest
 {
     /**
-    *
-    */
+     *
+     */
     @RegisterExtension
     static final MultiDatabaseExtension DATABASE_EXTENSION = new MultiDatabaseExtension();
 
@@ -186,7 +185,7 @@ final class ParameterizedRowTest
 
         // @formatter:off
         Flux.usingWhen(connectionFactory.create(),
-                connection ->  Flux.from(connection.createStatement("SELECT value as ALIASED_VALUE FROM tbl").execute())
+                connection ->  Flux.from(connection.createStatement("SELECT test_value as ALIASED_VALUE FROM tbl").execute())
                 .flatMap(result -> Flux.from(result.map((row, rowMetadata) ->
                             row.get("ALIASED_VALUE", Integer.class)
                             )
@@ -216,7 +215,7 @@ final class ParameterizedRowTest
         //
         // @formatter:off
 //        Mono.from(this.connectionFactory.create())
-//            .flatMapMany(connection -> Flux.from(connection.createStatement("SELECT value FROM tbl").execute())
+//            .flatMapMany(connection -> Flux.from(connection.createStatement("SELECT test_value FROM tbl").execute())
 //                .flatMap(TestKit::extractColumns)
 //                .concatWith(TestKit.close(connection)))
 //        .as(StepVerifier::create)
@@ -228,12 +227,12 @@ final class ParameterizedRowTest
 
         try
         {
-            // awaitExecution(connection.createStatement("CREATE TABLE tbl ( value INTEGER )"));
+            // awaitExecution(connection.createStatement("CREATE TABLE tbl ( test_value INTEGER )"));
 
             awaitUpdate(1, connection.createStatement("INSERT INTO tbl VALUES (100)"));
 
-            awaitQuery(List.of(100), row -> row.get(0, Integer.class), connection.createStatement("SELECT value FROM tbl"));
-            awaitQuery(List.of(100), row -> row.get("value", Integer.class), connection.createStatement("SELECT value FROM tbl"));
+            awaitQuery(List.of(100), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
+            awaitQuery(List.of(100), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
         }
         finally
         {

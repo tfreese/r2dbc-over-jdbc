@@ -3,6 +3,12 @@ package io.r2dbc.jdbc;
 
 import java.util.stream.Stream;
 
+import io.r2dbc.client.R2dbc;
+import io.r2dbc.jdbc.util.DbServerExtension;
+import io.r2dbc.jdbc.util.JanitorInvocationInterceptor;
+import io.r2dbc.jdbc.util.MultiDatabaseExtension;
+import io.r2dbc.spi.ConnectionFactories;
+import io.r2dbc.spi.ConnectionFactoryOptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -10,13 +16,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-
-import io.r2dbc.client.R2dbc;
-import io.r2dbc.jdbc.util.DbServerExtension;
-import io.r2dbc.jdbc.util.MultiDatabaseExtension;
-import io.r2dbc.jdbc.util.JanitorInvocationInterceptor;
-import io.r2dbc.spi.ConnectionFactories;
-import io.r2dbc.spi.ConnectionFactoryOptions;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -55,7 +54,7 @@ final class ParameterizedR2dbcClientTest
                 ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build();
         R2dbc r2dbc = new R2dbc(ConnectionFactories.get(connectionFactoryOptions));
 
-       // @formatter:off
+        // @formatter:off
        r2dbc.inTransaction(handle -> handle.execute("INSERT INTO tbl VALUES (?)", 200))
            .as(StepVerifier::create)
            .expectNext(1).as("value from insertion")
@@ -77,7 +76,7 @@ final class ParameterizedR2dbcClientTest
                 ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build();
         R2dbc r2dbc = new R2dbc(ConnectionFactories.get(connectionFactoryOptions));
 
-       // @formatter:off
+        // @formatter:off
        r2dbc.inTransaction(handle -> handle.execute("INSERT INTO tbl VALUES (?)", 100)
                .concatWith(handle.execute("INSERT INTO tbl VALUES (?)", 200))
                .concatWith(handle.execute("INSERT INTO tbl VALUES (?)", 300))
@@ -106,8 +105,8 @@ final class ParameterizedR2dbcClientTest
 
         // @formatter:off
         r2dbc.inTransaction(handle -> handle.execute("INSERT INTO tbl VALUES (?)", 100))
-            .concatWith(r2dbc.inTransaction(handle -> handle.select("SELECT value FROM tbl")
-                .mapResult(result -> Flux.from(result.map((row, rowMetadata) -> row.get("value", Integer.class)))))
+            .concatWith(r2dbc.inTransaction(handle -> handle.select("SELECT test_value FROM tbl")
+                .mapResult(result -> Flux.from(result.map((row, rowMetadata) -> row.get("test_value", Integer.class)))))
                 )
             .as(StepVerifier::create)
             .expectNext(1).as("value from insertion")
