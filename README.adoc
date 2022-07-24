@@ -1,18 +1,23 @@
 = r2dbc-over-jdbc - Reactive Relational Database Connectivity over JDBC
 
-
 *This is just an experimental and research Project and not designed for production use ... but it works !*
 
 See https://github.com/oracle/oracle-r2dbc [window="_blank"] +
-
 
 == Type-Mapping
 Adapt the `io.r2dbc.jdbc.codecs.Codec` Interface to match your needs !
 
 See `io.r2dbc.jdbc.codecs.DefaultCodecs`
 
-ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.CODECS, new MyCodecs())
-
+[source,java,indent=0]
+----
+ConnectionFactoryOptions options = ConnectionFactoryOptions.builder()
+.option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource())
+.option(JdbcConnectionFactoryProvider.CODECS, new MyCodecs()) // optional
+.build();
+ConnectionFactory connectionFactory = ConnectionFactories.get(options);
+----
 
 == Limitations
+
 * No support for named parameters, only '?'

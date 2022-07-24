@@ -118,8 +118,14 @@ final class ParameterizedExampleTest
     @MethodSource("getDatabases")
     void testBatchAutoIncrement(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
     {
-        ConnectionFactory connectionFactory =
-                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+        // @formatter:off
+        ConnectionFactoryOptions options = ConnectionFactoryOptions.builder()
+                .option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource())
+                //.option(JdbcConnectionFactoryProvider.CODECS, new MyCodecs()) // optional
+                .build()
+                ;
+        ConnectionFactory connectionFactory = ConnectionFactories.get(options);
+        // @formatter:on
 
         // @formatter:off
         Flux.usingWhen(connectionFactory.create(),
