@@ -41,6 +41,13 @@ public class IntegerCodec extends AbstractNumberCodec<Integer>
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Integer value) throws SQLException
     {
-        preparedStatement.setInt(parameterIndex, value);
+        if (value == null)
+        {
+            preparedStatement.setNull(parameterIndex, JDBCType.INTEGER.getVendorTypeNumber());
+        }
+        else
+        {
+            preparedStatement.setInt(parameterIndex, value);
+        }
     }
 }

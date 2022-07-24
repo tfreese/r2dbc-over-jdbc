@@ -76,12 +76,12 @@ final class ParameterizedExampleTest
         try
         {
             // @formatter:off
-            awaitUpdate(5, connection.createStatement("INSERT INTO tbl VALUES (?)")
+            awaitUpdate(5L, connection.createStatement("INSERT INTO test VALUES (?)")
                     .bind(0, 1).add()
                     .bind(0, 2).add()
                     .bind(0, 3).add()
                     .bind(0, 4).add()
-                    .bind(0, 5).add()
+                    .bind(0, 5)
                     );
             // @formatter:on
         }
@@ -95,7 +95,7 @@ final class ParameterizedExampleTest
         //        // @formatter:off
 //        Mono.from(connectionFactory.create())
 //            .flatMapMany(connection -> {
-//                Statement statement = connection.createStatement("INSERT INTO tbl VALUES (?)");
+//                Statement statement = connection.createStatement("INSERT INTO test VALUES (?)");
 //
 //                IntStream.range(0, 10).forEach(i -> statement.bind(0, i).add());
 //
@@ -124,9 +124,17 @@ final class ParameterizedExampleTest
         // @formatter:off
         Flux.usingWhen(connectionFactory.create(),
             connection -> {
-                Statement statement = connection.createStatement("INSERT INTO tbl_auto (test_value) VALUES (?)");
+                Statement statement = connection.createStatement("INSERT INTO test_auto (test_value) VALUES (?)");
 
-                IntStream.range(0, 10).forEach(i -> statement.bind(0, i).add());
+                IntStream.range(0, 10).forEach((i) ->
+                {
+                    statement.bind(0, i);
+
+                    if (i != 9)
+                    {
+                        statement.add();
+                    }
+                });
 
                 return Flux.from(statement.returnGeneratedValues().execute())
                         .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Integer.class)))
@@ -159,23 +167,23 @@ final class ParameterizedExampleTest
         try
         {
             awaitNone(connection.beginTransaction());
-            awaitUpdate(1, connection.createStatement("INSERT INTO tbl VALUES (100)"));
-            awaitUpdate(3, connection.createStatement("INSERT INTO tbl VALUES (?)").bind(0, 200).add().bind(0, 300).add().bind(0, 400));
-            awaitQuery(List.of(100, 200, 300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
-            awaitQuery(List.of(100, 200, 300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
+            awaitUpdate(1L, connection.createStatement("INSERT INTO test VALUES (100)"));
+            awaitUpdate(3L, connection.createStatement("INSERT INTO test VALUES (?)").bind(0, 200).add().bind(0, 300).add().bind(0, 400));
+            awaitQuery(List.of(100, 200, 300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
+            awaitQuery(List.of(100, 200, 300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
             awaitNone(connection.commitTransaction());
 
-            awaitQuery(List.of(100, 200, 300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
-            awaitQuery(List.of(100, 200, 300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
+            awaitQuery(List.of(100, 200, 300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
+            awaitQuery(List.of(100, 200, 300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
 
             awaitNone(connection.beginTransaction());
-            awaitUpdate(2, connection.createStatement("DELETE FROM tbl where test_value < ?").bind(0, 255));
-            awaitQuery(List.of(300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
-            awaitQuery(List.of(300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
+            awaitUpdate(2, connection.createStatement("DELETE FROM test where test_value < ?").bind(0, 255));
+            awaitQuery(List.of(300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
+            awaitQuery(List.of(300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
             awaitNone(connection.commitTransaction());
 
-            awaitQuery(List.of(300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
-            awaitQuery(List.of(300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
+            awaitQuery(List.of(300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
+            awaitQuery(List.of(300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
         }
         finally
         {
@@ -184,37 +192,37 @@ final class ParameterizedExampleTest
 
         assertTrue(true);
 
-        // server.getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
+        // server.getJdbcOperations().execute("INSERT INTO test VALUES (100)");
         //
         //        // @formatter:off
 //        Mono.from(connectionFactory.create())
 //            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-//                    .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
+//                    .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO test VALUES (?)")
 //                                .bind(0, 200)
 //                                .add().bind(0, 300)
 //                                .add().bind(0, 400)
 //                                .execute())
 //                            .flatMap(TestKit::extractRowsUpdated))
-//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM tbl")
+//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
 //                                .execute())
 //                            .flatMap(TestKit::extractColumns))
 //                    .concatWith(connection.commitTransaction())
 //
 //
-//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM tbl")
+//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
 //                                .execute())
 //                            .flatMap(TestKit::extractColumns))
 //
 //
 //                    .concatWith(connection.beginTransaction())
-//                    .concatWith(Flux.from(connection.createStatement("DELETE FROM tbl where test_value < ?")
+//                    .concatWith(Flux.from(connection.createStatement("DELETE FROM test where test_value < ?")
 //                                .bind(0, 255)
 //                                .execute())
 //                            .flatMap(TestKit::extractRowsUpdated))
 //                    .concatWith(connection.commitTransaction())
 //
 //
-//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM tbl")
+//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
 //                                .execute())
 //                            .flatMap(TestKit::extractColumns))
 //
@@ -248,23 +256,23 @@ final class ParameterizedExampleTest
         try
         {
             awaitNone(connection.beginTransaction());
-            awaitUpdate(1, connection.createStatement("INSERT INTO tbl VALUES (100)"));
-            awaitUpdate(3, connection.createStatement("INSERT INTO tbl VALUES (?)").bind(0, 200).add().bind(0, 300).add().bind(0, 400));
-            awaitQuery(List.of(100, 200, 300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
-            awaitQuery(List.of(100, 200, 300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
+            awaitUpdate(1L, connection.createStatement("INSERT INTO test VALUES (100)"));
+            awaitUpdate(3L, connection.createStatement("INSERT INTO test VALUES (?)").bind(0, 200).add().bind(0, 300).add().bind(0, 400));
+            awaitQuery(List.of(100, 200, 300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
+            awaitQuery(List.of(100, 200, 300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
             awaitNone(connection.commitTransaction());
 
-            awaitQuery(List.of(100, 200, 300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
-            awaitQuery(List.of(100, 200, 300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
+            awaitQuery(List.of(100, 200, 300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
+            awaitQuery(List.of(100, 200, 300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
 
             awaitNone(connection.beginTransaction());
-            awaitUpdate(2, connection.createStatement("DELETE FROM tbl where test_value < ?").bind(0, 255));
-            awaitQuery(List.of(300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
-            awaitQuery(List.of(300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
+            awaitUpdate(2, connection.createStatement("DELETE FROM test where test_value < ?").bind(0, 255));
+            awaitQuery(List.of(300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
+            awaitQuery(List.of(300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
             awaitNone(connection.rollbackTransaction());
 
-            awaitQuery(List.of(100, 200, 300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
-            awaitQuery(List.of(100, 200, 300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
+            awaitQuery(List.of(100, 200, 300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
+            awaitQuery(List.of(100, 200, 300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
         }
         finally
         {
@@ -290,10 +298,10 @@ final class ParameterizedExampleTest
 
         try
         {
-            awaitUpdate(List.of(5), connection.createStatement("INSERT INTO tbl VALUES (100), (200), (300), (400), (500)"));
-            awaitUpdate(2, connection.createStatement("DELETE FROM tbl where test_value = ?").bind(0, 300).add().bind(0, 400));
-            awaitQuery(List.of(100, 200, 500), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
-            awaitQuery(List.of(100, 200, 500), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
+            awaitUpdate(List.of(5L), connection.createStatement("INSERT INTO test VALUES (100), (200), (300), (400), (500)"));
+            awaitUpdate(2, connection.createStatement("DELETE FROM test where test_value = ?").bind(0, 300).add().bind(0, 400));
+            awaitQuery(List.of(100, 200, 500), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
+            awaitQuery(List.of(100, 200, 500), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
         }
         finally
         {
@@ -302,12 +310,12 @@ final class ParameterizedExampleTest
 
         assertTrue(true);
 
-        // server.getJdbcOperations().execute("INSERT INTO tbl VALUES (100, 200, 300, 400, 500)");
+        // server.getJdbcOperations().execute("INSERT INTO test VALUES (100, 200, 300, 400, 500)");
         //
         //        // @formatter:off
 //        Mono.from(connectionFactory.create())
 //            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-//                    .<Object>thenMany(Flux.from(connection.createStatement("DELETE FROM tbl where test_value < ?")
+//                    .<Object>thenMany(Flux.from(connection.createStatement("DELETE FROM test where test_value < ?")
 //                                .bind(0, 300)
 //                                .add().bind(0, 400)
 //                                .execute())
@@ -315,7 +323,7 @@ final class ParameterizedExampleTest
 //                    .concatWith(connection.commitTransaction())
 //
 //
-//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM tbl")
+//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
 //                                .execute())
 //                            .flatMap(TestKit::extractColumns))
 //
@@ -346,12 +354,8 @@ final class ParameterizedExampleTest
         try
         {
             // @formatter:off
-            awaitUpdate(1, connection.createStatement("INSERT INTO tbl VALUES (?)")
-                    .bind(0, 1).add()
-                    .add()
-                    .add()
-                    .add()
-                    .add()
+            awaitUpdate(1, connection.createStatement("INSERT INTO test VALUES (?)")
+                    .bind(0, 1)
                     );
             // @formatter:on
         }
@@ -365,7 +369,7 @@ final class ParameterizedExampleTest
         //        // @formatter:off
 //       Mono.from(connectionFactory.create())
 //           .flatMapMany(connection -> {
-//               Statement statement = connection.createStatement("INSERT INTO tbl VALUES (?)")
+//               Statement statement = connection.createStatement("INSERT INTO test VALUES (?)")
 //                       .bind(0, 2)
 //                       .add()
 //                       .add()
@@ -394,23 +398,23 @@ final class ParameterizedExampleTest
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
-        server.getJdbcOperations().execute("INSERT INTO tbl VALUES (100), (200)");
+        server.getJdbcOperations().execute("INSERT INTO test VALUES (100), (200)");
 
         // @formatter:off
         Flux.usingWhen(connectionFactory.create(),
                 connection -> Mono.from(connection
                         .beginTransaction())
-                        .<Object>thenMany(Flux.from(connection.createStatement("SELECT test_value FROM tbl")
+                        .<Object>thenMany(Flux.from(connection.createStatement("SELECT test_value FROM test")
                                 .execute())
                             .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Integer.class)))
                                     .collectList()))
 
-                        .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM tbl")
+                        .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
                                 .execute())
                             .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, String.class)))
                                     .collectList()))
 
-                        .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM tbl")
+                        .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
                                 .execute())
                             .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Double.class)))
                                     .collectList()))
@@ -441,30 +445,30 @@ final class ParameterizedExampleTest
         try
         {
             awaitNone(connection.beginTransaction());
-            awaitUpdate(1, connection.createStatement("INSERT INTO tbl VALUES (100)"));
-            awaitUpdate(3, connection.createStatement("INSERT INTO tbl VALUES (?)").bind(0, 200).add().bind(0, 300).add().bind(0, 400));
-            awaitQuery(List.of(100, 200, 300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
-            awaitQuery(List.of(100, 200, 300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
+            awaitUpdate(1L, connection.createStatement("INSERT INTO test VALUES (100)"));
+            awaitUpdate(3L, connection.createStatement("INSERT INTO test VALUES (?)").bind(0, 200).add().bind(0, 300).add().bind(0, 400));
+            awaitQuery(List.of(100, 200, 300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
+            awaitQuery(List.of(100, 200, 300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
             awaitNone(connection.commitTransaction());
 
-            awaitQuery(List.of(100, 200, 300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
-            awaitQuery(List.of(100, 200, 300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
+            awaitQuery(List.of(100, 200, 300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
+            awaitQuery(List.of(100, 200, 300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
 
             // @formatter:off
             awaitNone(connection.beginTransaction());
-            awaitUpdate(4, connection.createStatement("UPDATE tbl set test_value = ? where test_value = ?")
+            awaitUpdate(4, connection.createStatement("UPDATE test set test_value = ? where test_value = ?")
                     .bind(0, 199).bind(1, 100)
                     .add().bind(0, 299).bind(1, 200)
                     .add().bind(0, 399).bind(1, 300)
                     .add().bind(0, 499).bind(1, 400)
                     );
-            awaitQuery(List.of(199, 299, 399, 499), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
-            awaitQuery(List.of(199, 299, 399, 499), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
+            awaitQuery(List.of(199, 299, 399, 499), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
+            awaitQuery(List.of(199, 299, 399, 499), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
             awaitNone(connection.commitTransaction());
             // @formatter:on
 
-            awaitQuery(List.of(199, 299, 399, 499), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
-            awaitQuery(List.of(199, 299, 399, 499), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
+            awaitQuery(List.of(199, 299, 399, 499), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
+            awaitQuery(List.of(199, 299, 399, 499), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
         }
         finally
         {
@@ -473,30 +477,30 @@ final class ParameterizedExampleTest
 
         assertTrue(true);
 
-        // server.getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
+        // server.getJdbcOperations().execute("INSERT INTO test VALUES (100)");
         //
         //        // @formatter:off
 //        Mono.from(connectionFactory.create())
 //            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-//                    .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO tbl VALUES (?)")
+//                    .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO test VALUES (?)")
 //                                .bind(0, 200)
 //                                .add().bind(0, 300)
 //                                .add().bind(0, 400)
 //                                .execute())
 //                            .flatMap(TestKit::extractRowsUpdated))
-//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM tbl")
+//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
 //                                .execute())
 //                            .flatMap(TestKit::extractColumns))
 //                    .concatWith(connection.commitTransaction())
 //
 //
-//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM tbl")
+//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
 //                                .execute())
 //                            .flatMap(TestKit::extractColumns))
 //
 //
 //                    .concatWith(connection.beginTransaction())
-//                    .concatWith(Flux.from(connection.createStatement("UPDATE tbl set test_value = ? where test_value = ?")
+//                    .concatWith(Flux.from(connection.createStatement("UPDATE test set test_value = ? where test_value = ?")
 //                                .bind(0, 199).bind(1, 100)
 //                                .add().bind(0, 299).bind(1, 200)
 //                                .add().bind(0, 399).bind(1, 300)
@@ -506,7 +510,7 @@ final class ParameterizedExampleTest
 //                    .concatWith(connection.commitTransaction())
 //
 //
-//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM tbl")
+//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
 //                                .execute())
 //                            .flatMap(TestKit::extractColumns))
 //

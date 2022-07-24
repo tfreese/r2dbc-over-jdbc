@@ -41,6 +41,13 @@ public class DoubleCodec extends AbstractNumberCodec<Double>
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Double value) throws SQLException
     {
-        preparedStatement.setDouble(parameterIndex, value);
+        if (value == null)
+        {
+            preparedStatement.setNull(parameterIndex, JDBCType.DOUBLE.getVendorTypeNumber());
+        }
+        else
+        {
+            preparedStatement.setDouble(parameterIndex, value);
+        }
     }
 }

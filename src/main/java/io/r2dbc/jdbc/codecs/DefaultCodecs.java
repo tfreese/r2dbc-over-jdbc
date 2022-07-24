@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import io.r2dbc.spi.Parameter;
+
 /**
  * Default implementation of {@link Codecs}.
  *
@@ -17,12 +19,12 @@ import java.util.Objects;
 public class DefaultCodecs implements Codecs
 {
     /**
-    *
-    */
+     *
+     */
     private final Map<Class<?>, Codec<?>> codecsForJavaType = new HashMap<>();
     /**
-    *
-    */
+     *
+     */
     private final Map<JDBCType, Codec<?>> codecsForJDBCType = new HashMap<>();
 
     /**
@@ -72,16 +74,29 @@ public class DefaultCodecs implements Codecs
     {
         Objects.requireNonNull(javaType, "javaType must not be null");
 
-        Codec<?> codec = this.codecsForJavaType.get(javaType);
+        Class<?> type = javaType;
+
+        if (Parameter.class.isAssignableFrom(javaType))
+        {
+            // Implementierungen sind private.
+            type = Parameter.class;
+        }
+
+        Codec<?> codec = this.codecsForJavaType.get(type);
 
         if (codec == null)
         {
-            codec = this.codecsForJavaType.get(javaType.getEnclosingClass());
+            codec = this.codecsForJavaType.get(type.getEnclosingClass());
         }
 
         if (codec == null)
         {
-            throw new IllegalArgumentException(String.format("No Codec found for JavaType %s", javaType.getSimpleName()));
+            codec = this.codecsForJavaType.get(type.getDeclaringClass());
+        }
+
+        if (codec == null)
+        {
+            throw new IllegalArgumentException(String.format("No Codec found for JavaType '%s'", javaType.getSimpleName()));
         }
 
         return (Codec<T>) codec;
@@ -103,7 +118,7 @@ public class DefaultCodecs implements Codecs
 
         if (codec == null)
         {
-            throw new IllegalArgumentException(String.format("No Codec found for type %s", jdbcType.getName()));
+            throw new IllegalArgumentException(String.format("No Codec found for JDBCType '%s'", jdbcType.getName()));
         }
 
         return (Codec<T>) codec;
@@ -116,6 +131,12 @@ public class DefaultCodecs implements Codecs
     public Class<?> getJavaType(final JDBCType jdbcType)
     {
         return get(jdbcType).getJavaType();
+    }
+
+    @Override
+    public JDBCType getJdbcType(final Class<?> javaType)
+    {
+        return get(javaType).supportedJdbcTypes().iterator().next();
     }
 
     /**
@@ -133,6 +154,7 @@ public class DefaultCodecs implements Codecs
         add(new LongCodec());
         add(new ObjectCodec());
         add(new StringCodec());
+        add(new ParameterCodec(this));
     }
 
     /**
@@ -155,9 +177,9 @@ public class DefaultCodecs implements Codecs
      */
     @Override
     @SuppressWarnings(
-    {
-            "unchecked", "rawtypes"
-    })
+            {
+                    "unchecked", "rawtypes"
+            })
     public <T> T mapTo(final JDBCType jdbcType, final Class<? extends T> javaType, final Object value)
     {
         Objects.requireNonNull(javaType, "javaType must not be null");
@@ -171,9 +193,9 @@ public class DefaultCodecs implements Codecs
      * @see io.r2dbc.jdbc.codecs.Codecs#mapToSql(java.lang.Class, java.sql.PreparedStatement, int, java.lang.Object)
      */
     @SuppressWarnings(
-    {
-            "rawtypes", "unchecked"
-    })
+            {
+                    "rawtypes", "unchecked"
+            })
     @Override
     public void mapToSql(final Class<?> javaType, final PreparedStatement preparedStatement, final int parameterIndex, final Object value) throws SQLException
     {

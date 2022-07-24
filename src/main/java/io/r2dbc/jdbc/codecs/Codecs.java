@@ -23,6 +23,15 @@ public interface Codecs
     Class<?> getJavaType(final JDBCType jdbcType);
 
     /**
+     * Returns the {@link JDBCType} for the JavaType
+     *
+     * @param javaType Class<?>
+     *
+     * @return JDBCType
+     */
+    JDBCType getJdbcType(final Class<?> javaType);
+
+    /**
      * Read an Object from a {@link ResultSet}.
      *
      * @param <T> Type

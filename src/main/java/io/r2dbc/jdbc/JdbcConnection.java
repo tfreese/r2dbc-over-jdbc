@@ -4,6 +4,7 @@ package io.r2dbc.jdbc;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Savepoint;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -14,7 +15,9 @@ import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionMetadata;
 import io.r2dbc.spi.IsolationLevel;
 import io.r2dbc.spi.Statement;
+import io.r2dbc.spi.TransactionDefinition;
 import io.r2dbc.spi.ValidationDepth;
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
@@ -63,11 +66,14 @@ public class JdbcConnection implements Connection
         this.jdbcConnectionMono = Mono.just(this.jdbcConnection);
     }
 
-    /**
-     * @see io.r2dbc.spi.Connection#beginTransaction()
-     */
     @Override
     public Mono<Void> beginTransaction()
+    {
+        return beginTransaction(null);
+    }
+
+    @Override
+    public Mono<Void> beginTransaction(final TransactionDefinition definition)
     {
         return this.jdbcConnectionMono.handle((con, sink) ->
         {
@@ -94,9 +100,6 @@ public class JdbcConnection implements Connection
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
-    /**
-     * @see io.r2dbc.spi.Connection#close()
-     */
     @Override
     public Mono<Void> close()
     {
@@ -125,9 +128,6 @@ public class JdbcConnection implements Connection
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
-    /**
-     * @see io.r2dbc.spi.Connection#commitTransaction()
-     */
     @Override
     public Mono<Void> commitTransaction()
     {
@@ -157,18 +157,12 @@ public class JdbcConnection implements Connection
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
-    /**
-     * @see io.r2dbc.spi.Connection#createBatch()
-     */
     @Override
     public Batch createBatch()
     {
         return new JdbcBatch(this);
     }
 
-    /**
-     * @see io.r2dbc.spi.Connection#createSavepoint(java.lang.String)
-     */
     @Override
     public Mono<Void> createSavepoint(final String name)
     {
@@ -211,9 +205,6 @@ public class JdbcConnection implements Connection
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
-    /**
-     * @see io.r2dbc.spi.Connection#createStatement(java.lang.String)
-     */
     @Override
     public Statement createStatement(final String sql)
     {
@@ -238,17 +229,6 @@ public class JdbcConnection implements Connection
         // }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(JdbcStatement.class).block();
     }
 
-    /**
-     * @return {@link Logger}
-     */
-    private Logger getLogger()
-    {
-        return LOGGER;
-    }
-
-    /**
-     * @see io.r2dbc.spi.Connection#getMetadata()
-     */
     @Override
     public ConnectionMetadata getMetadata()
     {
@@ -272,9 +252,6 @@ public class JdbcConnection implements Connection
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).cast(ConnectionMetadata.class).block();
     }
 
-    /**
-     * @see io.r2dbc.spi.Connection#getTransactionIsolationLevel()
-     */
     @Override
     public IsolationLevel getTransactionIsolationLevel()
     {
@@ -310,9 +287,6 @@ public class JdbcConnection implements Connection
         }
     }
 
-    /**
-     * @see io.r2dbc.spi.Connection#isAutoCommit()
-     */
     @Override
     public boolean isAutoCommit()
     {
@@ -342,9 +316,6 @@ public class JdbcConnection implements Connection
         // }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(Boolean.class).block();
     }
 
-    /**
-     * @see io.r2dbc.spi.Connection#releaseSavepoint(java.lang.String)
-     */
     @Override
     public Mono<Void> releaseSavepoint(final String name)
     {
@@ -375,9 +346,6 @@ public class JdbcConnection implements Connection
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
-    /**
-     * @see io.r2dbc.spi.Connection#rollbackTransaction()
-     */
     @Override
     public Mono<Void> rollbackTransaction()
     {
@@ -406,9 +374,6 @@ public class JdbcConnection implements Connection
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
-    /**
-     * @see io.r2dbc.spi.Connection#rollbackTransactionToSavepoint(java.lang.String)
-     */
     @Override
     public Mono<Void> rollbackTransactionToSavepoint(final String name)
     {
@@ -434,9 +399,6 @@ public class JdbcConnection implements Connection
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
-    /**
-     * @see io.r2dbc.spi.Connection#setAutoCommit(boolean)
-     */
     @Override
     public Mono<Void> setAutoCommit(final boolean autoCommit)
     {
@@ -458,9 +420,18 @@ public class JdbcConnection implements Connection
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
-    /**
-     * @see io.r2dbc.spi.Connection#setTransactionIsolationLevel(io.r2dbc.spi.IsolationLevel)
-     */
+    @Override
+    public Publisher<Void> setLockWaitTimeout(final Duration timeout)
+    {
+        return Mono.empty();
+    }
+
+    @Override
+    public Publisher<Void> setStatementTimeout(final Duration timeout)
+    {
+        return Mono.empty();
+    }
+
     @Override
     public Mono<Void> setTransactionIsolationLevel(final IsolationLevel isolationLevel)
     {
@@ -503,9 +474,6 @@ public class JdbcConnection implements Connection
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
-    /**
-     * @see io.r2dbc.spi.Connection#validate(io.r2dbc.spi.ValidationDepth)
-     */
     @Override
     public Mono<Boolean> validate(final ValidationDepth depth)
     {
@@ -524,5 +492,10 @@ public class JdbcConnection implements Connection
                 sink.error(sex);
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).cast(Boolean.class);
+    }
+
+    private Logger getLogger()
+    {
+        return LOGGER;
     }
 }

@@ -7,14 +7,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-
 import io.r2dbc.jdbc.codecs.BlobCodec;
 import io.r2dbc.jdbc.codecs.ClobCodec;
 import io.r2dbc.jdbc.util.DbServerExtension;
@@ -26,6 +18,13 @@ import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
 import io.r2dbc.spi.Result;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
@@ -37,13 +36,13 @@ import reactor.test.StepVerifier;
 class ParameterizedLobTest
 {
     /**
-    *
-    */
+     *
+     */
     static byte[] ALL_BYTES = new byte[-(-128) + 127];
 
     /**
-    *
-    */
+     *
+     */
     @RegisterExtension
     static final MultiDatabaseExtension DATABASE_EXTENSION = new MultiDatabaseExtension();
 
@@ -96,7 +95,7 @@ class ParameterizedLobTest
                                 .flatMap(Result::getRowsUpdated)
                         )
                 .as(StepVerifier::create)
-                .expectNext(0)
+                .expectNext(0L)
                 .verifyComplete();
         // @formatter:on
     }

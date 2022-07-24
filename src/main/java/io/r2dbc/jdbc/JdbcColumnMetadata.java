@@ -6,13 +6,14 @@ import java.util.Objects;
 
 import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Nullability;
+import io.r2dbc.spi.Type;
 
 /**
  * R2DBC Adapter for JDBC.
  *
  * @author Thomas Freese
  */
-public class JdbcColumnMetadata implements ColumnMetadata
+public class JdbcColumnMetadata implements ColumnMetadata, Type
 {
     /**
      *
@@ -55,7 +56,7 @@ public class JdbcColumnMetadata implements ColumnMetadata
      * @param scale int
      */
     public JdbcColumnMetadata(final String name, final int column, final Class<?> javaType, final JDBCType jdbcType, final Nullability nullability,
-            final int precision, final int scale)
+                              final int precision, final int scale)
     {
         super();
 
@@ -66,6 +67,12 @@ public class JdbcColumnMetadata implements ColumnMetadata
         this.nullability = Objects.requireNonNull(nullability, "nullability required");
         this.precision = precision;
         this.scale = scale;
+    }
+
+    @Override
+    public Type getType()
+    {
+        return this;
     }
 
     /**
@@ -97,54 +104,36 @@ public class JdbcColumnMetadata implements ColumnMetadata
         return this.column;
     }
 
-    /**
-     * @see io.r2dbc.spi.ColumnMetadata#getJavaType()
-     */
     @Override
     public Class<?> getJavaType()
     {
         return this.javaType;
     }
 
-    /**
-     * @see io.r2dbc.spi.ColumnMetadata#getName()
-     */
     @Override
     public String getName()
     {
         return this.name;
     }
 
-    /**
-     * @see io.r2dbc.spi.ColumnMetadata#getNativeTypeMetadata()
-     */
     @Override
     public JDBCType getNativeTypeMetadata()
     {
         return this.jdbcType;
     }
 
-    /**
-     * @see io.r2dbc.spi.ColumnMetadata#getNullability()
-     */
     @Override
     public Nullability getNullability()
     {
         return this.nullability;
     }
 
-    /**
-     * @see io.r2dbc.spi.ColumnMetadata#getPrecision()
-     */
     @Override
     public Integer getPrecision()
     {
         return this.precision;
     }
 
-    /**
-     * @see io.r2dbc.spi.ColumnMetadata#getScale()
-     */
     @Override
     public Integer getScale()
     {

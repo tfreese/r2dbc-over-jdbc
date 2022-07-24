@@ -19,9 +19,6 @@ public final class JdbcConnectionFactoryMetadata implements ConnectionFactoryMet
      */
     public static final String NAME = "jdbc";
 
-    /**
-     * @see io.r2dbc.spi.ConnectionFactoryMetadata#getName()
-     */
     @Override
     public String getName()
     {

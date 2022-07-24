@@ -27,9 +27,6 @@ public final class JdbcConnectionFactoryProvider implements ConnectionFactoryPro
      */
     public static final Option<DataSource> DATASOURCE = Option.valueOf("datasource");
 
-    /**
-     * @see io.r2dbc.spi.ConnectionFactoryProvider#create(io.r2dbc.spi.ConnectionFactoryOptions)
-     */
     @Override
     public ConnectionFactory create(final ConnectionFactoryOptions connectionFactoryOptions)
     {
@@ -37,31 +34,25 @@ public final class JdbcConnectionFactoryProvider implements ConnectionFactoryPro
 
         // @formatter:off
         JdbcConnectionConfiguration.Builder builder = JdbcConnectionConfiguration.builder()
-                .dataSource(connectionFactoryOptions.getValue(DATASOURCE))
-                .codecs(connectionFactoryOptions.getValue(CODECS));
+                .dataSource((DataSource) connectionFactoryOptions.getValue(DATASOURCE))
+                .codecs((Codecs) connectionFactoryOptions.getValue(CODECS));
         // @formatter:on
 
         return new JdbcConnectionFactory(builder.build());
     }
 
-    /**
-     * @see io.r2dbc.spi.ConnectionFactoryProvider#getDriver()
-     */
     @Override
     public String getDriver()
     {
         return "generic";
     }
 
-    /**
-     * @see io.r2dbc.spi.ConnectionFactoryProvider#supports(io.r2dbc.spi.ConnectionFactoryOptions)
-     */
     @Override
     public boolean supports(final ConnectionFactoryOptions connectionFactoryOptions)
     {
         Objects.requireNonNull(connectionFactoryOptions, "connectionFactoryOptions must not be null");
 
-        DataSource dataSource = connectionFactoryOptions.getValue(DATASOURCE);
+        Object dataSource = connectionFactoryOptions.getValue(DATASOURCE);
 
         return dataSource != null;
     }

@@ -9,6 +9,7 @@ import io.r2dbc.jdbc.util.JanitorInvocationInterceptor;
 import io.r2dbc.jdbc.util.MultiDatabaseExtension;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactoryOptions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -24,6 +25,7 @@ import reactor.test.StepVerifier;
  */
 // @ExtendWith(DatabaseExtension.class) // funktioniert nicht mit statischem Zugriff auf die Server -> werden sonst doppelt erzeugt !
 @ExtendWith(JanitorInvocationInterceptor.class)
+@Disabled("R2DBC-Client 0.8.2 RC2 not compatible with API 1.0.0")
 final class ParameterizedR2dbcClientTest
 {
     /**
@@ -55,7 +57,7 @@ final class ParameterizedR2dbcClientTest
         R2dbc r2dbc = new R2dbc(ConnectionFactories.get(connectionFactoryOptions));
 
         // @formatter:off
-       r2dbc.inTransaction(handle -> handle.execute("INSERT INTO tbl VALUES (?)", 200))
+       r2dbc.inTransaction(handle -> handle.execute("INSERT INTO test VALUES (?)", 200))
            .as(StepVerifier::create)
            .expectNext(1).as("value from insertion")
            .verifyComplete()
@@ -77,9 +79,9 @@ final class ParameterizedR2dbcClientTest
         R2dbc r2dbc = new R2dbc(ConnectionFactories.get(connectionFactoryOptions));
 
         // @formatter:off
-       r2dbc.inTransaction(handle -> handle.execute("INSERT INTO tbl VALUES (?)", 100)
-               .concatWith(handle.execute("INSERT INTO tbl VALUES (?)", 200))
-               .concatWith(handle.execute("INSERT INTO tbl VALUES (?)", 300))
+       r2dbc.inTransaction(handle -> handle.execute("INSERT INTO test VALUES (?)", 100)
+               .concatWith(handle.execute("INSERT INTO test VALUES (?)", 200))
+               .concatWith(handle.execute("INSERT INTO test VALUES (?)", 300))
                )
            .as(StepVerifier::create)
            .expectNext(1).as("value from insertion")
@@ -104,8 +106,8 @@ final class ParameterizedR2dbcClientTest
         R2dbc r2dbc = new R2dbc(ConnectionFactories.get(connectionFactoryOptions));
 
         // @formatter:off
-        r2dbc.inTransaction(handle -> handle.execute("INSERT INTO tbl VALUES (?)", 100))
-            .concatWith(r2dbc.inTransaction(handle -> handle.select("SELECT test_value FROM tbl")
+        r2dbc.inTransaction(handle -> handle.execute("INSERT INTO test VALUES (?)", 100))
+            .concatWith(r2dbc.inTransaction(handle -> handle.select("SELECT test_value FROM test")
                 .mapResult(result -> Flux.from(result.map((row, rowMetadata) -> row.get("test_value", Integer.class)))))
                 )
             .as(StepVerifier::create)

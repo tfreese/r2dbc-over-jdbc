@@ -9,6 +9,7 @@
 package io.r2dbc.jdbc.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -16,11 +17,10 @@ import java.time.Duration;
 import java.util.List;
 import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
-
 import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.Statement;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -153,7 +153,7 @@ public final class Awaits
      *
      * @throws Throwable If the statement execution results in an error.
      */
-    public static void awaitUpdate(final int expectedCount, final Statement statement)
+    public static void awaitUpdate(final long expectedCount, final Statement statement)
     {
         awaitUpdate(List.of(expectedCount), statement);
     }
@@ -167,9 +167,9 @@ public final class Awaits
      *
      * @throws Throwable If the statement execution results in an error.
      */
-    public static void awaitUpdate(final List<Integer> expectedCounts, final Statement statement)
+    public static void awaitUpdate(final List<Long> expectedCounts, final Statement statement)
     {
-        assertEquals(expectedCounts, Flux.from(statement.execute()).flatMap(result -> Flux.from(result.getRowsUpdated())).collectList().block(sqlTimeout()),
+        assertIterableEquals(expectedCounts, Flux.from(statement.execute()).flatMap(result -> Flux.from(result.getRowsUpdated())).collectList().block(sqlTimeout()),
                 "Unexpected update counts");
     }
 

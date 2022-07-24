@@ -37,9 +37,6 @@ public class JdbcBatch implements Batch
         this.connection = Objects.requireNonNull(connection, "connection required");
     }
 
-    /**
-     * @see io.r2dbc.spi.Batch#add(java.lang.String)
-     */
     @Override
     public Batch add(final String sql)
     {
@@ -48,9 +45,6 @@ public class JdbcBatch implements Batch
         return this;
     }
 
-    /**
-     * @see io.r2dbc.spi.Batch#execute()
-     */
     @Override
     public Flux<Result> execute()
     {

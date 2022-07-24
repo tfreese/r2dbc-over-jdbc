@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import io.r2dbc.jdbc.codecs.Codecs;
@@ -122,6 +123,10 @@ public abstract class AbstractJdbcStatement implements Statement
          *
          */
         private Map<Integer, Object> current;
+        /**
+         *
+         */
+        private boolean trailingAdd = false;
 
         /**
          *
@@ -131,6 +136,7 @@ public abstract class AbstractJdbcStatement implements Statement
             validateBinds();
 
             this.current = null;
+            this.trailingAdd = true;
         }
 
         /**
@@ -144,7 +150,14 @@ public abstract class AbstractJdbcStatement implements Statement
                 this.binds.add(this.current);
             }
 
+            this.trailingAdd = false;
+
             return this.current;
+        }
+
+        public boolean isTrailingAdd()
+        {
+            return this.trailingAdd;
         }
 
         /**
@@ -220,6 +233,11 @@ public abstract class AbstractJdbcStatement implements Statement
          */
         void validateBinds()
         {
+            if (isTrailingAdd())
+            {
+                throw new IllegalStateException("trailling add() in bindings");
+            }
+
             if (this.current == null)
             {
                 return;
@@ -235,6 +253,7 @@ public abstract class AbstractJdbcStatement implements Statement
             }
         }
     }
+
     /**
      *
      */
@@ -300,9 +319,6 @@ public abstract class AbstractJdbcStatement implements Statement
         }
     }
 
-    /**
-     * @see io.r2dbc.spi.Statement#add()
-     */
     @Override
     public Statement add()
     {
@@ -311,9 +327,6 @@ public abstract class AbstractJdbcStatement implements Statement
         return this;
     }
 
-    /**
-     * @see io.r2dbc.spi.Statement#bind(int, java.lang.Object)
-     */
     @Override
     public Statement bind(final int index, final Object value)
     {
@@ -334,9 +347,6 @@ public abstract class AbstractJdbcStatement implements Statement
         return this;
     }
 
-    /**
-     * @see io.r2dbc.spi.Statement#bind(java.lang.String, java.lang.Object)
-     */
     @Override
     public Statement bind(final String name, final Object value)
     {
@@ -356,14 +366,11 @@ public abstract class AbstractJdbcStatement implements Statement
         }
         catch (Exception ex)
         {
-            throw new IllegalArgumentException(
+            throw new NoSuchElementException(
                     String.format("Name '%s' is not valid. Should either be an Integer index or a String represented integer.", name));
         }
     }
 
-    /**
-     * @see io.r2dbc.spi.Statement#bindNull(int, java.lang.Class)
-     */
     @Override
     public Statement bindNull(final int index, final Class<?> type)
     {
@@ -379,9 +386,6 @@ public abstract class AbstractJdbcStatement implements Statement
         return this;
     }
 
-    // /**
-    // * @see io.r2dbc.spi.Statement#bind(java.lang.Object, java.lang.Object)
-    // */
     // @Override
     // public Statement bind(final Object identifier, final Object value)
     // {
@@ -398,9 +402,6 @@ public abstract class AbstractJdbcStatement implements Statement
     // String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String represented integer.", identifier));
     // }
 
-    /**
-     * @see io.r2dbc.spi.Statement#bindNull(java.lang.String, java.lang.Class)
-     */
     @Override
     public Statement bindNull(final String name, final Class<?> type)
     {
@@ -425,9 +426,6 @@ public abstract class AbstractJdbcStatement implements Statement
         }
     }
 
-    // /**
-    // * @see io.r2dbc.spi.Statement#bindNull(java.lang.Object, java.lang.Class)
-    // */
     // @Override
     // public Statement bindNull(final Object identifier, final Class<?> type)
     // {
@@ -444,49 +442,31 @@ public abstract class AbstractJdbcStatement implements Statement
     // String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String represented integer.", identifier));
     // }
 
-    /**
-     * @return {@link Bindings}
-     */
     protected Bindings getBindings()
     {
         return this.bindings;
     }
 
-    /**
-     * @return {@link Codecs}
-     */
     protected Codecs getCodecs()
     {
         return this.codecs;
     }
 
-    /**
-     * @return {@link java.sql.Connection}
-     */
     protected java.sql.Connection getJdbcConnection()
     {
         return this.jdbcConnection;
     }
 
-    /**
-     * @return {@link Logger}
-     */
     protected Logger getLogger()
     {
         return this.logger;
     }
 
-    /**
-     * @return String
-     */
     protected String getSql()
     {
         return this.sql;
     }
 
-    /**
-     * @return {@link SQL_OPERATION}
-     */
     protected SQL_OPERATION getSqlOperation()
     {
         return this.sqlOperation;
@@ -531,9 +511,6 @@ public abstract class AbstractJdbcStatement implements Statement
     // return rows;
     // }
 
-    // /**
-    // * @see io.r2dbc.spi.Statement#returnGeneratedValues(java.lang.String[])
-    // */
     // @Override
     // public Statement returnGeneratedValues(final String...columns)
     // {

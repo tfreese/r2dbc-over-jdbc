@@ -10,6 +10,7 @@ import io.r2dbc.jdbc.codecs.Codecs;
 import io.r2dbc.spi.Blob;
 import io.r2dbc.spi.Clob;
 import io.r2dbc.spi.ColumnMetadata;
+import io.r2dbc.spi.Result;
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;
 
@@ -18,11 +19,11 @@ import io.r2dbc.spi.RowMetadata;
  *
  * @author Thomas Freese
  */
-public class JdbcRow implements Row
+public class JdbcRow implements Row, Result.RowSegment
 {
     /**
-    *
-    */
+     *
+     */
     private final Codecs codecs;
     /**
      *
@@ -49,13 +50,22 @@ public class JdbcRow implements Row
         this.codecs = Objects.requireNonNull(codecs, "codecs required");
     }
 
-    /**
-     * @see io.r2dbc.spi.Row#get(int)
-     */
+    @Override
+    public Row row()
+    {
+        return this;
+    }
+
+    @Override
+    public RowMetadata getMetadata()
+    {
+        return this.rowMetadata;
+    }
+
     @Override
     public Object get(final int index)
     {
-        ColumnMetadata metadata = this.rowMetadata.getColumnMetadata(index);
+        ColumnMetadata metadata = getMetadata().getColumnMetadata(index);
 
         if (Clob.class.equals(metadata.getJavaType()))
         {
@@ -71,9 +81,6 @@ public class JdbcRow implements Row
         return get(index, Object.class);
     }
 
-    /**
-     * @see io.r2dbc.spi.Row#get(int, java.lang.Class)
-     */
     @Override
     public <T> T get(final int index, final Class<T> type)
     {
@@ -89,28 +96,22 @@ public class JdbcRow implements Row
             return null;
         }
 
-        ColumnMetadata metadata = this.rowMetadata.getColumnMetadata(index);
+        ColumnMetadata metadata = getMetadata().getColumnMetadata(index);
         JDBCType jdbcType = (JDBCType) metadata.getNativeTypeMetadata();
 
         return this.codecs.mapTo(jdbcType, type, value);
     }
 
-    /**
-     * @see io.r2dbc.spi.Row#get(java.lang.String)
-     */
     @Override
     public Object get(final String name)
     {
-        ColumnMetadata metadata = this.rowMetadata.getColumnMetadata(name);
+        ColumnMetadata metadata = getMetadata().getColumnMetadata(name);
 
         int column = ((JdbcColumnMetadata) metadata).getColumn();
 
         return get(column);
     }
 
-    /**
-     * @see io.r2dbc.spi.Row#get(java.lang.String, java.lang.Class)
-     */
     @Override
     public <T> T get(final String name, final Class<T> type)
     {
@@ -124,7 +125,7 @@ public class JdbcRow implements Row
             throw new IllegalArgumentException("type is null");
         }
 
-        ColumnMetadata metadata = this.rowMetadata.getColumnMetadata(name);
+        ColumnMetadata metadata = getMetadata().getColumnMetadata(name);
 
         int column = ((JdbcColumnMetadata) metadata).getColumn();
 

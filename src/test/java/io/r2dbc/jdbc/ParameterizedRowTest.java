@@ -181,11 +181,11 @@ final class ParameterizedRowTest
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
-        server.getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
+        server.getJdbcOperations().execute("INSERT INTO test VALUES (100)");
 
         // @formatter:off
         Flux.usingWhen(connectionFactory.create(),
-                connection ->  Flux.from(connection.createStatement("SELECT test_value as ALIASED_VALUE FROM tbl").execute())
+                connection ->  Flux.from(connection.createStatement("SELECT test_value as ALIASED_VALUE FROM test").execute())
                 .flatMap(result -> Flux.from(result.map((row, rowMetadata) ->
                             row.get("ALIASED_VALUE", Integer.class)
                             )
@@ -211,11 +211,11 @@ final class ParameterizedRowTest
         ConnectionFactory connectionFactory =
                 ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
-        // server.getJdbcOperations().execute("INSERT INTO tbl VALUES (100)");
+        // server.getJdbcOperations().execute("INSERT INTO test VALUES (100)");
         //
         // @formatter:off
 //        Mono.from(this.connectionFactory.create())
-//            .flatMapMany(connection -> Flux.from(connection.createStatement("SELECT test_value FROM tbl").execute())
+//            .flatMapMany(connection -> Flux.from(connection.createStatement("SELECT test_value FROM test").execute())
 //                .flatMap(TestKit::extractColumns)
 //                .concatWith(TestKit.close(connection)))
 //        .as(StepVerifier::create)
@@ -227,12 +227,12 @@ final class ParameterizedRowTest
 
         try
         {
-            // awaitExecution(connection.createStatement("CREATE TABLE tbl ( test_value INTEGER )"));
+            // awaitExecution(connection.createStatement("CREATE TABLE test ( test_value INTEGER )"));
 
-            awaitUpdate(1, connection.createStatement("INSERT INTO tbl VALUES (100)"));
+            awaitUpdate(1, connection.createStatement("INSERT INTO test VALUES (100)"));
 
-            awaitQuery(List.of(100), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
-            awaitQuery(List.of(100), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM tbl"));
+            awaitQuery(List.of(100), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
+            awaitQuery(List.of(100), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
         }
         finally
         {

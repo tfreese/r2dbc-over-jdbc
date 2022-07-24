@@ -67,6 +67,13 @@ public class BooleanCodec extends AbstractCodec<Boolean>
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Boolean value) throws SQLException
     {
-        preparedStatement.setBoolean(parameterIndex, value);
+        if (value == null)
+        {
+            preparedStatement.setNull(parameterIndex, JDBCType.BOOLEAN.getVendorTypeNumber());
+        }
+        else
+        {
+            preparedStatement.setBoolean(parameterIndex, value);
+        }
     }
 }

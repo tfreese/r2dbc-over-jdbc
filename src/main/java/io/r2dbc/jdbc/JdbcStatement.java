@@ -7,12 +7,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 import io.r2dbc.jdbc.codecs.Codecs;
 import io.r2dbc.spi.ColumnMetadata;
 import io.r2dbc.spi.Result;
-import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -164,9 +162,8 @@ public class JdbcStatement extends AbstractJdbcStatement
     protected Result createResult(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows) throws SQLException
     {
         RowMetadata rowMetadata = JdbcRowMetadata.of(resultSet, getCodecs());
-        Iterable<ColumnMetadata> columnMetaDatas = (Iterable<ColumnMetadata>) rowMetadata.getColumnMetadatas();
 
-        Flux<Row> rows = Flux.generate((final SynchronousSink<Row> sink) ->
+        Flux<JdbcRow> rows = Flux.generate((final SynchronousSink<JdbcRow> sink) ->
         {
             try
             {
@@ -176,7 +173,7 @@ public class JdbcStatement extends AbstractJdbcStatement
 
                     int index = 0;
 
-                    for (ColumnMetadata columnMetaData : columnMetaDatas)
+                    for (ColumnMetadata columnMetaData : rowMetadata.getColumnMetadatas())
                     {
                         String columnLabel = columnMetaData.getName();
                         JDBCType jdbcType = (JDBCType) columnMetaData.getNativeTypeMetadata();
@@ -209,10 +206,10 @@ public class JdbcStatement extends AbstractJdbcStatement
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert);
 
-        Mono<Integer> rowsUpdated = affectedRows != null ? Mono.just(IntStream.of(affectedRows).sum()) : Mono.empty();
-        // Flux<Integer> rowsUpdated = affectedRows != null ? Flux.fromStream(IntStream.of(affectedRows).boxed()) : Flux.empty();
+        //        Mono<Long> rowsUpdated = affectedRows != null ? Mono.just(IntStream.of(affectedRows).mapToLong(Long::valueOf).sum()) : Mono.empty();
+        // Flux<Long> rowsUpdated = affectedRows != null ? Flux.fromStream(IntStream.of(affectedRows).mapToLong(Long::valueOf).boxed()) : Flux.empty();
 
-        return new JdbcResult(rows, Mono.just(rowMetadata), rowsUpdated);
+        return new JdbcResult(rows, Mono.just(rowMetadata), affectedRows);
     }
 
     /**

@@ -41,6 +41,13 @@ public class FloatCodec extends AbstractNumberCodec<Float>
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Float value) throws SQLException
     {
-        preparedStatement.setFloat(parameterIndex, value);
+        if (value == null)
+        {
+            preparedStatement.setNull(parameterIndex, JDBCType.FLOAT.getVendorTypeNumber());
+        }
+        else
+        {
+            preparedStatement.setFloat(parameterIndex, value);
+        }
     }
 }

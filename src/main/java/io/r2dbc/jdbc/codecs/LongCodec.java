@@ -41,6 +41,13 @@ public class LongCodec extends AbstractNumberCodec<Long>
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Long value) throws SQLException
     {
-        preparedStatement.setLong(parameterIndex, value);
+        if (value == null)
+        {
+            preparedStatement.setNull(parameterIndex, JDBCType.DECIMAL.getVendorTypeNumber());
+        }
+        else
+        {
+            preparedStatement.setLong(parameterIndex, value);
+        }
     }
 }

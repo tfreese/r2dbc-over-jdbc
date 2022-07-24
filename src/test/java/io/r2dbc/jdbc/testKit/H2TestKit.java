@@ -2,14 +2,13 @@
 package io.r2dbc.jdbc.testKit;
 
 import io.r2dbc.jdbc.util.DbServerExtension;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 /**
  * @author Thomas Freese
  */
-@Disabled("io.r2dbc.spi.test.TestKit.TestStatement verwendet für H2 ungültige Spaltennamen")
+//@Disabled("io.r2dbc.spi.test.TestKit.TestStatement verwendet für H2 ungültige Spaltennamen")
 public class H2TestKit extends AbstractTestKit
 {
     /**

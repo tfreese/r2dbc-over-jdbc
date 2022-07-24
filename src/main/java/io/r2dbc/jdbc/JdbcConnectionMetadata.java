@@ -52,18 +52,12 @@ public class JdbcConnectionMetadata implements ConnectionMetadata
         this.version = Objects.requireNonNull(version, "version required");
     }
 
-    /**
-     * @see io.r2dbc.spi.ConnectionMetadata#getDatabaseProductName()
-     */
     @Override
     public String getDatabaseProductName()
     {
         return this.productName;
     }
 
-    /**
-     * @see io.r2dbc.spi.ConnectionMetadata#getDatabaseVersion()
-     */
     @Override
     public String getDatabaseVersion()
     {

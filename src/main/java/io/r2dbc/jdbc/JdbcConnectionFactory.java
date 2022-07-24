@@ -55,18 +55,12 @@ public final class JdbcConnectionFactory implements ConnectionFactory
         this(connectionConfiguration.getDataSource(), connectionConfiguration.getCodecs());
     }
 
-    /**
-     * @see io.r2dbc.spi.ConnectionFactory#create()
-     */
     @Override
     public Mono<io.r2dbc.spi.Connection> create()
     {
         return this.jdbcConnectionFactory.map(jdbcConnection -> new JdbcConnection(jdbcConnection, this.codecs));
     }
 
-    /**
-     * @see io.r2dbc.spi.ConnectionFactory#getMetadata()
-     */
     @Override
     public ConnectionFactoryMetadata getMetadata()
     {

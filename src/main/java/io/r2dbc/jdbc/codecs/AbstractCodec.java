@@ -48,10 +48,10 @@ public abstract class AbstractCodec<T> implements Codec<T>
 
         this.javaType = Objects.requireNonNull(javaType, "javaType required");
 
-        if (supportedJdbcTypes.length == 0)
-        {
-            throw new IllegalArgumentException("at leat one JDBCType required");
-        }
+        //        if (supportedJdbcTypes.length == 0)
+        //        {
+        //            throw new IllegalArgumentException("at leat one JDBCType required");
+        //        }
 
         this.supportedJdbcTypes = Stream.of(supportedJdbcTypes).collect(Collectors.toUnmodifiableSet());
     }
