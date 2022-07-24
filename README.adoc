@@ -2,7 +2,7 @@
 
 *This is just an experimental and research Project and not designed for production use ... but it works !*
 
-See https://github.com/oracle/oracle-r2dbc [window="_blank"] +
+See https://github.com/r2dbc/r2dbc-h2[r2dbc-h2, window="blank"] +
 
 == Type-Mapping
 Adapt the `io.r2dbc.jdbc.codecs.Codec` Interface to match your needs !
