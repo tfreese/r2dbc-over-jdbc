@@ -143,7 +143,6 @@ public class JdbcStatement extends AbstractJdbcStatement
             }
 
             int[] affectedRows = stmt.executeBatch();
-            // affectedRows = normalizeAffectedRowsForReactive(affectedRows);
 
             return new Context(stmt, null, affectedRows);
         });
