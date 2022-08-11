@@ -38,7 +38,7 @@ class ParameterizedLobTest
     /**
      *
      */
-    static byte[] ALL_BYTES = new byte[-(-128) + 127];
+    static final byte[] ALL_BYTES = new byte[-(-128) + 127];
 
     /**
      *

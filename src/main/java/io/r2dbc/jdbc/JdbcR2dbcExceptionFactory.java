@@ -1,6 +1,7 @@
 // Created: 14.06.2019
 package io.r2dbc.jdbc;
 
+import java.io.Serial;
 import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
@@ -41,6 +42,7 @@ public final class JdbcR2dbcExceptionFactory
         /**
          *
          */
+        @Serial
         private static final long serialVersionUID = -6441515280969268939L;
 
         /**
@@ -65,6 +67,7 @@ public final class JdbcR2dbcExceptionFactory
         /**
          *
          */
+        @Serial
         private static final long serialVersionUID = 6607810949597270120L;
 
         /**
@@ -89,6 +92,7 @@ public final class JdbcR2dbcExceptionFactory
         /**
          *
          */
+        @Serial
         private static final long serialVersionUID = -4703171992215253093L;
 
         /**
@@ -113,6 +117,7 @@ public final class JdbcR2dbcExceptionFactory
         /**
          *
          */
+        @Serial
         private static final long serialVersionUID = -5814246921224867624L;
 
         /**
