@@ -6,8 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import java.util.stream.Stream;
 
-import javax.sql.DataSource;
-
+import io.r2dbc.jdbc.util.DbServerExtension;
+import io.r2dbc.jdbc.util.MultiDatabaseExtension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -15,9 +15,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-
-import io.r2dbc.jdbc.util.DbServerExtension;
-import io.r2dbc.jdbc.util.MultiDatabaseExtension;
 import reactor.test.StepVerifier;
 
 /**
@@ -26,8 +23,8 @@ import reactor.test.StepVerifier;
 final class ParameterizedConnectionFactoryTest
 {
     /**
-    *
-    */
+     *
+     */
     @RegisterExtension
     static final MultiDatabaseExtension DATABASE_EXTENSION = new MultiDatabaseExtension();
 
@@ -45,7 +42,7 @@ final class ParameterizedConnectionFactoryTest
     @Test
     void testConstructorNoConfiguration()
     {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcConnectionFactory((DataSource) null, null)).withMessage("dataSource must not be null");
+        assertThatNullPointerException().isThrownBy(() -> new JdbcConnectionFactory(null, null)).withMessage("dataSource must not be null");
     }
 
     /**

@@ -2,6 +2,7 @@
 package io.r2dbc.jdbc.codecs;
 
 import java.sql.JDBCType;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -48,12 +49,14 @@ public abstract class AbstractCodec<T> implements Codec<T>
 
         this.javaType = Objects.requireNonNull(javaType, "javaType required");
 
-        //        if (supportedJdbcTypes.length == 0)
-        //        {
-        //            throw new IllegalArgumentException("at leat one JDBCType required");
-        //        }
-
-        this.supportedJdbcTypes = Stream.of(supportedJdbcTypes).collect(Collectors.toUnmodifiableSet());
+        if (supportedJdbcTypes.length == 0)
+        {
+            this.supportedJdbcTypes = Collections.emptySet();
+        }
+        else
+        {
+            this.supportedJdbcTypes = Stream.of(supportedJdbcTypes).collect(Collectors.toUnmodifiableSet());
+        }
     }
 
     /**

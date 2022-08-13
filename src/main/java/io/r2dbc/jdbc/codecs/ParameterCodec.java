@@ -1,6 +1,5 @@
 package io.r2dbc.jdbc.codecs;
 
-import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,7 +16,7 @@ public class ParameterCodec extends AbstractCodec<Parameter>
 
     public ParameterCodec(Codecs codecs)
     {
-        super(Parameter.class, new JDBCType[0]);
+        super(Parameter.class);
 
         this.codecs = codecs;
     }

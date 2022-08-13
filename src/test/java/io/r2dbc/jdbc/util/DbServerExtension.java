@@ -148,15 +148,15 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
         {
             case HSQL:
             case H2:
-//                try (Connection connection = this.dataSource.getConnection();
-//                     Statement statement = connection.createStatement())
-//                {
-//                    statement.execute("SHUTDOWN");
-//                }
-//                catch (Exception ex)
-//                {
-//                    LOGGER.error(ex.getMessage());
-//                }
+                //                try (Connection connection = this.dataSource.getConnection();
+                //                     Statement statement = connection.createStatement())
+                //                {
+                //                    statement.execute("SHUTDOWN");
+                //                }
+                //                catch (Exception ex)
+                //                {
+                //                    LOGGER.error(ex.getMessage());
+                //                }
                 break;
 
             case DERBY:
@@ -216,28 +216,26 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
 
         switch (getDatabaseType())
         {
-            case HSQL:
+            case HSQL ->
+            {
                 // ;shutdown=true schliesst die DB nach Ende der letzten Connection.
                 // ;MVCC=true;LOCK_MODE=0
                 config.setDriverClassName("org.hsqldb.jdbc.JDBCDriver");
                 config.setJdbcUrl("jdbc:hsqldb:mem:" + createDbName() + ";shutdown=true");
-
-                break;
-
-            case H2:
+            }
+            case H2 ->
+            {
                 // ;DB_CLOSE_DELAY=-1 schliesst NICHT die DB nach Ende der letzten Connection
                 // ;DB_CLOSE_ON_EXIT=FALSE schliesst NICHT die DB nach Ende der Runtime
                 config.setDriverClassName("org.h2.Driver");
                 config.setJdbcUrl("jdbc:h2:mem:" + createDbName() + ";DB_CLOSE_DELAY=0;DB_CLOSE_ON_EXIT=true");
-                break;
-
-            case DERBY:
+            }
+            case DERBY ->
+            {
                 config.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
                 config.setJdbcUrl("jdbc:derby:memory:" + createDbName() + ";create=true");
-                break;
-
-            default:
-                throw new IllegalArgumentException("unsupported databaseType: " + this.databaseType);
+            }
+            default -> throw new IllegalArgumentException("unsupported databaseType: " + this.databaseType);
         }
 
         config.setUsername("sa");
