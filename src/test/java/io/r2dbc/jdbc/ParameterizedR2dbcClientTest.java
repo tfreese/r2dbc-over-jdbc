@@ -23,7 +23,7 @@ import reactor.test.StepVerifier;
 /**
  * @author Thomas Freese
  */
-// @ExtendWith(DatabaseExtension.class) // funktioniert nicht mit statischem Zugriff auf die Server -> werden sonst doppelt erzeugt !
+// @ExtendWith(DatabaseExtension.class) // funktioniert nicht mit statischem Zugriff auf die Server, diese werden sonst doppelt erzeugt !
 @ExtendWith(JanitorInvocationInterceptor.class)
 @Disabled("R2DBC-Client 0.8.2 RC2 not compatible with API 1.0.0")
 final class ParameterizedR2dbcClientTest

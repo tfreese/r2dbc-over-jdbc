@@ -73,7 +73,7 @@ public class JdbcResult implements Result
             return new JdbcResult(Flux.empty(), rowMetadata, null);
         }
 
-        Flux<JdbcRow> filteredSegments = this.rows.filter(filter::test);
+        Flux<JdbcRow> filteredSegments = this.rows.filter(filter);
 
         return new JdbcResult(filteredSegments, rowMetadata, affectedRows);
     }

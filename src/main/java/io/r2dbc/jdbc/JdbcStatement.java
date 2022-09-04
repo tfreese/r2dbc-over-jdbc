@@ -157,7 +157,6 @@ public class JdbcStatement extends AbstractJdbcStatement
      *
      * @throws SQLException Falls was schiefgeht.
      */
-    @SuppressWarnings("unchecked")
     protected Result createResult(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows) throws SQLException
     {
         RowMetadata rowMetadata = JdbcRowMetadata.of(resultSet, getCodecs());
