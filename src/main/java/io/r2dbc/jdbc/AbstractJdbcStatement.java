@@ -128,6 +128,11 @@ public abstract class AbstractJdbcStatement implements Statement
          */
         private boolean trailingAdd = false;
 
+        public boolean isTrailingAdd()
+        {
+            return this.trailingAdd;
+        }
+
         /**
          *
          */
@@ -153,11 +158,6 @@ public abstract class AbstractJdbcStatement implements Statement
             this.trailingAdd = false;
 
             return this.current;
-        }
-
-        public boolean isTrailingAdd()
-        {
-            return this.trailingAdd;
         }
 
         /**
@@ -235,7 +235,7 @@ public abstract class AbstractJdbcStatement implements Statement
         {
             if (isTrailingAdd())
             {
-                throw new IllegalStateException("trailling add() in bindings");
+                throw new IllegalStateException("trailing add() in bindings");
             }
 
             if (this.current == null)

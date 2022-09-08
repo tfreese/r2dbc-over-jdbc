@@ -24,7 +24,7 @@ import reactor.test.StepVerifier;
 /**
  * @author Thomas Freese
  */
-// @ExtendWith(DatabaseExtension.class) // funktioniert nicht mit statischem Zugriff auf die Server -> werden sonst doppelt erzeugt !
+// @ExtendWith(DatabaseExtension.class) // funktioniert nicht mit statischem Zugriff auf die Server, werden sonst doppelt erzeugt !
 @ExtendWith(JanitorInvocationInterceptor.class)
 @Disabled("Not finished")
 final class ParameterizedDatabaseClientTest
