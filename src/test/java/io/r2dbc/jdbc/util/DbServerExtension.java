@@ -232,7 +232,7 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
             }
             case DERBY ->
             {
-                config.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
+                config.setDriverClassName("org.apache.derby.iapi.jdbc.AutoloadedDriver");
                 config.setJdbcUrl("jdbc:derby:memory:" + createDbName() + ";create=true");
             }
             default -> throw new IllegalArgumentException("unsupported databaseType: " + this.databaseType);

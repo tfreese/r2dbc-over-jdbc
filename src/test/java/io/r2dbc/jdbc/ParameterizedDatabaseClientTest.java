@@ -29,24 +29,14 @@ import reactor.test.StepVerifier;
 @Disabled("Not finished")
 final class ParameterizedDatabaseClientTest
 {
-    /**
-     *
-     */
     @RegisterExtension
     static final MultiDatabaseExtension DATABASE_EXTENSION = new MultiDatabaseExtension();
 
-    /**
-     * @return {@link Stream}
-     */
     static Stream<Arguments> getDatabases()
     {
         return DATABASE_EXTENSION.getServers().stream().map(server -> Arguments.of(server.getDatabaseType(), server));
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testInsert") // Ohne Parameter
     // @ArgumentsSource(DatabaseExtension.class)
@@ -73,10 +63,6 @@ final class ParameterizedDatabaseClientTest
        // @formatter:on
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testInsertBatch") // Ohne Parameter
     @MethodSource("getDatabases")
@@ -100,10 +86,6 @@ final class ParameterizedDatabaseClientTest
        // @formatter:on
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testInsertWithSelect") // Ohne Parameter
     @MethodSource("getDatabases")

@@ -18,9 +18,6 @@ import org.springframework.jdbc.core.JdbcOperations;
  */
 public class JanitorInvocationInterceptor implements InvocationInterceptor
 {
-    /**
-     *
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(JanitorInvocationInterceptor.class);
 
     /**
@@ -77,9 +74,6 @@ public class JanitorInvocationInterceptor implements InvocationInterceptor
         interceptTestMethod(invocation, invocationContext, extensionContext);
     }
 
-    /**
-     * @param jdbcOperations {@link JdbcOperations}
-     */
     private void createTable(final JdbcOperations jdbcOperations)
     {
         // LOGGER.debug("createTables");
@@ -107,9 +101,6 @@ public class JanitorInvocationInterceptor implements InvocationInterceptor
         }
     }
 
-    /**
-     * @param jdbcOperations {@link JdbcOperations}
-     */
     private void dropTable(final JdbcOperations jdbcOperations)
     {
         // LOGGER.debug("dropTables");

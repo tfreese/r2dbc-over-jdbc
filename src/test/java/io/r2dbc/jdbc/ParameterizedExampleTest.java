@@ -35,34 +35,19 @@ import reactor.test.StepVerifier;
 @ExtendWith(JanitorInvocationInterceptor.class)
 final class ParameterizedExampleTest
 {
-    /**
-     *
-     */
     @RegisterExtension
     static final MultiDatabaseExtension DATABASE_EXTENSION = new MultiDatabaseExtension();
 
-    /**
-     * @param connectionFactory {@link ConnectionFactory}
-     *
-     * @return {@link Connection}
-     */
     static Connection getConnection(final ConnectionFactory connectionFactory)
     {
         return Mono.from(connectionFactory.create()).block(DbServerExtension.getSqlTimeout());
     }
 
-    /**
-     * @return {@link Stream}
-     */
     static Stream<Arguments> getDatabases()
     {
         return DATABASE_EXTENSION.getServers().stream().map(server -> Arguments.of(server.getDatabaseType(), server));
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testBatch") // Ohne Parameter
     @MethodSource("getDatabases")
@@ -109,10 +94,6 @@ final class ParameterizedExampleTest
 //        // @formatter:on
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testBatchAutoIncrement") // Ohne Parameter
     @MethodSource("getDatabases")
@@ -156,10 +137,6 @@ final class ParameterizedExampleTest
         // @formatter:on
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testBatchWithCommit") // Ohne Parameter
     @MethodSource("getDatabases")
@@ -245,10 +222,6 @@ final class ParameterizedExampleTest
 //       // @formatter:on
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testBatchWithRollback") // Ohne Parameter
     @MethodSource("getDatabases")
@@ -288,10 +261,6 @@ final class ParameterizedExampleTest
         assertTrue(true);
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testDeleteBatch") // Ohne Parameter
     @MethodSource("getDatabases")
@@ -343,10 +312,6 @@ final class ParameterizedExampleTest
 //       // @formatter:on
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testInsert") // Ohne Parameter
     @MethodSource("getDatabases")
@@ -392,10 +357,6 @@ final class ParameterizedExampleTest
 //       // @formatter:on
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testSelectWithConverter") // Ohne Parameter
     @MethodSource("getDatabases")
@@ -434,10 +395,6 @@ final class ParameterizedExampleTest
        // @formatter:on
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testUpdate") // Ohne Parameter
     @MethodSource("getDatabases")
