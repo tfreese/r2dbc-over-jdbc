@@ -16,10 +16,6 @@
     <name>${project.groupId} - ${project.artifactId}</name>
     <description>Reactive Relational Database Connectivity over JDBC Implementation.</description>
 
-    <properties>
-        <version_io.r2dbc_r2dbc-spi>1.0.0.RELEASE</version_io.r2dbc_r2dbc-spi>
-    </properties>
-
     <dependencies>
         <!-- compile scope -->
         <dependency>
@@ -29,7 +25,6 @@
         <dependency>
             <groupId>io.r2dbc</groupId>
             <artifactId>r2dbc-spi</artifactId>
-            <version>${version_io.r2dbc_r2dbc-spi}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -67,7 +62,6 @@
         <dependency>
             <groupId>io.r2dbc</groupId>
             <artifactId>r2dbc-spi-test</artifactId>
-            <version>${version_io.r2dbc_r2dbc-spi}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
