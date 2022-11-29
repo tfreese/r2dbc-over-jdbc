@@ -18,13 +18,8 @@ import io.r2dbc.spi.Option;
  */
 public final class JdbcConnectionFactoryProvider implements ConnectionFactoryProvider
 {
-    /**
-     * {@link DataSource}
-     */
     public static final Option<Codecs> CODECS = Option.valueOf("codecs");
-    /**
-     * {@link DataSource}
-     */
+
     public static final Option<DataSource> DATASOURCE = Option.valueOf("datasource");
 
     @Override

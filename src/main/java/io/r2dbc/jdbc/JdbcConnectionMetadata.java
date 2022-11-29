@@ -12,22 +12,10 @@ import io.r2dbc.spi.ConnectionMetadata;
  */
 public class JdbcConnectionMetadata implements ConnectionMetadata
 {
-    /**
-     *
-     */
     private final String productName;
-    /**
-     *
-     */
+
     private final String version;
 
-    /**
-     * Erstellt ein neues {@link JdbcConnectionMetadata} Object.
-     *
-     * @param databaseMetaData {@link DatabaseMetaData}
-     *
-     * @throws SQLException Falls was schiefgeht.
-     */
     public JdbcConnectionMetadata(final DatabaseMetaData databaseMetaData) throws SQLException
     {
         super();
@@ -38,12 +26,6 @@ public class JdbcConnectionMetadata implements ConnectionMetadata
         this.version = databaseMetaData.getDatabaseProductVersion();
     }
 
-    /**
-     * Erstellt ein neues {@link JdbcConnectionMetadata} Object.
-     *
-     * @param productName String
-     * @param version String
-     */
     public JdbcConnectionMetadata(final String productName, final String version)
     {
         super();

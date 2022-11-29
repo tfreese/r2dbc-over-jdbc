@@ -18,18 +18,9 @@ import io.r2dbc.spi.Parameter;
  */
 public class DefaultCodecs implements Codecs
 {
-    /**
-     *
-     */
-    private final Map<Class<?>, Codec<?>> codecsForJavaType = new HashMap<>();
-    /**
-     *
-     */
     private final Map<JDBCType, Codec<?>> codecsForJDBCType = new HashMap<>();
+    private final Map<Class<?>, Codec<?>> codecsForJavaType = new HashMap<>();
 
-    /**
-     * Erstellt ein neues {@link DefaultCodecs} Object.
-     */
     public DefaultCodecs()
     {
         super();
@@ -37,9 +28,6 @@ public class DefaultCodecs implements Codecs
         loadCodecs();
     }
 
-    /**
-     * @param codec {@link Codec}
-     */
     public void add(final Codec<?> codec)
     {
         for (JDBCType jdbcType : codec.supportedJdbcTypes())
@@ -63,68 +51,6 @@ public class DefaultCodecs implements Codecs
     }
 
     /**
-     * Returns the {@link Codec} for the {@link JDBCType}
-     *
-     * @param javaType Class
-     *
-     * @return {@link Codec}
-     */
-    @SuppressWarnings("unchecked")
-    protected <T> Codec<T> get(final Class<T> javaType)
-    {
-        Objects.requireNonNull(javaType, "javaType must not be null");
-
-        Class<?> type = javaType;
-
-        if (Parameter.class.isAssignableFrom(javaType))
-        {
-            // Implementierungen sind private.
-            type = Parameter.class;
-        }
-
-        Codec<?> codec = this.codecsForJavaType.get(type);
-
-        if (codec == null)
-        {
-            codec = this.codecsForJavaType.get(type.getEnclosingClass());
-        }
-
-        if (codec == null)
-        {
-            codec = this.codecsForJavaType.get(type.getDeclaringClass());
-        }
-
-        if (codec == null)
-        {
-            throw new IllegalArgumentException(String.format("No Codec found for JavaType '%s'", javaType.getSimpleName()));
-        }
-
-        return (Codec<T>) codec;
-    }
-
-    /**
-     * Returns the {@link Codec} for the {@link JDBCType}
-     *
-     * @param jdbcType {@link JDBCType}
-     *
-     * @return {@link Codec}
-     */
-    @SuppressWarnings("unchecked")
-    protected <T> Codec<T> get(final JDBCType jdbcType)
-    {
-        Objects.requireNonNull(jdbcType, "jdbcType must not be null");
-
-        Codec<?> codec = this.codecsForJDBCType.get(jdbcType);
-
-        if (codec == null)
-        {
-            throw new IllegalArgumentException(String.format("No Codec found for JDBCType '%s'", jdbcType.getName()));
-        }
-
-        return (Codec<T>) codec;
-    }
-
-    /**
      * @see io.r2dbc.jdbc.codecs.Codecs#getJavaType(java.sql.JDBCType)
      */
     @Override
@@ -137,24 +63,6 @@ public class DefaultCodecs implements Codecs
     public JDBCType getJdbcType(final Class<?> javaType)
     {
         return get(javaType).supportedJdbcTypes().iterator().next();
-    }
-
-    /**
-     *
-     */
-    protected void loadCodecs()
-    {
-        add(new BlobCodec());
-        add(new BooleanCodec());
-        add(new ClobCodec());
-        add(new DateCodec());
-        add(new DoubleCodec());
-        add(new FloatCodec());
-        add(new IntegerCodec());
-        add(new LongCodec());
-        add(new ObjectCodec());
-        add(new StringCodec());
-        add(new ParameterCodec(this));
     }
 
     /**
@@ -206,5 +114,68 @@ public class DefaultCodecs implements Codecs
         Codec codec = get(javaType);
 
         codec.mapToSql(preparedStatement, parameterIndex, value);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T> Codec<T> get(final Class<T> javaType)
+    {
+        Objects.requireNonNull(javaType, "javaType must not be null");
+
+        Class<?> type = javaType;
+
+        if (Parameter.class.isAssignableFrom(javaType))
+        {
+            // Implementierungen sind private.
+            type = Parameter.class;
+        }
+
+        Codec<?> codec = this.codecsForJavaType.get(type);
+
+        if (codec == null)
+        {
+            codec = this.codecsForJavaType.get(type.getEnclosingClass());
+        }
+
+        if (codec == null)
+        {
+            codec = this.codecsForJavaType.get(type.getDeclaringClass());
+        }
+
+        if (codec == null)
+        {
+            throw new IllegalArgumentException(String.format("No Codec found for JavaType '%s'", javaType.getSimpleName()));
+        }
+
+        return (Codec<T>) codec;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T> Codec<T> get(final JDBCType jdbcType)
+    {
+        Objects.requireNonNull(jdbcType, "jdbcType must not be null");
+
+        Codec<?> codec = this.codecsForJDBCType.get(jdbcType);
+
+        if (codec == null)
+        {
+            throw new IllegalArgumentException(String.format("No Codec found for JDBCType '%s'", jdbcType.getName()));
+        }
+
+        return (Codec<T>) codec;
+    }
+
+    protected void loadCodecs()
+    {
+        add(new BlobCodec());
+        add(new BooleanCodec());
+        add(new ClobCodec());
+        add(new DateCodec());
+        add(new DoubleCodec());
+        add(new FloatCodec());
+        add(new IntegerCodec());
+        add(new LongCodec());
+        add(new ObjectCodec());
+        add(new StringCodec());
+        add(new ParameterCodec(this));
     }
 }

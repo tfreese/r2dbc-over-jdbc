@@ -26,11 +26,6 @@ import reactor.core.publisher.Mono;
  */
 public final class R2dbcUtils
 {
-    /**
-     * @param blob {@link Blob}
-     *
-     * @return {@link ByteBuffer}
-     */
     public static byte[] blobToByteArray(final Blob blob)
     {
         // ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -66,14 +61,9 @@ public final class R2dbcUtils
         // @formatter:on
     }
 
-    /**
-     * @param blob {@link Blob}
-     *
-     * @return {@link ByteBuffer}
-     */
     public static ByteBuffer blobToByteBuffer(final Blob blob)
     {
-//        // @formatter:off
+        //        // @formatter:off
 //        ByteBuffer byteBuffer = Flux.from(blob.stream())
 //            .reduce(ByteBuffer::put)
 //            .concatWith(Mono.from(blob.discard())
@@ -96,11 +86,6 @@ public final class R2dbcUtils
         return ByteBuffer.wrap(bytes);
     }
 
-    /**
-     * @param blob {@link Blob}
-     *
-     * @return {@link InputStream}
-     */
     public static InputStream blobToInputStream(final Blob blob)
     {
         byte[] bytes = blobToByteArray(blob);
@@ -108,11 +93,6 @@ public final class R2dbcUtils
         return new ByteArrayInputStream(bytes);
     }
 
-    /**
-     * @param blob {@link Blob}
-     *
-     * @return String
-     */
     public static String blobToString(final Blob blob)
     {
         ByteBuffer byteBuffer = blobToByteBuffer(blob);
@@ -123,11 +103,6 @@ public final class R2dbcUtils
         return charBuffer.toString();
     }
 
-    /**
-     * @param bytes byte[]
-     *
-     * @return {@link Blob}
-     */
     public static Blob byteArrayToBlob(final byte[] bytes)
     {
         ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
@@ -135,21 +110,11 @@ public final class R2dbcUtils
         return byteBufferToBlob(byteBuffer);
     }
 
-    /**
-     * @param byteBuffer {@link ByteBuffer}
-     *
-     * @return {@link Blob}
-     */
     public static Blob byteBufferToBlob(final ByteBuffer byteBuffer)
     {
         return Blob.from((Mono.just(byteBuffer)));
     }
 
-    /**
-     * @param byteBuffer {@link ByteBuffer}
-     *
-     * @return byte[]
-     */
     public static byte[] byteBufferToByteArray(final ByteBuffer byteBuffer)
     {
         byte[] bytes = new byte[byteBuffer.remaining()];
@@ -158,21 +123,11 @@ public final class R2dbcUtils
         return bytes;
     }
 
-    /**
-     * @param byteBuffer {@link ByteBuffer}
-     *
-     * @return {@link InputStream}
-     */
     public static InputStream byteBufferToInputStream(final ByteBuffer byteBuffer)
     {
         return new ByteArrayInputStream(byteBuffer.array());
     }
 
-    /**
-     * @param clob {@link Clob}
-     *
-     * @return String
-     */
     public static String clobToString(final Clob clob)
     {
         // @formatter:off
@@ -186,11 +141,6 @@ public final class R2dbcUtils
         // @formatter:on
     }
 
-    /**
-     * @param inputStream {@link InputStream}
-     *
-     * @return {@link Blob}
-     */
     public static Blob inputStreamToBlob(final InputStream inputStream)
     {
         ByteBuffer byteBuffer = inputStreamToByteBuffer(inputStream);
@@ -198,11 +148,6 @@ public final class R2dbcUtils
         return byteBufferToBlob(byteBuffer);
     }
 
-    /**
-     * @param inputStream {@link InputStream}
-     *
-     * @return {@link ByteBuffer}
-     */
     public static ByteBuffer inputStreamToByteBuffer(final InputStream inputStream)
     {
         try
@@ -224,11 +169,6 @@ public final class R2dbcUtils
         }
     }
 
-    /**
-     * @param reader {@link java.sql.Blob}
-     *
-     * @return String
-     */
     public static String readerToString(final Reader reader)
     {
         try
@@ -248,11 +188,6 @@ public final class R2dbcUtils
         }
     }
 
-    /**
-     * @param sqlBlob {@link java.sql.Blob}
-     *
-     * @return {@link Blob}
-     */
     public static Blob sqlBlobToBlob(final java.sql.Blob sqlBlob)
     {
         ByteBuffer byteBuffer = null;
@@ -273,11 +208,6 @@ public final class R2dbcUtils
         return byteBufferToBlob(byteBuffer);
     }
 
-    /**
-     * @param sqlClob {@link java.sql.Clob}
-     *
-     * @return {@link Clob}
-     */
     public static Clob sqlClobToClob(final java.sql.Clob sqlClob)
     {
         String string = null;
@@ -298,11 +228,6 @@ public final class R2dbcUtils
         return stringToClob(string);
     }
 
-    /**
-     * @param value String
-     *
-     * @return {@link Blob}
-     */
     public static Blob stringToBlob(final String value)
     {
         ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(value);
@@ -310,19 +235,11 @@ public final class R2dbcUtils
         return byteBufferToBlob(byteBuffer);
     }
 
-    /**
-     * @param value String
-     *
-     * @return {@link Clob}
-     */
     public static Clob stringToClob(final String value)
     {
         return Clob.from((Mono.just(value)));
     }
 
-    /**
-     * Erstellt ein neues {@link R2dbcUtils} Object.
-     */
     private R2dbcUtils()
     {
         super();

@@ -11,24 +11,14 @@ import java.util.stream.Stream;
 /**
  * Basic-Implementation for a {@link Codec}.
  *
- * @param <T> Type
- *
  * @author Thomas Freese
  */
 public abstract class AbstractCodec<T> implements Codec<T>
 {
-    /**
-     *
-     */
     private final Class<T> javaType;
-    /**
-     *
-     */
+
     private final Set<JDBCType> supportedJdbcTypes;
 
-    // /**
-    // * Erstellt ein neues {@link AbstractCodec} Object.
-    // */
     // @SuppressWarnings("unchecked")
     // protected AbstractCodec()
     // {
@@ -37,12 +27,6 @@ public abstract class AbstractCodec<T> implements Codec<T>
     // this.javaType = (Class<T>) ((ParameterizedType) (getClass().getGenericSuperclass())).getActualTypeArguments()[0];
     // }
 
-    /**
-     * Erstellt ein neues {@link AbstractCodec} Object.
-     *
-     * @param javaType Class
-     * @param supportedJdbcTypes {@link JDBCType}
-     */
     protected AbstractCodec(final Class<T> javaType, final JDBCType... supportedJdbcTypes)
     {
         super();
@@ -77,11 +61,6 @@ public abstract class AbstractCodec<T> implements Codec<T>
         return this.supportedJdbcTypes;
     }
 
-    /**
-     * @param object Object
-     *
-     * @return {@link RuntimeException}
-     */
     protected RuntimeException throwCanNotMapException(final Object object)
     {
         return new IllegalArgumentException(String.format("can not map %s into %s", object.getClass().getSimpleName(), getJavaType().getSimpleName()));

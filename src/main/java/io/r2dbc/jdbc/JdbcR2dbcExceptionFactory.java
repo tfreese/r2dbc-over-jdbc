@@ -39,20 +39,9 @@ public final class JdbcR2dbcExceptionFactory
      */
     static class JdbcR2dbcDataException extends R2dbcException
     {
-        /**
-         *
-         */
         @Serial
         private static final long serialVersionUID = -6441515280969268939L;
 
-        /**
-         * Erstellt ein neues {@link JdbcR2dbcDataException} Object.
-         *
-         * @param message String
-         * @param sqlState String
-         * @param errorCode int
-         * @param cause {@link SQLException}
-         */
         JdbcR2dbcDataException(final String message, final String sqlState, final int errorCode, final SQLException cause)
         {
             super(message, sqlState, errorCode, cause);
@@ -64,20 +53,9 @@ public final class JdbcR2dbcExceptionFactory
      */
     static class JdbcR2dbcException extends R2dbcException
     {
-        /**
-         *
-         */
         @Serial
         private static final long serialVersionUID = 6607810949597270120L;
 
-        /**
-         * Erstellt ein neues {@link JdbcR2dbcDataException} Object.
-         *
-         * @param message String
-         * @param sqlState String
-         * @param errorCode int
-         * @param cause {@link SQLException}
-         */
         JdbcR2dbcException(final String message, final String sqlState, final int errorCode, final SQLException cause)
         {
             super(message, sqlState, errorCode, cause);
@@ -89,20 +67,9 @@ public final class JdbcR2dbcExceptionFactory
      */
     static class JdbcR2dbcNonTransientException extends R2dbcNonTransientException
     {
-        /**
-         *
-         */
         @Serial
         private static final long serialVersionUID = -4703171992215253093L;
 
-        /**
-         * Erstellt ein neues {@link JdbcR2dbcDataException} Object.
-         *
-         * @param message String
-         * @param sqlState String
-         * @param errorCode int
-         * @param cause {@link SQLException}
-         */
         JdbcR2dbcNonTransientException(final String message, final String sqlState, final int errorCode, final SQLException cause)
         {
             super(message, sqlState, errorCode, cause);
@@ -114,31 +81,15 @@ public final class JdbcR2dbcExceptionFactory
      */
     static class JdbcR2dbcTransientException extends R2dbcTransientException
     {
-        /**
-         *
-         */
         @Serial
         private static final long serialVersionUID = -5814246921224867624L;
 
-        /**
-         * Erstellt ein neues {@link JdbcR2dbcDataException} Object.
-         *
-         * @param message String
-         * @param sqlState String
-         * @param errorCode int
-         * @param cause {@link SQLException}
-         */
         JdbcR2dbcTransientException(final String message, final String sqlState, final int errorCode, final SQLException cause)
         {
             super(message, sqlState, errorCode, cause);
         }
     }
 
-    /**
-     * @param ex {@link SQLException}
-     *
-     * @return {@link R2dbcException}
-     */
     public static R2dbcException convert(final SQLException ex)
     {
         if (ex.getClass() == SQLDataException.class)
@@ -209,9 +160,6 @@ public final class JdbcR2dbcExceptionFactory
         return new JdbcR2dbcException(ex.getMessage(), ex.getSQLState(), ex.getErrorCode(), ex);
     }
 
-    /**
-     * Erstellt ein neues {@link JdbcR2dbcExceptionFactory} Object.
-     */
     private JdbcR2dbcExceptionFactory()
     {
         super();

@@ -34,9 +34,6 @@ import org.junit.jupiter.api.Test;
  */
 final class JdbcDatabaseExceptionFactoryTest
 {
-    /**
-     *
-     */
     @Test
     void testFeatureNotSupportedException()
     {
@@ -44,9 +41,6 @@ final class JdbcDatabaseExceptionFactoryTest
                 .isInstanceOf(R2dbcNonTransientException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
     }
 
-    /**
-     *
-     */
     @Test
     void testIntegrityConstraintViolationException()
     {
@@ -54,9 +48,6 @@ final class JdbcDatabaseExceptionFactoryTest
                 .isInstanceOf(R2dbcDataIntegrityViolationException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
     }
 
-    /**
-     *
-     */
     @Test
     void testInvalidAuthorizationSpecException()
     {
@@ -64,9 +55,6 @@ final class JdbcDatabaseExceptionFactoryTest
                 .isInstanceOf(R2dbcPermissionDeniedException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
     }
 
-    /**
-     *
-     */
     @Test
     void testNonTransientConnectionException()
     {
@@ -74,9 +62,6 @@ final class JdbcDatabaseExceptionFactoryTest
                 .isInstanceOf(R2dbcNonTransientResourceException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
     }
 
-    /**
-     *
-     */
     @Test
     void testNonTransientException()
     {
@@ -84,9 +69,6 @@ final class JdbcDatabaseExceptionFactoryTest
                 .isInstanceOf(R2dbcNonTransientException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
     }
 
-    /**
-     *
-     */
     @Test
     void testRecoverableException()
     {
@@ -94,9 +76,6 @@ final class JdbcDatabaseExceptionFactoryTest
                 .isInstanceOf(R2dbcNonTransientException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
     }
 
-    /**
-     *
-     */
     @Test
     void testSqlDataException()
     {
@@ -104,9 +83,6 @@ final class JdbcDatabaseExceptionFactoryTest
                 .isInstanceOf(R2dbcException.class).extracting("sqlState", "errorCode").contains("SQLState", 999);
     }
 
-    /**
-     *
-     */
     @Test
     void testSqlException()
     {
@@ -114,9 +90,6 @@ final class JdbcDatabaseExceptionFactoryTest
                 .isInstanceOf(R2dbcException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
     }
 
-    /**
-     *
-     */
     @Test
     void testSyntaxErrorException()
     {
@@ -124,9 +97,6 @@ final class JdbcDatabaseExceptionFactoryTest
                 .isInstanceOf(R2dbcBadGrammarException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
     }
 
-    /**
-     *
-     */
     @Test
     void testTimeoutException()
     {
@@ -134,9 +104,6 @@ final class JdbcDatabaseExceptionFactoryTest
                 .isInstanceOf(R2dbcTimeoutException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
     }
 
-    /**
-     *
-     */
     @Test
     void testTransactionRollbackException()
     {
@@ -144,9 +111,6 @@ final class JdbcDatabaseExceptionFactoryTest
                 .isInstanceOf(R2dbcRollbackException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
     }
 
-    /**
-     *
-     */
     @Test
     void testTransientConnectionException()
     {
@@ -154,9 +118,6 @@ final class JdbcDatabaseExceptionFactoryTest
                 .isInstanceOf(R2dbcTransientResourceException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
     }
 
-    /**
-     *
-     */
     @Test
     void testTransientException()
     {
@@ -164,9 +125,6 @@ final class JdbcDatabaseExceptionFactoryTest
                 .isInstanceOf(R2dbcTransientException.class).extracting("sqlState", "errorCode").containsExactly("SQLState", 999);
     }
 
-    /**
-     *
-     */
     @Test
     void testUnknownException()
     {

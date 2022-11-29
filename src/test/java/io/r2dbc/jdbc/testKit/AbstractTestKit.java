@@ -21,20 +21,11 @@ import reactor.test.StepVerifier;
  */
 abstract class AbstractTestKit implements TestKit<Integer>
 {
-    /**
-     * @param <T> Type
-     * @param connection {@link Connection}
-     *
-     * @return {@link Mono}
-     */
     public static <T> Mono<T> close(final Connection connection)
     {
         return Mono.from(connection.close()).then(Mono.empty());
     }
 
-    /**
-     *
-     */
     private ConnectionFactory connectionFactory;
 
     @Override
@@ -79,11 +70,6 @@ abstract class AbstractTestKit implements TestKit<Integer>
         return "?";
     }
 
-    /**
-     * @return {@link DbServerExtension}
-     */
-    abstract DbServerExtension getServer();
-
     @Override
     @Test
     public void prepareStatement()
@@ -106,4 +92,6 @@ abstract class AbstractTestKit implements TestKit<Integer>
             return Flux.from(statement.execute()).flatMap(this::extractRowsUpdated);
         }, Connection::close).as(StepVerifier::create).expectNext(10L).as("values from insertions").verifyComplete();
     }
+
+    abstract DbServerExtension getServer();
 }

@@ -10,9 +10,6 @@ import org.junit.jupiter.api.Test;
  */
 final class JdbcConnectionFactoryMetadataTest
 {
-    /**
-     *
-     */
     @Test
     void testName()
     {

@@ -21,26 +21,12 @@ import io.r2dbc.spi.RowMetadata;
  */
 public class JdbcRow implements Row, Result.RowSegment
 {
-    /**
-     *
-     */
     private final Codecs codecs;
-    /**
-     *
-     */
+
     private final RowMetadata rowMetadata;
-    /**
-     *
-     */
+
     private final Map<Integer, Object> values;
 
-    /**
-     * Erstellt ein neues {@link JdbcRow} Object.
-     *
-     * @param rowMetadata {@link JdbcRowMetadata}
-     * @param values {@link Map}
-     * @param codecs {@link Codecs}
-     */
     public JdbcRow(final RowMetadata rowMetadata, final Map<Integer, Object> values, final Codecs codecs)
     {
         super();
@@ -48,18 +34,6 @@ public class JdbcRow implements Row, Result.RowSegment
         this.rowMetadata = Objects.requireNonNull(rowMetadata, "rowMetadata required");
         this.values = Objects.requireNonNull(values, "values required");
         this.codecs = Objects.requireNonNull(codecs, "codecs required");
-    }
-
-    @Override
-    public Row row()
-    {
-        return this;
-    }
-
-    @Override
-    public RowMetadata getMetadata()
-    {
-        return this.rowMetadata;
     }
 
     @Override
@@ -130,5 +104,17 @@ public class JdbcRow implements Row, Result.RowSegment
         int column = ((JdbcColumnMetadata) metadata).getColumn();
 
         return get(column, type);
+    }
+
+    @Override
+    public RowMetadata getMetadata()
+    {
+        return this.rowMetadata;
+    }
+
+    @Override
+    public Row row()
+    {
+        return this;
     }
 }

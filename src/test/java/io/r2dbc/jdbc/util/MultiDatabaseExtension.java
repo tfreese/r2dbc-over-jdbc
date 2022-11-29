@@ -18,9 +18,6 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
  */
 public class MultiDatabaseExtension implements BeforeAllCallback, AfterAllCallback // , ArgumentsProvider
 {
-    /**
-     *
-     */
     private final Map<EmbeddedDatabaseType, DbServerExtension> servers = new HashMap<>();
 
     /**
@@ -59,19 +56,11 @@ public class MultiDatabaseExtension implements BeforeAllCallback, AfterAllCallba
         }
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     *
-     * @return {@link DbServerExtension}
-     */
     public DbServerExtension getServer(final EmbeddedDatabaseType databaseType)
     {
         return this.servers.get(databaseType);
     }
 
-    /**
-     * @return {@link Collection}
-     */
     public Collection<DbServerExtension> getServers()
     {
         return this.servers.values();

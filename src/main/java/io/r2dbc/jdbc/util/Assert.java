@@ -8,12 +8,6 @@ import java.sql.SQLException;
  */
 public final class Assert
 {
-    /**
-     * @param value Object
-     * @param message String
-     *
-     * @throws SQLException Falls was schiefgeht.
-     */
     public static void assertNotNull(final Object value, final String message) throws SQLException
     {
         if (value == null)
@@ -22,12 +16,6 @@ public final class Assert
         }
     }
 
-    /**
-     * @param value String
-     * @param message String
-     *
-     * @throws SQLException Falls was schiefgeht.
-     */
     public static void assertNotNullOrBlank(final String value, final String message) throws SQLException
     {
         if ((value == null) || value.isBlank())
@@ -36,9 +24,6 @@ public final class Assert
         }
     }
 
-    /**
-     * Erstellt ein neues {@link Assert} Object.
-     */
     private Assert()
     {
         super();

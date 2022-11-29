@@ -11,9 +11,6 @@ import java.sql.SQLException;
  */
 public class FloatCodec extends AbstractNumberCodec<Float>
 {
-    /**
-     * Erstellt ein neues {@link FloatCodec} Object.
-     */
     public FloatCodec()
     {
         super(Float.class, JDBCType.FLOAT);

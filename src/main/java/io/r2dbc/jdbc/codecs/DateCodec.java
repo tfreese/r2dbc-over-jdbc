@@ -16,9 +16,6 @@ import java.util.Date;
  */
 public class DateCodec extends AbstractCodec<Date>
 {
-    /**
-     * Erstellt ein neues {@link DateCodec} Object.
-     */
     public DateCodec()
     {
         super(Date.class, JDBCType.DATE, JDBCType.TIME, JDBCType.TIMESTAMP);

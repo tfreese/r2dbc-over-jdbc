@@ -22,33 +22,20 @@ import reactor.test.StepVerifier;
  */
 final class ParameterizedConnectionFactoryTest
 {
-    /**
-     *
-     */
     @RegisterExtension
     static final MultiDatabaseExtension DATABASE_EXTENSION = new MultiDatabaseExtension();
 
-    /**
-     * @return {@link Stream}
-     */
     static Stream<Arguments> getDatabases()
     {
         return DATABASE_EXTENSION.getServers().stream().map(server -> Arguments.of(server.getDatabaseType(), server));
     }
 
-    /**
-     *
-     */
     @Test
     void testConstructorNoConfiguration()
     {
         assertThatNullPointerException().isThrownBy(() -> new JdbcConnectionFactory(null, null)).withMessage("dataSource must not be null");
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testCreate") // Ohne Parameter
     @MethodSource("getDatabases")
@@ -59,10 +46,6 @@ final class ParameterizedConnectionFactoryTest
         new JdbcConnectionFactory(configuration).create().as(StepVerifier::create).expectNextCount(1).verifyComplete();
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testGetMetadata") // Ohne Parameter
     @MethodSource("getDatabases")
@@ -73,10 +56,6 @@ final class ParameterizedConnectionFactoryTest
         assertThat(new JdbcConnectionFactory(configuration).getMetadata()).isNotNull();
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testOptions") // Ohne Parameter
     @MethodSource("getDatabases")

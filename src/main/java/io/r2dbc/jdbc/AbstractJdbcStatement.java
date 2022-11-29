@@ -29,25 +29,10 @@ public abstract class AbstractJdbcStatement implements Statement
      */
     enum SQL_OPERATION
     {
-        /**
-         *
-         */
         DELETE,
-        /**
-         *
-         */
         EXECUTE,
-        /**
-         *
-         */
         INSERT,
-        /**
-         *
-         */
         SELECT,
-        /**
-         *
-         */
         UPDATE
     }
 
@@ -56,26 +41,12 @@ public abstract class AbstractJdbcStatement implements Statement
      */
     static class Context
     {
-        /**
-         *
-         */
         private final int[] affectedRows;
-        /**
-         *
-         */
+
         private final ResultSet resultSet;
-        /**
-         *
-         */
+
         private final PreparedStatement stmt;
 
-        /**
-         * Erstellt ein neues {@link Context} Object.
-         *
-         * @param stmt {@link PreparedStatement}
-         * @param resultSet {@link ResultSet}
-         * @param affectedRows int[]
-         */
         public Context(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows)
         {
             super();
@@ -85,25 +56,16 @@ public abstract class AbstractJdbcStatement implements Statement
             this.affectedRows = affectedRows;
         }
 
-        /**
-         * @return int[]
-         */
         int[] getAffectedRows()
         {
             return this.affectedRows;
         }
 
-        /**
-         * @return {@link ResultSet}
-         */
         ResultSet getResultSet()
         {
             return this.resultSet;
         }
 
-        /**
-         * @return {@link PreparedStatement}
-         */
         PreparedStatement getStmt()
         {
             return this.stmt;
@@ -115,17 +77,10 @@ public abstract class AbstractJdbcStatement implements Statement
      */
     class Bindings
     {
-        /**
-         *
-         */
         private final List<Map<Integer, Object>> binds = new ArrayList<>();
-        /**
-         *
-         */
+
         private Map<Integer, Object> current;
-        /**
-         *
-         */
+
         private boolean trailingAdd = false;
 
         public boolean isTrailingAdd()
@@ -133,9 +88,6 @@ public abstract class AbstractJdbcStatement implements Statement
             return this.trailingAdd;
         }
 
-        /**
-         *
-         */
         void finish()
         {
             validateBinds();
@@ -144,9 +96,6 @@ public abstract class AbstractJdbcStatement implements Statement
             this.trailingAdd = true;
         }
 
-        /**
-         * @return {@link Map}
-         */
         Map<Integer, Object> getCurrent()
         {
             if (this.current == null)
@@ -160,9 +109,6 @@ public abstract class AbstractJdbcStatement implements Statement
             return this.current;
         }
 
-        /**
-         * @return {@link Map}
-         */
         Map<Integer, Object> getLast()
         {
             if (this.binds.isEmpty())
@@ -173,11 +119,6 @@ public abstract class AbstractJdbcStatement implements Statement
             return this.binds.get(this.binds.size() - 1);
         }
 
-        /**
-         * @param preparedStatement {@link java.sql.PreparedStatement}
-         *
-         * @throws SQLException Falls was schiefgeht.
-         */
         void prepareBatch(final PreparedStatement preparedStatement) throws SQLException
         {
             if (this.binds.isEmpty())
@@ -200,12 +141,6 @@ public abstract class AbstractJdbcStatement implements Statement
             }
         }
 
-        /**
-         * @param preparedStatement {@link java.sql.PreparedStatement}
-         * @param bind {@link Map}
-         *
-         * @throws SQLException Falls was schiefgeht.
-         */
         void prepareStatement(final PreparedStatement preparedStatement, final Map<Integer, Object> bind) throws SQLException
         {
             for (Entry<Integer, Object> entry : bind.entrySet())
@@ -228,9 +163,6 @@ public abstract class AbstractJdbcStatement implements Statement
             }
         }
 
-        /**
-         * Prüfen, ob alle Parameter gesetzt wurden.
-         */
         void validateBinds()
         {
             if (isTrailingAdd())
@@ -254,38 +186,18 @@ public abstract class AbstractJdbcStatement implements Statement
         }
     }
 
-    /**
-     *
-     */
     private final Bindings bindings = new Bindings();
-    /**
-     *
-     */
+
     private final Codecs codecs;
-    /**
-     *
-     */
+
     private final java.sql.Connection jdbcConnection;
-    /**
-     *
-     */
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    /**
-     *
-     */
+
     private final String sql;
-    /**
-     *
-     */
+
     private final SQL_OPERATION sqlOperation;
 
-    /**
-     * Erstellt ein neues {@link AbstractJdbcStatement} Object.
-     *
-     * @param jdbcConnection {@link java.sql.Connection}
-     * @param sql String
-     * @param codecs {@link Codecs}
-     */
     protected AbstractJdbcStatement(final java.sql.Connection jdbcConnection, final String sql, final Codecs codecs)
     {
         super();

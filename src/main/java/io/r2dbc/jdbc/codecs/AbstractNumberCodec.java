@@ -5,17 +5,10 @@ import java.sql.JDBCType;
 
 /**
  * @author Thomas Freese
- * @param <T> Type
  */
 abstract class AbstractNumberCodec<T extends Number> extends AbstractCodec<T>
 {
-    /**
-     * Erstellt ein neues {@link AbstractNumberCodec} Object.
-     *
-     * @param javaType Class
-     * @param supportedJdbcTypes {@link JDBCType}
-     */
-    protected AbstractNumberCodec(final Class<T> javaType, final JDBCType...supportedJdbcTypes)
+    protected AbstractNumberCodec(final Class<T> javaType, final JDBCType... supportedJdbcTypes)
     {
         super(javaType, supportedJdbcTypes);
     }

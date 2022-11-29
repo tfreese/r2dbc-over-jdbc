@@ -15,46 +15,20 @@ import io.r2dbc.spi.Type;
  */
 public class JdbcColumnMetadata implements ColumnMetadata, Type
 {
-    /**
-     *
-     */
     private final int column;
-    /**
-     *
-     */
+
     private final Class<?> javaType;
-    /**
-     *
-     */
+
     private final JDBCType jdbcType;
-    /**
-     *
-     */
+
     private final String name;
-    /**
-     *
-     */
+
     private final Nullability nullability;
-    /**
-     *
-     */
+
     private final int precision;
-    /**
-     *
-     */
+
     private final int scale;
 
-    /**
-     * Erstellt ein neues {@link JdbcColumnMetadata} Object.
-     *
-     * @param name String
-     * @param column int; 0 based
-     * @param javaType Class
-     * @param jdbcType {@link JDBCType}
-     * @param nullability {@link Nullability}
-     * @param precision int
-     * @param scale int
-     */
     public JdbcColumnMetadata(final String name, final int column, final Class<?> javaType, final JDBCType jdbcType, final Nullability nullability,
                               final int precision, final int scale)
     {
@@ -67,12 +41,6 @@ public class JdbcColumnMetadata implements ColumnMetadata, Type
         this.nullability = Objects.requireNonNull(nullability, "nullability required");
         this.precision = precision;
         this.scale = scale;
-    }
-
-    @Override
-    public Type getType()
-    {
-        return this;
     }
 
     /**
@@ -96,9 +64,6 @@ public class JdbcColumnMetadata implements ColumnMetadata, Type
                 && (this.scale == other.scale);
     }
 
-    /**
-     * @return int
-     */
     public int getColumn()
     {
         return this.column;
@@ -138,6 +103,12 @@ public class JdbcColumnMetadata implements ColumnMetadata, Type
     public Integer getScale()
     {
         return this.scale;
+    }
+
+    @Override
+    public Type getType()
+    {
+        return this;
     }
 
     /**

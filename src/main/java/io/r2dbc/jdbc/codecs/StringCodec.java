@@ -15,9 +15,6 @@ import io.r2dbc.spi.Clob;
  */
 public class StringCodec extends AbstractCodec<String>
 {
-    /**
-     * Erstellt ein neues {@link StringCodec} Object.
-     */
     public StringCodec()
     {
         super(String.class, JDBCType.CHAR, JDBCType.VARCHAR);

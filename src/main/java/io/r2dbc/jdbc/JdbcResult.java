@@ -21,30 +21,11 @@ import reactor.core.publisher.Mono;
  */
 public class JdbcResult implements Result
 {
-    /**
-     *
-     */
-    private final Mono<RowMetadata> rowMetadata;
-    /**
-     *
-     */
-    private final Flux<JdbcRow> rows;
-    /**
-     *
-     */
     private final int[] affectedRows;
-    /**
-     *
-     */
+    private final Mono<RowMetadata> rowMetadata;
+    private final Flux<JdbcRow> rows;
     private final Long rowsUpdated;
 
-    /**
-     * Erstellt ein neues {@link JdbcResult} Object.
-     *
-     * @param rows {@link Flux}
-     * @param rowMetadata {@link Mono}
-     * @param affectedRows int[]
-     */
     public JdbcResult(final Flux<JdbcRow> rows, final Mono<RowMetadata> rowMetadata, final int[] affectedRows)
     {
         super();

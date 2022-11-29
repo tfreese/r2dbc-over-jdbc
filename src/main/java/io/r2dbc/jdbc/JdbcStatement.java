@@ -21,18 +21,8 @@ import reactor.core.publisher.SynchronousSink;
  */
 public class JdbcStatement extends AbstractJdbcStatement
 {
-    /**
-     *
-     */
     private static final int DEBUG_SQL_LENGTH = 80;
 
-    /**
-     * Erstellt ein neues {@link JdbcStatement} Object.
-     *
-     * @param connection {@link java.sql.Connection}
-     * @param sql String
-     * @param codecs {@link Codecs}
-     */
     public JdbcStatement(final java.sql.Connection connection, final String sql, final Codecs codecs)
     {
         super(connection, sql, codecs);
@@ -72,12 +62,6 @@ public class JdbcStatement extends AbstractJdbcStatement
         // @formatter:on
     }
 
-    /**
-     * @param connection {@link java.sql.Connection}
-     * @param sql String
-     *
-     * @return {@link Mono}
-     */
     protected Mono<Context> createExecuteMono(final java.sql.Connection connection, final String sql)
     {
         if (SQL_OPERATION.SELECT.equals(getSqlOperation()))
@@ -149,13 +133,8 @@ public class JdbcStatement extends AbstractJdbcStatement
     }
 
     /**
-     * @param stmt {@link PreparedStatement}
      * @param resultSet {@link ResultSet}, optional
      * @param affectedRows int[], optional
-     *
-     * @return {@link Result}
-     *
-     * @throws SQLException Falls was schiefgeht.
      */
     protected Result createResult(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows) throws SQLException
     {
@@ -210,11 +189,6 @@ public class JdbcStatement extends AbstractJdbcStatement
         return new JdbcResult(rows, Mono.just(rowMetadata), affectedRows);
     }
 
-    /**
-     * @param sql String
-     *
-     * @return String
-     */
     protected String prepareSqlForLog(final String sql)
     {
         if (sql.length() < DEBUG_SQL_LENGTH)

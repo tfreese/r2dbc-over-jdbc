@@ -11,9 +11,6 @@ import java.sql.SQLException;
  */
 public class IntegerCodec extends AbstractNumberCodec<Integer>
 {
-    /**
-     * Erstellt ein neues {@link IntegerCodec} Object.
-     */
     public IntegerCodec()
     {
         super(Integer.class, JDBCType.INTEGER);

@@ -20,21 +20,10 @@ import reactor.core.publisher.Mono;
  */
 public final class JdbcConnectionFactory implements ConnectionFactory
 {
-    /**
-     *
-     */
     private final Codecs codecs;
-    /**
-     *
-     */
+
     private final Mono<Connection> jdbcConnectionFactory;
 
-    /**
-     * Erstellt ein neues {@link JdbcConnectionFactory} Object.
-     *
-     * @param dataSource {@link DataSource}
-     * @param codecs {@link Codecs}
-     */
     public JdbcConnectionFactory(final DataSource dataSource, final Codecs codecs)
     {
         super();
@@ -45,11 +34,6 @@ public final class JdbcConnectionFactory implements ConnectionFactory
         this.codecs = new DefaultCodecs();
     }
 
-    /**
-     * Erstellt ein neues {@link JdbcConnectionFactory} Object.
-     *
-     * @param connectionConfiguration {@link JdbcConnectionConfiguration}
-     */
     public JdbcConnectionFactory(final JdbcConnectionConfiguration connectionConfiguration)
     {
         this(connectionConfiguration.getDataSource(), connectionConfiguration.getCodecs());

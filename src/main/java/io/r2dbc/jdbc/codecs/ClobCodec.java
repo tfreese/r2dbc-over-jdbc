@@ -15,14 +15,8 @@ import reactor.core.publisher.Mono;
  */
 public class ClobCodec extends AbstractCodec<Clob>
 {
-    /**
-    *
-    */
     public static final Clob NULL_CLOB = Clob.from(Mono.empty());
 
-    /**
-     * Erstellt ein neues {@link ClobCodec} Object.
-     */
     public ClobCodec()
     {
         super(Clob.class, JDBCType.CLOB);

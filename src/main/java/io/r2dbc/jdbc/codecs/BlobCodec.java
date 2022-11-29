@@ -17,14 +17,8 @@ import reactor.core.publisher.Mono;
  */
 public class BlobCodec extends AbstractCodec<Blob>
 {
-    /**
-     *
-     */
     public static final Blob NULL_BLOB = Blob.from(Mono.empty());
 
-    /**
-     * Erstellt ein neues {@link BlobCodec} Object.
-     */
     public BlobCodec()
     {
         super(Blob.class, JDBCType.BINARY, JDBCType.BLOB);

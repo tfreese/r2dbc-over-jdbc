@@ -13,9 +13,6 @@ import org.junit.jupiter.api.Test;
  */
 final class JdbcColumnMetadataTest
 {
-    /**
-     *
-     */
     @Test
     void testConstructorNoName()
     {
@@ -23,9 +20,6 @@ final class JdbcColumnMetadataTest
                 .withMessage("name required");
     }
 
-    /**
-     *
-     */
     @Test
     void testConstructorNoNullability()
     {

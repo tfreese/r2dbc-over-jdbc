@@ -16,46 +16,13 @@ import java.util.Set;
  */
 public interface Codec<T>
 {
-    /**
-     * @return Class
-     */
     Class<T> getJavaType();
 
-    /**
-     * Read an Object from a {@link ResultSet}.
-     *
-     * @param resultSet {@link ResultSet}
-     * @param columnLabel String
-     *
-     * @return Object
-     *
-     * @throws SQLException Falls was schiefgeht.
-     */
     T mapFromSql(ResultSet resultSet, String columnLabel) throws SQLException;
 
-    /**
-     * Map an Object into another one.
-     *
-     * @param javaType Class
-     * @param value Object
-     *
-     * @return Object
-     */
     <M> M mapTo(Class<M> javaType, T value);
 
-    /**
-     * Write an Object in a {@link PreparedStatement}.
-     *
-     * @param preparedStatement {@link PreparedStatement}
-     * @param parameterIndex int, ONE-Based
-     * @param value Object
-     *
-     * @throws SQLException Falls was schiefgeht.
-     */
     void mapToSql(PreparedStatement preparedStatement, int parameterIndex, T value) throws SQLException;
 
-    /**
-     * @return {@link Set}
-     */
     Set<JDBCType> supportedJdbcTypes();
 }

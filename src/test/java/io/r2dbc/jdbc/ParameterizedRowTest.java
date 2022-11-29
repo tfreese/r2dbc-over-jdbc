@@ -47,28 +47,16 @@ import reactor.test.StepVerifier;
 @ExtendWith(JanitorInvocationInterceptor.class)
 final class ParameterizedRowTest
 {
-    /**
-     *
-     */
     @RegisterExtension
     static final MultiDatabaseExtension DATABASE_EXTENSION = new MultiDatabaseExtension();
 
-    /**
-     * @return {@link Stream}
-     */
     static Stream<Arguments> getDatabases()
     {
         return DATABASE_EXTENSION.getServers().stream().map(server -> Arguments.of(server.getDatabaseType(), server));
     }
 
-    /**
-     *
-     */
     private final Codecs codecs = new DefaultCodecs();
 
-    /**
-     *
-     */
     @Test
     void testConstructorNoValues()
     {
@@ -79,9 +67,6 @@ final class ParameterizedRowTest
         assertThatNullPointerException().isThrownBy(() -> new JdbcRow(rowMetadata, null, this.codecs)).withMessage("values required");
     }
 
-    /**
-     *
-     */
     @Test
     void testGetByIndex()
     {
@@ -96,9 +81,6 @@ final class ParameterizedRowTest
         assertThat(new JdbcRow(rowMetadata, values, this.codecs).get(0, Object.class)).isSameAs(value);
     }
 
-    /**
-     *
-     */
     @Test
     void testGetByName()
     {
@@ -113,9 +95,6 @@ final class ParameterizedRowTest
         assertThat(new JdbcRow(rowMetadata, values, this.codecs).get("test-name-2", Object.class)).isSameAs(value);
     }
 
-    /**
-     *
-     */
     @Test
     void testGetInvalidIdentifier()
     {
@@ -125,9 +104,6 @@ final class ParameterizedRowTest
         assertThat(new JdbcRow(rowMetadata, new HashMap<>(), this.codecs).get(3, Object.class)).isNull();
     }
 
-    /**
-     *
-     */
     @Test
     void testGetNoIdentifier()
     {
@@ -138,9 +114,6 @@ final class ParameterizedRowTest
                 .withMessage("name is null");
     }
 
-    /**
-     *
-     */
     @Test
     void testGetNull()
     {
@@ -153,9 +126,6 @@ final class ParameterizedRowTest
         assertThat(new JdbcRow(rowMetadata, values, this.codecs).get("test-name-3", Object.class)).isNull();
     }
 
-    /**
-     *
-     */
     @Test
     void testGetWrongIdentifierType()
     {
@@ -169,10 +139,6 @@ final class ParameterizedRowTest
                 .withMessage("No MetaData for Name: %s", identifier);
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testSelectWithAliases") // Ohne Parameter
     @MethodSource("getDatabases")
@@ -199,10 +165,6 @@ final class ParameterizedRowTest
         // @formatter:on
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testSelectWithoutAliases") // Ohne Parameter
     @MethodSource("getDatabases")

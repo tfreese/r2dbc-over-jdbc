@@ -16,20 +16,10 @@ import reactor.core.publisher.Flux;
  */
 public class JdbcBatch implements Batch
 {
-    /**
-     *
-     */
     private final Connection connection;
-    /**
-     *
-     */
+
     private final List<String> statements = new ArrayList<>();
 
-    /**
-     * Erstellt ein neues {@link JdbcBatch} Object.
-     *
-     * @param connection {@link Connection}
-     */
     public JdbcBatch(final Connection connection)
     {
         super();
@@ -48,8 +38,6 @@ public class JdbcBatch implements Batch
     @Override
     public Flux<Result> execute()
     {
-        // @formatter:off
         return Flux.fromIterable(this.statements).map(this.connection::createStatement).flatMap(Statement::execute);
-        // @formatter:on
     }
 }

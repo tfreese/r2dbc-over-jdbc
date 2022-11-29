@@ -11,9 +11,6 @@ import java.sql.SQLException;
  */
 public class DoubleCodec extends AbstractNumberCodec<Double>
 {
-    /**
-     * Erstellt ein neues {@link DoubleCodec} Object.
-     */
     public DoubleCodec()
     {
         super(Double.class, JDBCType.DOUBLE);

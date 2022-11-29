@@ -25,14 +25,6 @@ import io.r2dbc.spi.RowMetadata;
  */
 public class JdbcRowMetadata implements RowMetadata
 {
-    /**
-     * @param resultSet {@link ResultSet}
-     * @param codecs {@link Codecs}
-     *
-     * @return {@link List}
-     *
-     * @throws SQLException Falls was schiefgeht.
-     */
     public static RowMetadata of(final ResultSet resultSet, final Codecs codecs) throws SQLException
     {
         if (resultSet == null)
@@ -67,20 +59,10 @@ public class JdbcRowMetadata implements RowMetadata
         return new JdbcRowMetadata(list);
     }
 
-    /**
-     *
-     */
     private final List<ColumnMetadata> columnMetaDatas;
-    /**
-     *
-     */
+
     private final Map<String, ColumnMetadata> columnMetaDatasByName = new LinkedHashMap<>();
 
-    /**
-     * Erstellt ein neues {@link JdbcRowMetadata} Object.
-     *
-     * @param columnMetaDatas {@link ResultSet}
-     */
     public JdbcRowMetadata(final List<ColumnMetadata> columnMetaDatas)
     {
         super();
@@ -102,21 +84,9 @@ public class JdbcRowMetadata implements RowMetadata
     }
 
     @Override
-    public ColumnMetadata getColumnMetadata(final int index)
+    public boolean contains(final String columnName)
     {
-        if ((index < 0) || (index >= this.columnMetaDatas.size()))
-        {
-            throw new ArrayIndexOutOfBoundsException("Index: " + index + ", Size: " + this.columnMetaDatas.size());
-        }
-
-        ColumnMetadata metaData = this.columnMetaDatas.get(index);
-
-        if (metaData == null)
-        {
-            throw new NoSuchElementException("No MetaData for Index: " + index);
-        }
-
-        return metaData;
+        return this.columnMetaDatasByName.containsKey(columnName.toLowerCase());
     }
 
     @Override
@@ -138,9 +108,21 @@ public class JdbcRowMetadata implements RowMetadata
     }
 
     @Override
-    public boolean contains(final String columnName)
+    public ColumnMetadata getColumnMetadata(final int index)
     {
-        return this.columnMetaDatasByName.containsKey(columnName.toLowerCase());
+        if ((index < 0) || (index >= this.columnMetaDatas.size()))
+        {
+            throw new ArrayIndexOutOfBoundsException("Index: " + index + ", Size: " + this.columnMetaDatas.size());
+        }
+
+        ColumnMetadata metaData = this.columnMetaDatas.get(index);
+
+        if (metaData == null)
+        {
+            throw new NoSuchElementException("No MetaData for Index: " + index);
+        }
+
+        return metaData;
     }
 
     @Override

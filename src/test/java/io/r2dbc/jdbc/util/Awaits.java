@@ -173,17 +173,11 @@ public final class Awaits
                 "Unexpected update counts");
     }
 
-    /**
-     * @return {@link Duration}
-     */
     private static Duration sqlTimeout()
     {
         return DbServerExtension.getSqlTimeout();
     }
 
-    /**
-     * Erstellt ein neues {@link Awaits} Object.
-     */
     private Awaits()
     {
         super();

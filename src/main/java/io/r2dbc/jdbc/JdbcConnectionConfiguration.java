@@ -20,18 +20,10 @@ final class JdbcConnectionConfiguration
      */
     static final class Builder
     {
-        /**
-        *
-        */
         private Codecs codecs;
-        /**
-        *
-        */
+
         private DataSource dataSource;
 
-        /**
-         * @return {@link JdbcConnectionConfiguration}
-         */
         public JdbcConnectionConfiguration build()
         {
             if (this.codecs == null)
@@ -43,11 +35,6 @@ final class JdbcConnectionConfiguration
 
         }
 
-        /**
-         * @param codecs {@link Codecs}
-         *
-         * @return {@link Builder}
-         */
         public Builder codecs(final Codecs codecs)
         {
             this.codecs = codecs;
@@ -55,11 +42,6 @@ final class JdbcConnectionConfiguration
             return this;
         }
 
-        /**
-         * @param dataSource {@link DataSource}
-         *
-         * @return {@link Builder}
-         */
         public Builder dataSource(final DataSource dataSource)
         {
             this.dataSource = dataSource;
@@ -83,29 +65,15 @@ final class JdbcConnectionConfiguration
         }
     }
 
-    /**
-     * @return {@link Builder}
-     */
     public static Builder builder()
     {
         return new Builder();
     }
 
-    /**
-    *
-    */
     private final Codecs codecs;
-    /**
-    *
-    */
+
     private final DataSource dataSource;
 
-    /**
-     * Erstellt ein neues {@link JdbcConnectionConfiguration} Object.
-     *
-     * @param dataSource {@link DataSource}
-     * @param codecs {@link Codecs}
-     */
     private JdbcConnectionConfiguration(final DataSource dataSource, final Codecs codecs)
     {
         super();
@@ -114,17 +82,11 @@ final class JdbcConnectionConfiguration
         this.codecs = Objects.requireNonNull(codecs, "codecs must not be null");
     }
 
-    /**
-     * @return {@link Codecs}
-     */
     public Codecs getCodecs()
     {
         return this.codecs;
     }
 
-    /**
-     * @return {@link DataSource}
-     */
     public DataSource getDataSource()
     {
         return this.dataSource;

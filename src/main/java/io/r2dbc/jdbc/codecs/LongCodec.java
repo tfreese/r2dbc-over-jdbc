@@ -11,9 +11,6 @@ import java.sql.SQLException;
  */
 public class LongCodec extends AbstractNumberCodec<Long>
 {
-    /**
-     * Erstellt ein neues {@link LongCodec} Object.
-     */
     public LongCodec()
     {
         super(Long.class, JDBCType.BIGINT, JDBCType.DECIMAL);

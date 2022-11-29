@@ -11,9 +11,6 @@ import java.sql.SQLException;
  */
 public class BooleanCodec extends AbstractCodec<Boolean>
 {
-    /**
-     * Erstellt ein neues {@link BooleanCodec} Object.
-     */
     public BooleanCodec()
     {
         super(Boolean.class, JDBCType.BIT, JDBCType.BOOLEAN);

@@ -16,6 +16,9 @@
     <name>${project.groupId} - ${project.artifactId}</name>
     <description>Reactive Relational Database Connectivity over JDBC Implementation.</description>
 
+    <properties>
+    </properties>
+
     <dependencies>
         <!-- compile scope -->
         <dependency>
@@ -52,11 +55,6 @@
         <dependency>
             <groupId>io.projectreactor.addons</groupId>
             <artifactId>reactor-extra</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.r2dbc</groupId>
-            <artifactId>r2dbc-client</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -104,11 +102,12 @@
             <artifactId>spring-jdbc</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-r2dbc</artifactId>
-            <scope>test</scope>
-        </dependency>
+
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework</groupId>-->
+        <!--            <artifactId>spring-r2dbc</artifactId>-->
+        <!--            <scope>test</scope>-->
+        <!--        </dependency>-->
         <!--dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>

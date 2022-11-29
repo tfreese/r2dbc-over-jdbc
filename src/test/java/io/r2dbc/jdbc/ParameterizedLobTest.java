@@ -35,14 +35,8 @@ import reactor.test.StepVerifier;
  */
 class ParameterizedLobTest
 {
-    /**
-     *
-     */
     static final byte[] ALL_BYTES = new byte[-(-128) + 127];
 
-    /**
-     *
-     */
     @RegisterExtension
     static final MultiDatabaseExtension DATABASE_EXTENSION = new MultiDatabaseExtension();
 
@@ -56,28 +50,16 @@ class ParameterizedLobTest
         }
     }
 
-    /**
-     * @param connectionFactory {@link ConnectionFactory}
-     *
-     * @return {@link Connection}
-     */
     static Connection getConnection(final ConnectionFactory connectionFactory)
     {
         return Mono.from(connectionFactory.create()).block(DbServerExtension.getSqlTimeout());
     }
 
-    /**
-     * @return {@link Stream}
-     */
     static Stream<Arguments> getDatabases()
     {
         return DATABASE_EXTENSION.getServers().stream().map(server -> Arguments.of(server.getDatabaseType(), server));
     }
 
-    /**
-     * @param connection {@link Connection}
-     * @param columnType String
-     */
     void createTable(final Connection connection, final String columnType)
     {
         // "DROP TABLE IF EXISTS lob_test"
@@ -100,10 +82,6 @@ class ParameterizedLobTest
         // @formatter:on
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testBigBlob") // Ohne Parameter
     @MethodSource("getDatabases")
@@ -161,10 +139,6 @@ class ParameterizedLobTest
         // @formatter:on
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testBigClob") // Ohne Parameter
     @MethodSource("getDatabases")
@@ -221,10 +195,6 @@ class ParameterizedLobTest
         // @formatter:on
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testNullBlob") // Ohne Parameter
     @MethodSource("getDatabases")
@@ -261,10 +231,6 @@ class ParameterizedLobTest
         // @formatter:on
     }
 
-    /**
-     * @param databaseType {@link EmbeddedDatabaseType}
-     * @param server {@link DbServerExtension}
-     */
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testNullClob") // Ohne Parameter
     @MethodSource("getDatabases")

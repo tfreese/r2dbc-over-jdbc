@@ -24,27 +24,18 @@ import reactor.test.StepVerifier;
  */
 final class JdbcResultTest
 {
-    /**
-     *
-     */
     @Test
     void testConstructorNoRowMetadata()
     {
         assertThatNullPointerException().isThrownBy(() -> new JdbcResult(Flux.empty(), null, null)).withMessage("rowMetadata must not be null");
     }
 
-    /**
-     *
-     */
     @Test
     void testConstructorNoRows()
     {
         assertThatNullPointerException().isThrownBy(() -> new JdbcResult(null, Mono.empty(), null)).withMessage("rows must not be null");
     }
 
-    /**
-     *
-     */
     @Test
     void testToResultErrorResponse()
     {

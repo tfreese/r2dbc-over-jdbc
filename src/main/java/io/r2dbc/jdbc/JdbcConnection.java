@@ -29,33 +29,16 @@ import reactor.core.publisher.Mono;
  */
 public class JdbcConnection implements Connection
 {
-    /**
-     *
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcConnection.class);
-    /**
-     *
-     */
+
     private final Codecs codecs;
-    /**
-     *
-     */
+
     private final java.sql.Connection jdbcConnection;
-    /**
-     *
-     */
+
     private final Mono<java.sql.Connection> jdbcConnectionMono;
-    /**
-     *
-     */
+
     private final Map<String, Savepoint> savePoints = new HashMap<>();
 
-    /**
-     * Erstellt ein neues {@link JdbcConnection} Object.
-     *
-     * @param jdbcConnection {@link java.sql.Connection}
-     * @param codecs {@link Codecs}
-     */
     public JdbcConnection(final java.sql.Connection jdbcConnection, final Codecs codecs)
     {
         super();

@@ -11,9 +11,6 @@ import java.sql.SQLException;
  */
 public class ObjectCodec extends AbstractCodec<Object>
 {
-    /**
-     * Erstellt ein neues {@link ObjectCodec} Object.
-     */
     public ObjectCodec()
     {
         super(Object.class, JDBCType.OTHER);
