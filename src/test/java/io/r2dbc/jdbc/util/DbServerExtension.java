@@ -4,8 +4,8 @@ package io.r2dbc.jdbc.util;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.sql.DataSource;
 
@@ -31,23 +31,9 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
  */
 public final class DbServerExtension implements BeforeAllCallback, BeforeTestExecutionCallback, AfterAllCallback, AfterTestExecutionCallback
 {
-    private static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger(1);
-
     private static final Logger LOGGER = LoggerFactory.getLogger(DbServerExtension.class);
 
     private static final Duration SQL_TIMEOUT = Duration.ofSeconds(5);
-
-    public static String createDbName()
-    {
-        String dbName = "db-" + ATOMIC_INTEGER.getAndIncrement();
-
-        if (LOGGER.isDebugEnabled())
-        {
-            LOGGER.debug("Create DB: {}", dbName);
-        }
-
-        return dbName;
-    }
 
     public static Duration getSqlTimeout()
     {
@@ -193,19 +179,19 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
                 // ;shutdown=true schliesst die DB nach Ende der letzten Connection.
                 // ;MVCC=true;LOCK_MODE=0
                 config.setDriverClassName("org.hsqldb.jdbc.JDBCDriver");
-                config.setJdbcUrl("jdbc:hsqldb:mem:" + createDbName() + ";shutdown=true");
+                config.setJdbcUrl("jdbc:hsqldb:mem:" + UUID.randomUUID() + ";shutdown=true");
             }
             case H2 ->
             {
                 // ;DB_CLOSE_DELAY=-1 schliesst NICHT die DB nach Ende der letzten Connection
                 // ;DB_CLOSE_ON_EXIT=FALSE schliesst NICHT die DB nach Ende der Runtime
                 config.setDriverClassName("org.h2.Driver");
-                config.setJdbcUrl("jdbc:h2:mem:" + createDbName() + ";DB_CLOSE_DELAY=0;DB_CLOSE_ON_EXIT=true");
+                config.setJdbcUrl("jdbc:h2:mem:" + UUID.randomUUID() + ";DB_CLOSE_DELAY=0;DB_CLOSE_ON_EXIT=true");
             }
             case DERBY ->
             {
                 config.setDriverClassName("org.apache.derby.iapi.jdbc.AutoloadedDriver");
-                config.setJdbcUrl("jdbc:derby:memory:" + createDbName() + ";create=true");
+                config.setJdbcUrl("jdbc:derby:memory:" + UUID.randomUUID() + ";create=true");
             }
             default -> throw new IllegalArgumentException("unsupported databaseType: " + this.databaseType);
         }
