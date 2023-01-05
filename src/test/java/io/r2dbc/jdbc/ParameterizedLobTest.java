@@ -151,14 +151,14 @@ class ParameterizedLobTest
 
         int i = 50 + new Random().nextInt(100);
 
-        String TEST_STRING = "foo你好bar";
+        String testString = "foo你好bar";
 
         // Connection connection = getConnection(connectionFactory);
         //
         // try
         // {
         // awaitNone(connection.beginTransaction());
-        // awaitUpdate(1, connection.createStatement("INSERT INTO lob_test values(?)").bind(0, Clob.from(Flux.range(0, i).map(it -> TEST_STRING))));
+        // awaitUpdate(1, connection.createStatement("INSERT INTO lob_test values(?)").bind(0, Clob.from(Flux.range(0, i).map(it -> testString))));
         // awaitNone(connection.commitTransaction());
         // }
         // finally
@@ -170,7 +170,7 @@ class ParameterizedLobTest
 
         // @formatter:off
         Flux.from(connection.createStatement("INSERT INTO lob_test values(?)")
-                .bind(0, Clob.from(Flux.range(0, i).map(it -> TEST_STRING)))
+                .bind(0, Clob.from(Flux.range(0, i).map(it -> testString)))
                 .execute()
                 )
                 .flatMap(Result::getRowsUpdated)
@@ -190,7 +190,7 @@ class ParameterizedLobTest
                 .map(CharSequence::length)
                 .collect(Collectors.summingInt(value -> value))
                 .as(StepVerifier::create)
-                .expectNext(i * TEST_STRING.length())
+                .expectNext(i * testString.length())
                 .verifyComplete();
         // @formatter:on
     }

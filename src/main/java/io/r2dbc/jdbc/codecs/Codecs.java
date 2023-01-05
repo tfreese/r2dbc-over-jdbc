@@ -13,9 +13,9 @@ import java.sql.SQLException;
  */
 public interface Codecs
 {
-    Class<?> getJavaType(final JDBCType jdbcType);
+    Class<?> getJavaType(JDBCType jdbcType);
 
-    JDBCType getJdbcType(final Class<?> javaType);
+    JDBCType getJdbcType(Class<?> javaType);
 
     <T> T mapFromSql(JDBCType jdbcType, ResultSet resultSet, String columnLabel) throws SQLException;
 

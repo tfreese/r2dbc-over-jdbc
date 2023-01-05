@@ -27,7 +27,7 @@ public abstract class AbstractJdbcStatement implements Statement
     /**
      * @author Thomas Freese
      */
-    enum SQL_OPERATION
+    enum SqlOperation
     {
         DELETE,
         EXECUTE,
@@ -47,7 +47,7 @@ public abstract class AbstractJdbcStatement implements Statement
 
         private final PreparedStatement stmt;
 
-        public Context(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows)
+        Context(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows)
         {
             super();
 
@@ -196,7 +196,7 @@ public abstract class AbstractJdbcStatement implements Statement
 
     private final String sql;
 
-    private final SQL_OPERATION sqlOperation;
+    private final SqlOperation sqlOperation;
 
     protected AbstractJdbcStatement(final java.sql.Connection jdbcConnection, final String sql, final Codecs codecs)
     {
@@ -211,23 +211,23 @@ public abstract class AbstractJdbcStatement implements Statement
 
         if (s.startsWith("select") || s.startsWith("with"))
         {
-            this.sqlOperation = SQL_OPERATION.SELECT;
+            this.sqlOperation = SqlOperation.SELECT;
         }
         else if (s.startsWith("delete"))
         {
-            this.sqlOperation = SQL_OPERATION.DELETE;
+            this.sqlOperation = SqlOperation.DELETE;
         }
         else if (s.startsWith("update"))
         {
-            this.sqlOperation = SQL_OPERATION.UPDATE;
+            this.sqlOperation = SqlOperation.UPDATE;
         }
         else if (s.startsWith("insert"))
         {
-            this.sqlOperation = SQL_OPERATION.INSERT;
+            this.sqlOperation = SqlOperation.INSERT;
         }
         else
         {
-            this.sqlOperation = SQL_OPERATION.EXECUTE;
+            this.sqlOperation = SqlOperation.EXECUTE;
         }
     }
 
@@ -379,7 +379,7 @@ public abstract class AbstractJdbcStatement implements Statement
         return this.sql;
     }
 
-    protected SQL_OPERATION getSqlOperation()
+    protected SqlOperation getSqlOperation()
     {
         return this.sqlOperation;
     }

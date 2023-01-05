@@ -64,7 +64,7 @@ public class JdbcStatement extends AbstractJdbcStatement
 
     protected Mono<Context> createExecuteMono(final java.sql.Connection connection, final String sql)
     {
-        if (SQL_OPERATION.SELECT.equals(getSqlOperation()))
+        if (SqlOperation.SELECT.equals(getSqlOperation()))
         {
             return Mono.fromCallable(() ->
             {
@@ -86,7 +86,7 @@ public class JdbcStatement extends AbstractJdbcStatement
                 return new Context(stmt, resultSet, null);
             });
         }
-        else if (SQL_OPERATION.INSERT.equals(getSqlOperation()))
+        else if (SqlOperation.INSERT.equals(getSqlOperation()))
         {
             return Mono.fromCallable(() ->
             {
