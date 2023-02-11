@@ -9,8 +9,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
  * @author Thomas Freese
  */
 //@Disabled("io.r2dbc.spi.test.TestKit.TestStatement verwendet für H2 ungültige Spaltennamen")
-public class H2TestKit extends AbstractTestKit
-{
+public class H2TestKit extends AbstractTestKit {
     @RegisterExtension
     static final DbServerExtension SERVER = new DbServerExtension(EmbeddedDatabaseType.H2);
 
@@ -18,8 +17,7 @@ public class H2TestKit extends AbstractTestKit
      * @see io.r2dbc.jdbc.testKit.AbstractTestKit#getServer()
      */
     @Override
-    DbServerExtension getServer()
-    {
+    DbServerExtension getServer() {
         return SERVER;
     }
 }

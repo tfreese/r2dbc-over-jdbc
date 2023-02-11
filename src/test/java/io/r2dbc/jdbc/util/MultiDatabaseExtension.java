@@ -23,8 +23,7 @@ public class MultiDatabaseExtension implements BeforeAllCallback, AfterAllCallba
     /**
      * Die Junit-{@link Extension} braucht zwingend einen Default-Constructor !
      */
-    public MultiDatabaseExtension()
-    {
+    public MultiDatabaseExtension() {
         super();
 
         this.servers.computeIfAbsent(EmbeddedDatabaseType.H2, DbServerExtension::new);
@@ -36,10 +35,8 @@ public class MultiDatabaseExtension implements BeforeAllCallback, AfterAllCallba
      * @see org.junit.jupiter.api.extension.AfterAllCallback#afterAll(org.junit.jupiter.api.extension.ExtensionContext)
      */
     @Override
-    public void afterAll(final ExtensionContext context) throws Exception
-    {
-        for (DbServerExtension server : this.servers.values())
-        {
+    public void afterAll(final ExtensionContext context) throws Exception {
+        for (DbServerExtension server : this.servers.values()) {
             server.afterAll(context);
         }
     }
@@ -48,21 +45,17 @@ public class MultiDatabaseExtension implements BeforeAllCallback, AfterAllCallba
      * @see org.junit.jupiter.api.extension.BeforeAllCallback#beforeAll(org.junit.jupiter.api.extension.ExtensionContext)
      */
     @Override
-    public void beforeAll(final ExtensionContext context) throws Exception
-    {
-        for (DbServerExtension server : this.servers.values())
-        {
+    public void beforeAll(final ExtensionContext context) throws Exception {
+        for (DbServerExtension server : this.servers.values()) {
             server.beforeAll(context);
         }
     }
 
-    public DbServerExtension getServer(final EmbeddedDatabaseType databaseType)
-    {
+    public DbServerExtension getServer(final EmbeddedDatabaseType databaseType) {
         return this.servers.get(databaseType);
     }
 
-    public Collection<DbServerExtension> getServers()
-    {
+    public Collection<DbServerExtension> getServers() {
         return this.servers.values();
     }
 

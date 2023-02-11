@@ -9,10 +9,8 @@ import java.sql.SQLException;
 /**
  * @author Thomas Freese
  */
-public class ObjectCodec extends AbstractCodec<Object>
-{
-    public ObjectCodec()
-    {
+public class ObjectCodec extends AbstractCodec<Object> {
+    public ObjectCodec() {
         super(Object.class, JDBCType.OTHER);
     }
 
@@ -20,12 +18,10 @@ public class ObjectCodec extends AbstractCodec<Object>
      * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    public Object mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException
-    {
+    public Object mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         Object value = resultSet.getObject(columnLabel);
 
-        if (resultSet.wasNull())
-        {
+        if (resultSet.wasNull()) {
             return null;
         }
 
@@ -37,19 +33,15 @@ public class ObjectCodec extends AbstractCodec<Object>
      */
     @SuppressWarnings("unchecked")
     @Override
-    public <M> M mapTo(final Class<M> javaType, final Object value)
-    {
-        if (value == null)
-        {
+    public <M> M mapTo(final Class<M> javaType, final Object value) {
+        if (value == null) {
             return null;
         }
 
-        if (getJavaType().equals(javaType) || Object.class.equals(javaType))
-        {
+        if (getJavaType().equals(javaType) || Object.class.equals(javaType)) {
             return (M) value;
         }
-        else if (CharSequence.class.isAssignableFrom(javaType))
-        {
+        else if (CharSequence.class.isAssignableFrom(javaType)) {
             String s = value.toString();
 
             return (M) s;
@@ -62,8 +54,7 @@ public class ObjectCodec extends AbstractCodec<Object>
      * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
      */
     @Override
-    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Object value) throws SQLException
-    {
+    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Object value) throws SQLException {
         preparedStatement.setObject(parameterIndex, value);
     }
 }

@@ -9,10 +9,8 @@ import java.sql.SQLException;
 /**
  * @author Thomas Freese
  */
-public class BooleanCodec extends AbstractCodec<Boolean>
-{
-    public BooleanCodec()
-    {
+public class BooleanCodec extends AbstractCodec<Boolean> {
+    public BooleanCodec() {
         super(Boolean.class, JDBCType.BIT, JDBCType.BOOLEAN);
     }
 
@@ -20,12 +18,10 @@ public class BooleanCodec extends AbstractCodec<Boolean>
      * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    public Boolean mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException
-    {
+    public Boolean mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         boolean value = resultSet.getBoolean(columnLabel);
 
-        if (resultSet.wasNull())
-        {
+        if (resultSet.wasNull()) {
             return null;
         }
 
@@ -37,19 +33,15 @@ public class BooleanCodec extends AbstractCodec<Boolean>
      */
     @SuppressWarnings("unchecked")
     @Override
-    public <M> M mapTo(final Class<M> javaType, final Boolean value)
-    {
-        if (value == null)
-        {
+    public <M> M mapTo(final Class<M> javaType, final Boolean value) {
+        if (value == null) {
             return null;
         }
 
-        if (getJavaType().equals(javaType) || Object.class.equals(javaType))
-        {
+        if (getJavaType().equals(javaType) || Object.class.equals(javaType)) {
             return (M) value;
         }
-        else if (CharSequence.class.isAssignableFrom(javaType))
-        {
+        else if (CharSequence.class.isAssignableFrom(javaType)) {
             String s = value.toString();
 
             return (M) s;
@@ -62,14 +54,11 @@ public class BooleanCodec extends AbstractCodec<Boolean>
      * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
      */
     @Override
-    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Boolean value) throws SQLException
-    {
-        if (value == null)
-        {
+    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Boolean value) throws SQLException {
+        if (value == null) {
             preparedStatement.setNull(parameterIndex, JDBCType.BOOLEAN.getVendorTypeNumber());
         }
-        else
-        {
+        else {
             preparedStatement.setBoolean(parameterIndex, value);
         }
     }

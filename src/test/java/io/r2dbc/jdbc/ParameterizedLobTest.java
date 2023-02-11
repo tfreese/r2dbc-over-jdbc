@@ -33,35 +33,29 @@ import reactor.test.StepVerifier;
 /**
  * @author Thomas Freese
  */
-class ParameterizedLobTest
-{
+class ParameterizedLobTest {
     static final byte[] ALL_BYTES = new byte[-(-128) + 127];
 
     @RegisterExtension
     static final MultiDatabaseExtension DATABASE_EXTENSION = new MultiDatabaseExtension();
 
-    static
-    {
+    static {
         Hooks.onOperatorDebug();
 
-        for (int i = -128; i < 127; i++)
-        {
+        for (int i = -128; i < 127; i++) {
             ALL_BYTES[-(-128) + i] = (byte) i;
         }
     }
 
-    static Connection getConnection(final ConnectionFactory connectionFactory)
-    {
+    static Connection getConnection(final ConnectionFactory connectionFactory) {
         return Mono.from(connectionFactory.create()).block(DbServerExtension.getSqlTimeout());
     }
 
-    static Stream<Arguments> getDatabases()
-    {
+    static Stream<Arguments> getDatabases() {
         return DATABASE_EXTENSION.getServers().stream().map(server -> Arguments.of(server.getDatabaseType(), server));
     }
 
-    void createTable(final Connection connection, final String columnType)
-    {
+    void createTable(final Connection connection, final String columnType) {
         // "DROP TABLE IF EXISTS lob_test"
 
         // @formatter:off
@@ -85,10 +79,8 @@ class ParameterizedLobTest
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testBigBlob") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testBigBlob(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
-    {
-        ConnectionFactory connectionFactory =
-                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+    void testBigBlob(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
+        ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         createTable(getConnection(connectionFactory), "BLOB");
 
@@ -142,10 +134,8 @@ class ParameterizedLobTest
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testBigClob") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testBigClob(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
-    {
-        ConnectionFactory connectionFactory =
-                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+    void testBigClob(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
+        ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         createTable(getConnection(connectionFactory), "CLOB");
 
@@ -198,10 +188,8 @@ class ParameterizedLobTest
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testNullBlob") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testNullBlob(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
-    {
-        ConnectionFactory connectionFactory =
-                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+    void testNullBlob(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
+        ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         createTable(getConnection(connectionFactory), "BLOB");
 
@@ -234,10 +222,8 @@ class ParameterizedLobTest
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testNullClob") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testNullClob(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
-    {
-        ConnectionFactory connectionFactory =
-                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+    void testNullClob(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
+        ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         createTable(getConnection(connectionFactory), "CLOB");
 

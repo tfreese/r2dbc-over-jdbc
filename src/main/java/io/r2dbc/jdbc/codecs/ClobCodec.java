@@ -13,12 +13,10 @@ import reactor.core.publisher.Mono;
 /**
  * @author Thomas Freese
  */
-public class ClobCodec extends AbstractCodec<Clob>
-{
+public class ClobCodec extends AbstractCodec<Clob> {
     public static final Clob NULL_CLOB = Clob.from(Mono.empty());
 
-    public ClobCodec()
-    {
+    public ClobCodec() {
         super(Clob.class, JDBCType.CLOB);
     }
 
@@ -26,12 +24,10 @@ public class ClobCodec extends AbstractCodec<Clob>
      * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    public Clob mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException
-    {
+    public Clob mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         java.sql.Clob value = resultSet.getClob(columnLabel);
 
-        if (resultSet.wasNull())
-        {
+        if (resultSet.wasNull()) {
             return NULL_CLOB;
         }
 
@@ -43,15 +39,12 @@ public class ClobCodec extends AbstractCodec<Clob>
      */
     @SuppressWarnings("unchecked")
     @Override
-    public <M> M mapTo(final Class<M> javaType, final Clob value)
-    {
-        if (value == null)
-        {
+    public <M> M mapTo(final Class<M> javaType, final Clob value) {
+        if (value == null) {
             return null;
         }
 
-        if (getJavaType().equals(javaType) || Object.class.equals(javaType))
-        {
+        if (getJavaType().equals(javaType) || Object.class.equals(javaType)) {
             // if (NULL_CLOB.equals(value))
             // {
             // return null;
@@ -61,8 +54,7 @@ public class ClobCodec extends AbstractCodec<Clob>
 
             return (M) value;
         }
-        else if (CharSequence.class.isAssignableFrom(javaType))
-        {
+        else if (CharSequence.class.isAssignableFrom(javaType)) {
             return (M) R2dbcUtils.clobToString(value);
         }
 
@@ -73,8 +65,7 @@ public class ClobCodec extends AbstractCodec<Clob>
      * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
      */
     @Override
-    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Clob value) throws SQLException
-    {
+    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Clob value) throws SQLException {
         java.sql.Clob clob = preparedStatement.getConnection().createClob();
 
         String string = R2dbcUtils.clobToString(value);

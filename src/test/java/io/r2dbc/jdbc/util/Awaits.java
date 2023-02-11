@@ -29,8 +29,7 @@ import reactor.core.publisher.Mono;
  * operations in a consistent order. The maximum time that a method will spend blocked is configured by {@link DatabaseConfig#sqlTimeout()}.
  */
 @SuppressWarnings("javadoc")
-public final class Awaits
-{
+public final class Awaits {
     /**
      * Subscribes to an {@code errorPublisher} and blocks until the publisher emits {@code onError} with an {@code errorType}. This method verifies that the
      * publisher does not emit {@code onComplete}.
@@ -40,8 +39,7 @@ public final class Awaits
      *
      * @throws Throwable If the publisher emits {@code onError} with a {@code Throwable} that is not an instance of {@code errorType}.
      */
-    public static void awaitError(final Class<? extends Throwable> errorType, final Publisher<?> errorPublisher)
-    {
+    public static void awaitError(final Class<? extends Throwable> errorType, final Publisher<?> errorPublisher) {
         assertThrows(errorType, () -> Mono.from(errorPublisher).block(sqlTimeout()), "Unexpected signal from Publisher of an error");
     }
 
@@ -53,10 +51,8 @@ public final class Awaits
      *
      * @throws Throwable If the statement execution results in an error.
      */
-    public static void awaitExecution(final Statement statement)
-    {
-        assertNull(Mono.from(statement.execute()).flatMap(result -> Mono.from(result.getRowsUpdated())).block(sqlTimeout()),
-                "Expected no update count when not updating rows");
+    public static void awaitExecution(final Statement statement) {
+        assertNull(Mono.from(statement.execute()).flatMap(result -> Mono.from(result.getRowsUpdated())).block(sqlTimeout()), "Expected no update count when not updating rows");
     }
 
     /**
@@ -68,8 +64,7 @@ public final class Awaits
      *
      * @throws Throwable If the publisher emits {@code onError}.
      */
-    public static <T> void awaitMany(final List<T> expectedValues, final Publisher<T> multiPublisher)
-    {
+    public static <T> void awaitMany(final List<T> expectedValues, final Publisher<T> multiPublisher) {
         assertEquals(expectedValues, awaitMany(multiPublisher), "Unexpected onNext signals from Publisher of multiple values");
     }
 
@@ -82,8 +77,7 @@ public final class Awaits
      *
      * @throws Throwable If the publisher emits {@code onError}.
      */
-    public static <T> List<T> awaitMany(final Publisher<T> multiPublisher)
-    {
+    public static <T> List<T> awaitMany(final Publisher<T> multiPublisher) {
         return Flux.from(multiPublisher).collectList().block(sqlTimeout());
     }
 
@@ -95,8 +89,7 @@ public final class Awaits
      *
      * @throws Throwable If the publisher emits {@code onError}.
      */
-    public static void awaitNone(final Publisher<?> emptyPublisher)
-    {
+    public static void awaitNone(final Publisher<?> emptyPublisher) {
         assertNull(Mono.from(emptyPublisher).block(sqlTimeout()), "Unexpected onNext signal from Publisher of no values");
     }
 
@@ -109,8 +102,7 @@ public final class Awaits
      *
      * @throws Throwable If the publisher emits {@code onError} or does not emit one {@code onNext} signal.
      */
-    public static <T> T awaitOne(final Publisher<T> singlePublisher)
-    {
+    public static <T> T awaitOne(final Publisher<T> singlePublisher) {
         return Flux.from(singlePublisher).single().cache().block(sqlTimeout());
     }
 
@@ -123,8 +115,7 @@ public final class Awaits
      *
      * @throws Throwable If the publisher emits {@code onError} or does not emit one {@code onNext} signal.
      */
-    public static <T> void awaitOne(final T expectedValue, final Publisher<T> singlePublisher)
-    {
+    public static <T> void awaitOne(final T expectedValue, final Publisher<T> singlePublisher) {
         assertEquals(expectedValue, awaitOne(singlePublisher), "Unexpected onNext signal from Publisher of a single value");
     }
 
@@ -138,10 +129,8 @@ public final class Awaits
      *
      * @throws Throwable If the statement execution results in an error.
      */
-    public static <T> void awaitQuery(final List<T> expectedRows, final Function<Row, T> rowMapper, final Statement statement)
-    {
-        assertEquals(expectedRows, Flux.from(statement.execute()).concatMap(result -> Flux.from(result.map((row, metadata) -> rowMapper.apply(row))))
-                .collectList().block(sqlTimeout()), "Unexpected row data");
+    public static <T> void awaitQuery(final List<T> expectedRows, final Function<Row, T> rowMapper, final Statement statement) {
+        assertEquals(expectedRows, Flux.from(statement.execute()).concatMap(result -> Flux.from(result.map((row, metadata) -> rowMapper.apply(row)))).collectList().block(sqlTimeout()), "Unexpected row data");
     }
 
     /**
@@ -153,8 +142,7 @@ public final class Awaits
      *
      * @throws Throwable If the statement execution results in an error.
      */
-    public static void awaitUpdate(final long expectedCount, final Statement statement)
-    {
+    public static void awaitUpdate(final long expectedCount, final Statement statement) {
         awaitUpdate(List.of(expectedCount), statement);
     }
 
@@ -167,19 +155,15 @@ public final class Awaits
      *
      * @throws Throwable If the statement execution results in an error.
      */
-    public static void awaitUpdate(final List<Long> expectedCounts, final Statement statement)
-    {
-        assertIterableEquals(expectedCounts, Flux.from(statement.execute()).flatMap(result -> Flux.from(result.getRowsUpdated())).collectList().block(sqlTimeout()),
-                "Unexpected update counts");
+    public static void awaitUpdate(final List<Long> expectedCounts, final Statement statement) {
+        assertIterableEquals(expectedCounts, Flux.from(statement.execute()).flatMap(result -> Flux.from(result.getRowsUpdated())).collectList().block(sqlTimeout()), "Unexpected update counts");
     }
 
-    private static Duration sqlTimeout()
-    {
+    private static Duration sqlTimeout() {
         return DbServerExtension.getSqlTimeout();
     }
 
-    private Awaits()
-    {
+    private Awaits() {
         super();
     }
 }

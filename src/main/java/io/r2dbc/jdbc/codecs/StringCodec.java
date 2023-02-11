@@ -13,10 +13,8 @@ import io.r2dbc.spi.Clob;
 /**
  * @author Thomas Freese
  */
-public class StringCodec extends AbstractCodec<String>
-{
-    public StringCodec()
-    {
+public class StringCodec extends AbstractCodec<String> {
+    public StringCodec() {
         super(String.class, JDBCType.CHAR, JDBCType.VARCHAR);
     }
 
@@ -24,12 +22,10 @@ public class StringCodec extends AbstractCodec<String>
      * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    public String mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException
-    {
+    public String mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         String value = resultSet.getString(columnLabel);
 
-        if (resultSet.wasNull())
-        {
+        if (resultSet.wasNull()) {
             return null;
         }
 
@@ -41,25 +37,20 @@ public class StringCodec extends AbstractCodec<String>
      */
     @SuppressWarnings("unchecked")
     @Override
-    public <M> M mapTo(final Class<M> javaType, final String value)
-    {
-        if (value == null)
-        {
+    public <M> M mapTo(final Class<M> javaType, final String value) {
+        if (value == null) {
             return null;
         }
 
-        if (getJavaType().equals(javaType) || Object.class.equals(javaType))
-        {
+        if (getJavaType().equals(javaType) || Object.class.equals(javaType)) {
             return (M) value;
         }
-        else if (Blob.class.isAssignableFrom(javaType))
-        {
+        else if (Blob.class.isAssignableFrom(javaType)) {
             Blob blob = R2dbcUtils.stringToBlob(value);
 
             return (M) blob;
         }
-        else if (Clob.class.isAssignableFrom(javaType))
-        {
+        else if (Clob.class.isAssignableFrom(javaType)) {
             Clob clob = R2dbcUtils.stringToClob(value);
 
             return (M) clob;
@@ -72,8 +63,7 @@ public class StringCodec extends AbstractCodec<String>
      * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
      */
     @Override
-    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final String value) throws SQLException
-    {
+    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final String value) throws SQLException {
         preparedStatement.setString(parameterIndex, value);
     }
 }

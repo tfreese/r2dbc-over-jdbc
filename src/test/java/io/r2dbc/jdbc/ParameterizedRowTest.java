@@ -45,21 +45,18 @@ import reactor.test.StepVerifier;
  * @author Thomas Freese
  */
 @ExtendWith(JanitorInvocationInterceptor.class)
-final class ParameterizedRowTest
-{
+final class ParameterizedRowTest {
     @RegisterExtension
     static final MultiDatabaseExtension DATABASE_EXTENSION = new MultiDatabaseExtension();
 
-    static Stream<Arguments> getDatabases()
-    {
+    static Stream<Arguments> getDatabases() {
         return DATABASE_EXTENSION.getServers().stream().map(server -> Arguments.of(server.getDatabaseType(), server));
     }
 
     private final Codecs codecs = new DefaultCodecs();
 
     @Test
-    void testConstructorNoValues()
-    {
+    void testConstructorNoValues() {
         JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-1", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
         JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
@@ -68,8 +65,7 @@ final class ParameterizedRowTest
     }
 
     @Test
-    void testGetByIndex()
-    {
+    void testGetByIndex() {
         JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-1", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
         JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
@@ -82,8 +78,7 @@ final class ParameterizedRowTest
     }
 
     @Test
-    void testGetByName()
-    {
+    void testGetByName() {
         JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-2", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
         JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
@@ -96,8 +91,7 @@ final class ParameterizedRowTest
     }
 
     @Test
-    void testGetInvalidIdentifier()
-    {
+    void testGetInvalidIdentifier() {
         ColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
         RowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
@@ -105,18 +99,15 @@ final class ParameterizedRowTest
     }
 
     @Test
-    void testGetNoIdentifier()
-    {
+    void testGetNoIdentifier() {
         JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
         JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
-        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcRow(rowMetadata, new HashMap<>(), this.codecs).get(null, Object.class))
-                .withMessage("name is null");
+        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcRow(rowMetadata, new HashMap<>(), this.codecs).get(null, Object.class)).withMessage("name is null");
     }
 
     @Test
-    void testGetNull()
-    {
+    void testGetNull() {
         JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-3", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
         JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
@@ -127,25 +118,20 @@ final class ParameterizedRowTest
     }
 
     @Test
-    void testGetWrongIdentifierType()
-    {
+    void testGetWrongIdentifierType() {
         String identifier = "-";
 
         JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
         JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
-        assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> new JdbcRow(rowMetadata, new HashMap<>(), this.codecs).get(identifier, Object.class))
-                .withMessage("No MetaData for Name: %s", identifier);
+        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> new JdbcRow(rowMetadata, new HashMap<>(), this.codecs).get(identifier, Object.class)).withMessage("No MetaData for Name: %s", identifier);
     }
 
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testSelectWithAliases") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testSelectWithAliases(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
-    {
-        ConnectionFactory connectionFactory =
-                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+    void testSelectWithAliases(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
+        ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         server.getJdbcOperations().execute("INSERT INTO test VALUES (100)");
 
@@ -168,10 +154,8 @@ final class ParameterizedRowTest
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testSelectWithoutAliases") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testSelectWithoutAliases(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
-    {
-        ConnectionFactory connectionFactory =
-                ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+    void testSelectWithoutAliases(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
+        ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         // server.getJdbcOperations().execute("INSERT INTO test VALUES (100)");
         //
@@ -187,8 +171,7 @@ final class ParameterizedRowTest
 
         Connection connection = Mono.from(connectionFactory.create()).block(DbServerExtension.getSqlTimeout());
 
-        try
-        {
+        try {
             // awaitExecution(connection.createStatement("CREATE TABLE test ( test_value INTEGER )"));
 
             awaitUpdate(1, connection.createStatement("INSERT INTO test VALUES (100)"));
@@ -196,8 +179,7 @@ final class ParameterizedRowTest
             awaitQuery(List.of(100), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
             awaitQuery(List.of(100), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
         }
-        finally
-        {
+        finally {
             awaitNone(connection.close());
         }
 

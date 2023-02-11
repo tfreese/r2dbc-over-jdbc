@@ -18,14 +18,12 @@ import reactor.core.publisher.Mono;
  *
  * @author Thomas Freese
  */
-public final class JdbcConnectionFactory implements ConnectionFactory
-{
+public final class JdbcConnectionFactory implements ConnectionFactory {
     private final Codecs codecs;
 
     private final Mono<Connection> jdbcConnectionFactory;
 
-    public JdbcConnectionFactory(final DataSource dataSource, final Codecs codecs)
-    {
+    public JdbcConnectionFactory(final DataSource dataSource, final Codecs codecs) {
         super();
 
         Objects.requireNonNull(dataSource, "dataSource must not be null");
@@ -34,20 +32,17 @@ public final class JdbcConnectionFactory implements ConnectionFactory
         this.codecs = new DefaultCodecs();
     }
 
-    public JdbcConnectionFactory(final JdbcConnectionConfiguration connectionConfiguration)
-    {
+    public JdbcConnectionFactory(final JdbcConnectionConfiguration connectionConfiguration) {
         this(connectionConfiguration.getDataSource(), connectionConfiguration.getCodecs());
     }
 
     @Override
-    public Mono<io.r2dbc.spi.Connection> create()
-    {
+    public Mono<io.r2dbc.spi.Connection> create() {
         return this.jdbcConnectionFactory.map(jdbcConnection -> new JdbcConnection(jdbcConnection, this.codecs));
     }
 
     @Override
-    public ConnectionFactoryMetadata getMetadata()
-    {
+    public ConnectionFactoryMetadata getMetadata() {
         return JdbcConnectionFactoryMetadata.INSTANCE;
     }
 }

@@ -14,8 +14,7 @@ import java.util.Set;
  *
  * @author Thomas Freese
  */
-public interface Codec<T>
-{
+public interface Codec<T> {
     Class<T> getJavaType();
 
     T mapFromSql(ResultSet resultSet, String columnLabel) throws SQLException;

@@ -14,10 +14,8 @@ import java.util.Date;
 /**
  * @author Thomas Freese
  */
-public class DateCodec extends AbstractCodec<Date>
-{
-    public DateCodec()
-    {
+public class DateCodec extends AbstractCodec<Date> {
+    public DateCodec() {
         super(Date.class, JDBCType.DATE, JDBCType.TIME, JDBCType.TIMESTAMP);
     }
 
@@ -25,12 +23,10 @@ public class DateCodec extends AbstractCodec<Date>
      * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    public Date mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException
-    {
+    public Date mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         java.sql.Date sqlDate = resultSet.getDate(columnLabel);
 
-        if (resultSet.wasNull())
-        {
+        if (resultSet.wasNull()) {
             return null;
         }
 
@@ -43,37 +39,30 @@ public class DateCodec extends AbstractCodec<Date>
      */
     @SuppressWarnings("unchecked")
     @Override
-    public <M> M mapTo(final Class<M> javaType, final Date value)
-    {
-        if (value == null)
-        {
+    public <M> M mapTo(final Class<M> javaType, final Date value) {
+        if (value == null) {
             return null;
         }
 
-        if (getJavaType().equals(javaType) || Object.class.equals(javaType))
-        {
+        if (getJavaType().equals(javaType) || Object.class.equals(javaType)) {
             return (M) value;
         }
-        else if (LocalDate.class.equals(javaType))
-        {
+        else if (LocalDate.class.equals(javaType)) {
             LocalDate localDate = LocalDate.ofInstant(value.toInstant(), ZoneId.systemDefault());
 
             return (M) localDate;
         }
-        else if (LocalDateTime.class.equals(javaType))
-        {
+        else if (LocalDateTime.class.equals(javaType)) {
             LocalDateTime localDateTime = value.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
             return (M) localDateTime;
         }
-        else if (LocalTime.class.equals(javaType))
-        {
+        else if (LocalTime.class.equals(javaType)) {
             LocalTime localTime = LocalTime.ofInstant(value.toInstant(), ZoneId.systemDefault());
 
             return (M) localTime;
         }
-        else if (String.class.equals(javaType))
-        {
+        else if (String.class.equals(javaType)) {
             String formatted = String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", value);
 
             return (M) formatted;
@@ -86,8 +75,7 @@ public class DateCodec extends AbstractCodec<Date>
      * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
      */
     @Override
-    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Date value) throws SQLException
-    {
+    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Date value) throws SQLException {
         java.sql.Date sqlDate = new java.sql.Date(value.getTime());
 
         preparedStatement.setDate(parameterIndex, sqlDate);

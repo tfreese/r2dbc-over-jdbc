@@ -15,12 +15,10 @@ import reactor.core.publisher.Mono;
 /**
  * @author Thomas Freese
  */
-public class BlobCodec extends AbstractCodec<Blob>
-{
+public class BlobCodec extends AbstractCodec<Blob> {
     public static final Blob NULL_BLOB = Blob.from(Mono.empty());
 
-    public BlobCodec()
-    {
+    public BlobCodec() {
         super(Blob.class, JDBCType.BINARY, JDBCType.BLOB);
     }
 
@@ -28,12 +26,10 @@ public class BlobCodec extends AbstractCodec<Blob>
      * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    public Blob mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException
-    {
+    public Blob mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         java.sql.Blob value = resultSet.getBlob(columnLabel);
 
-        if (resultSet.wasNull())
-        {
+        if (resultSet.wasNull()) {
             return NULL_BLOB;
         }
 
@@ -45,15 +41,12 @@ public class BlobCodec extends AbstractCodec<Blob>
      */
     @SuppressWarnings("unchecked")
     @Override
-    public <M> M mapTo(final Class<M> javaType, final Blob value)
-    {
-        if (value == null)
-        {
+    public <M> M mapTo(final Class<M> javaType, final Blob value) {
+        if (value == null) {
             return null;
         }
 
-        if (getJavaType().equals(javaType) || Object.class.equals(javaType))
-        {
+        if (getJavaType().equals(javaType) || Object.class.equals(javaType)) {
             // if (NULL_BLOB.equals(value))
             // {
             // return null;
@@ -61,16 +54,13 @@ public class BlobCodec extends AbstractCodec<Blob>
 
             return (M) value;
         }
-        else if (ByteBuffer.class.equals(javaType))
-        {
+        else if (ByteBuffer.class.equals(javaType)) {
             return (M) R2dbcUtils.blobToByteBuffer(value);
         }
-        else if (InputStream.class.isAssignableFrom(javaType))
-        {
+        else if (InputStream.class.isAssignableFrom(javaType)) {
             return (M) R2dbcUtils.blobToInputStream(value);
         }
-        else if (byte[].class.equals(javaType))
-        {
+        else if (byte[].class.equals(javaType)) {
             return (M) R2dbcUtils.blobToByteArray(value);
         }
 
@@ -81,8 +71,7 @@ public class BlobCodec extends AbstractCodec<Blob>
      * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
      */
     @Override
-    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Blob value) throws SQLException
-    {
+    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Blob value) throws SQLException {
         java.sql.Blob blob = preparedStatement.getConnection().createBlob();
 
         byte[] bytes = R2dbcUtils.blobToByteArray(value);

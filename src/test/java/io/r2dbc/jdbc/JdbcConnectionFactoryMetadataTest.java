@@ -8,11 +8,9 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Thomas Freese
  */
-final class JdbcConnectionFactoryMetadataTest
-{
+final class JdbcConnectionFactoryMetadataTest {
     @Test
-    void testName()
-    {
+    void testName() {
         assertThat(JdbcConnectionFactoryMetadata.INSTANCE.getName()).isEqualTo(JdbcConnectionFactoryMetadata.NAME);
     }
 }

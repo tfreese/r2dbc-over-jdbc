@@ -6,26 +6,20 @@ import java.sql.SQLException;
 /**
  * @author Thomas Freese
  */
-public final class Assert
-{
-    public static void assertNotNull(final Object value, final String message) throws SQLException
-    {
-        if (value == null)
-        {
+public final class Assert {
+    public static void assertNotNull(final Object value, final String message) throws SQLException {
+        if (value == null) {
             throw new SQLException(message);
         }
     }
 
-    public static void assertNotNullOrBlank(final String value, final String message) throws SQLException
-    {
-        if ((value == null) || value.isBlank())
-        {
+    public static void assertNotNullOrBlank(final String value, final String message) throws SQLException {
+        if ((value == null) || value.isBlank()) {
             throw new SQLException(message);
         }
     }
 
-    private Assert()
-    {
+    private Assert() {
         super();
     }
 }

@@ -23,33 +23,28 @@ import io.r2dbc.spi.RowMetadata;
  *
  * @author Thomas Freese
  */
-public class JdbcRowMetadata implements RowMetadata
-{
-    public static RowMetadata of(final ResultSet resultSet, final Codecs codecs) throws SQLException
-    {
-        if (resultSet == null)
-        {
+public class JdbcRowMetadata implements RowMetadata {
+    public static RowMetadata of(final ResultSet resultSet, final Codecs codecs) throws SQLException {
+        if (resultSet == null) {
             return new JdbcRowMetadata(Collections.emptyList());
         }
 
         ResultSetMetaData metaData = resultSet.getMetaData();
         List<ColumnMetadata> list = new ArrayList<>();
 
-        for (int column = 1; column <= metaData.getColumnCount(); column++)
-        {
+        for (int column = 1; column <= metaData.getColumnCount(); column++) {
             String name = metaData.getColumnLabel(column);
             int sqlType = metaData.getColumnType(column);
             JDBCType jdbcType = JDBCType.valueOf(sqlType);
             int precision = metaData.getPrecision(column);
             int scale = metaData.getScale(column);
 
-            Nullability nullability = switch (metaData.isNullable(column))
-                    {
-                        case ResultSetMetaData.columnNoNulls -> Nullability.NON_NULL;
-                        case ResultSetMetaData.columnNullable -> Nullability.NULLABLE;
+            Nullability nullability = switch (metaData.isNullable(column)) {
+                case ResultSetMetaData.columnNoNulls -> Nullability.NON_NULL;
+                case ResultSetMetaData.columnNullable -> Nullability.NULLABLE;
 
-                        default -> Nullability.UNKNOWN;
-                    };
+                default -> Nullability.UNKNOWN;
+            };
 
             Class<?> javaType = codecs.getJavaType(jdbcType);
 
@@ -63,44 +58,37 @@ public class JdbcRowMetadata implements RowMetadata
 
     private final Map<String, ColumnMetadata> columnMetaDatasByName = new LinkedHashMap<>();
 
-    public JdbcRowMetadata(final List<ColumnMetadata> columnMetaDatas)
-    {
+    public JdbcRowMetadata(final List<ColumnMetadata> columnMetaDatas) {
         super();
 
         this.columnMetaDatas = Objects.requireNonNull(columnMetaDatas, "columnMetaDatas must not be null");
 
-        columnMetaDatas.forEach(cmd ->
-        {
+        columnMetaDatas.forEach(cmd -> {
             // Bei Spalten mit identischen Namen, immer den ersten nehmen, laut Spezifikation.
             String name = cmd.getName().toLowerCase();
 
             ColumnMetadata old = this.columnMetaDatasByName.put(name, cmd);
 
-            if (old != null)
-            {
+            if (old != null) {
                 this.columnMetaDatasByName.put(name, old);
             }
         });
     }
 
     @Override
-    public boolean contains(final String columnName)
-    {
+    public boolean contains(final String columnName) {
         return this.columnMetaDatasByName.containsKey(columnName.toLowerCase());
     }
 
     @Override
-    public ColumnMetadata getColumnMetadata(final String name)
-    {
-        if (name == null)
-        {
+    public ColumnMetadata getColumnMetadata(final String name) {
+        if (name == null) {
             throw new IllegalArgumentException("name is null");
         }
 
         ColumnMetadata metaData = this.columnMetaDatasByName.get(name.toLowerCase());
 
-        if (metaData == null)
-        {
+        if (metaData == null) {
             throw new NoSuchElementException("No MetaData for Name: " + name);
         }
 
@@ -108,17 +96,14 @@ public class JdbcRowMetadata implements RowMetadata
     }
 
     @Override
-    public ColumnMetadata getColumnMetadata(final int index)
-    {
-        if ((index < 0) || (index >= this.columnMetaDatas.size()))
-        {
+    public ColumnMetadata getColumnMetadata(final int index) {
+        if ((index < 0) || (index >= this.columnMetaDatas.size())) {
             throw new ArrayIndexOutOfBoundsException("Index: " + index + ", Size: " + this.columnMetaDatas.size());
         }
 
         ColumnMetadata metaData = this.columnMetaDatas.get(index);
 
-        if (metaData == null)
-        {
+        if (metaData == null) {
             throw new NoSuchElementException("No MetaData for Index: " + index);
         }
 
@@ -126,8 +111,7 @@ public class JdbcRowMetadata implements RowMetadata
     }
 
     @Override
-    public List<ColumnMetadata> getColumnMetadatas()
-    {
+    public List<ColumnMetadata> getColumnMetadatas() {
         return List.copyOf(this.columnMetaDatas);
     }
 }

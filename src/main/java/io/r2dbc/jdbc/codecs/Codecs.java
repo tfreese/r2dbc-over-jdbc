@@ -11,8 +11,7 @@ import java.sql.SQLException;
  *
  * @author Thomas Freese
  */
-public interface Codecs
-{
+public interface Codecs {
     Class<?> getJavaType(JDBCType jdbcType);
 
     JDBCType getJdbcType(Class<?> javaType);

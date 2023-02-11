@@ -13,8 +13,7 @@ import java.util.stream.Stream;
  *
  * @author Thomas Freese
  */
-public abstract class AbstractCodec<T> implements Codec<T>
-{
+public abstract class AbstractCodec<T> implements Codec<T> {
     private final Class<T> javaType;
 
     private final Set<JDBCType> supportedJdbcTypes;
@@ -27,18 +26,15 @@ public abstract class AbstractCodec<T> implements Codec<T>
     // this.javaType = (Class<T>) ((ParameterizedType) (getClass().getGenericSuperclass())).getActualTypeArguments()[0];
     // }
 
-    protected AbstractCodec(final Class<T> javaType, final JDBCType... supportedJdbcTypes)
-    {
+    protected AbstractCodec(final Class<T> javaType, final JDBCType... supportedJdbcTypes) {
         super();
 
         this.javaType = Objects.requireNonNull(javaType, "javaType required");
 
-        if (supportedJdbcTypes.length == 0)
-        {
+        if (supportedJdbcTypes.length == 0) {
             this.supportedJdbcTypes = Collections.emptySet();
         }
-        else
-        {
+        else {
             this.supportedJdbcTypes = Stream.of(supportedJdbcTypes).collect(Collectors.toUnmodifiableSet());
         }
     }
@@ -47,8 +43,7 @@ public abstract class AbstractCodec<T> implements Codec<T>
      * @see io.r2dbc.jdbc.codecs.Codec#getJavaType()
      */
     @Override
-    public Class<T> getJavaType()
-    {
+    public Class<T> getJavaType() {
         return this.javaType;
     }
 
@@ -56,13 +51,11 @@ public abstract class AbstractCodec<T> implements Codec<T>
      * @see io.r2dbc.jdbc.codecs.Codec#supportedJdbcTypes()
      */
     @Override
-    public Set<JDBCType> supportedJdbcTypes()
-    {
+    public Set<JDBCType> supportedJdbcTypes() {
         return this.supportedJdbcTypes;
     }
 
-    protected RuntimeException throwCanNotMapException(final Object object)
-    {
+    protected RuntimeException throwCanNotMapException(final Object object) {
         return new IllegalArgumentException(String.format("can not map %s into %s", object.getClass().getSimpleName(), getJavaType().getSimpleName()));
     }
 }

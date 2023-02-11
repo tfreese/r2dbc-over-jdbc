@@ -22,31 +22,24 @@ import reactor.test.StepVerifier;
 /**
  * @author Thomas Freese
  */
-final class JdbcResultTest
-{
+final class JdbcResultTest {
     @Test
-    void testConstructorNoRowMetadata()
-    {
+    void testConstructorNoRowMetadata() {
         assertThatNullPointerException().isThrownBy(() -> new JdbcResult(Flux.empty(), null, null)).withMessage("rowMetadata must not be null");
     }
 
     @Test
-    void testConstructorNoRows()
-    {
+    void testConstructorNoRows() {
         assertThatNullPointerException().isThrownBy(() -> new JdbcResult(null, Mono.empty(), null)).withMessage("rows must not be null");
     }
 
     @Test
-    void testToResultErrorResponse()
-    {
+    void testToResultErrorResponse() {
         final BiFunction<Row, RowMetadata, Row> mappingFunction = (row, rowMetadata) -> row;
 
         Result result = mock(JdbcResult.class, RETURNS_SMART_NULLS);
 
-        when(result.map(mappingFunction)).thenAnswer(arg ->
-                Flux.error(new SQLIntegrityConstraintViolationException("can't do something", "some state", 999)).onErrorMap(SQLException.class,
-                        JdbcR2dbcExceptionFactory::convert)
-        );
+        when(result.map(mappingFunction)).thenAnswer(arg -> Flux.error(new SQLIntegrityConstraintViolationException("can't do something", "some state", 999)).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert));
         when(result.getRowsUpdated()).thenReturn(Mono.empty());
 
         Flux.from(result.map(mappingFunction)).as(StepVerifier::create).verifyError(R2dbcDataIntegrityViolationException.class);

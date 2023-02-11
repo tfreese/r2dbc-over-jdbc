@@ -19,16 +19,14 @@ import io.r2dbc.spi.RowMetadata;
  *
  * @author Thomas Freese
  */
-public class JdbcRow implements Row, Result.RowSegment
-{
+public class JdbcRow implements Row, Result.RowSegment {
     private final Codecs codecs;
 
     private final RowMetadata rowMetadata;
 
     private final Map<Integer, Object> values;
 
-    public JdbcRow(final RowMetadata rowMetadata, final Map<Integer, Object> values, final Codecs codecs)
-    {
+    public JdbcRow(final RowMetadata rowMetadata, final Map<Integer, Object> values, final Codecs codecs) {
         super();
 
         this.rowMetadata = Objects.requireNonNull(rowMetadata, "rowMetadata required");
@@ -37,17 +35,14 @@ public class JdbcRow implements Row, Result.RowSegment
     }
 
     @Override
-    public Object get(final int index)
-    {
+    public Object get(final int index) {
         ColumnMetadata metadata = getMetadata().getColumnMetadata(index);
 
-        if (Clob.class.equals(metadata.getJavaType()))
-        {
+        if (Clob.class.equals(metadata.getJavaType())) {
             // Clobs immer als String liefern.
             return get(index, String.class);
         }
-        else if (Blob.class.equals(metadata.getJavaType()))
-        {
+        else if (Blob.class.equals(metadata.getJavaType())) {
             // Blobs immer als ByteBuffer liefern.
             return get(index, ByteBuffer.class);
         }
@@ -56,17 +51,14 @@ public class JdbcRow implements Row, Result.RowSegment
     }
 
     @Override
-    public <T> T get(final int index, final Class<T> type)
-    {
-        if (type == null)
-        {
+    public <T> T get(final int index, final Class<T> type) {
+        if (type == null) {
             throw new IllegalArgumentException("type is null");
         }
 
         Object value = this.values.get(index);
 
-        if (value == null)
-        {
+        if (value == null) {
             return null;
         }
 
@@ -77,8 +69,7 @@ public class JdbcRow implements Row, Result.RowSegment
     }
 
     @Override
-    public Object get(final String name)
-    {
+    public Object get(final String name) {
         ColumnMetadata metadata = getMetadata().getColumnMetadata(name);
 
         int column = ((JdbcColumnMetadata) metadata).getColumn();
@@ -87,15 +78,12 @@ public class JdbcRow implements Row, Result.RowSegment
     }
 
     @Override
-    public <T> T get(final String name, final Class<T> type)
-    {
-        if (name == null)
-        {
+    public <T> T get(final String name, final Class<T> type) {
+        if (name == null) {
             throw new IllegalArgumentException("name is null");
         }
 
-        if (type == null)
-        {
+        if (type == null) {
             throw new IllegalArgumentException("type is null");
         }
 
@@ -107,14 +95,12 @@ public class JdbcRow implements Row, Result.RowSegment
     }
 
     @Override
-    public RowMetadata getMetadata()
-    {
+    public RowMetadata getMetadata() {
         return this.rowMetadata;
     }
 
     @Override
-    public Row row()
-    {
+    public Row row() {
         return this;
     }
 }

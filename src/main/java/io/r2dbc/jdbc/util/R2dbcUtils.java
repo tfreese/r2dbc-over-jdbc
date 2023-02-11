@@ -24,10 +24,8 @@ import reactor.core.publisher.Mono;
 /**
  * @author Thomas Freese
  */
-public final class R2dbcUtils
-{
-    public static byte[] blobToByteArray(final Blob blob)
-    {
+public final class R2dbcUtils {
+    public static byte[] blobToByteArray(final Blob blob) {
         // ByteArrayOutputStream baos = new ByteArrayOutputStream();
         //
         // Flux.from(blob.stream()).subscribe(byteBuffer -> {
@@ -61,8 +59,7 @@ public final class R2dbcUtils
         // @formatter:on
     }
 
-    public static ByteBuffer blobToByteBuffer(final Blob blob)
-    {
+    public static ByteBuffer blobToByteBuffer(final Blob blob) {
         //        // @formatter:off
 //        ByteBuffer byteBuffer = Flux.from(blob.stream())
 //            .reduce(ByteBuffer::put)
@@ -86,15 +83,13 @@ public final class R2dbcUtils
         return ByteBuffer.wrap(bytes);
     }
 
-    public static InputStream blobToInputStream(final Blob blob)
-    {
+    public static InputStream blobToInputStream(final Blob blob) {
         byte[] bytes = blobToByteArray(blob);
 
         return new ByteArrayInputStream(bytes);
     }
 
-    public static String blobToString(final Blob blob)
-    {
+    public static String blobToString(final Blob blob) {
         ByteBuffer byteBuffer = blobToByteBuffer(blob);
 
         byteBuffer = Base64.getEncoder().encode(byteBuffer);
@@ -103,33 +98,28 @@ public final class R2dbcUtils
         return charBuffer.toString();
     }
 
-    public static Blob byteArrayToBlob(final byte[] bytes)
-    {
+    public static Blob byteArrayToBlob(final byte[] bytes) {
         ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
 
         return byteBufferToBlob(byteBuffer);
     }
 
-    public static Blob byteBufferToBlob(final ByteBuffer byteBuffer)
-    {
+    public static Blob byteBufferToBlob(final ByteBuffer byteBuffer) {
         return Blob.from((Mono.just(byteBuffer)));
     }
 
-    public static byte[] byteBufferToByteArray(final ByteBuffer byteBuffer)
-    {
+    public static byte[] byteBufferToByteArray(final ByteBuffer byteBuffer) {
         byte[] bytes = new byte[byteBuffer.remaining()];
         byteBuffer.get(bytes);
 
         return bytes;
     }
 
-    public static InputStream byteBufferToInputStream(final ByteBuffer byteBuffer)
-    {
+    public static InputStream byteBufferToInputStream(final ByteBuffer byteBuffer) {
         return new ByteArrayInputStream(byteBuffer.array());
     }
 
-    public static String clobToString(final Clob clob)
-    {
+    public static String clobToString(final Clob clob) {
         // @formatter:off
         return Flux.from(clob.stream())
                 .reduce(new StringBuilder(), StringBuilder::append)
@@ -141,21 +131,17 @@ public final class R2dbcUtils
         // @formatter:on
     }
 
-    public static Blob inputStreamToBlob(final InputStream inputStream)
-    {
+    public static Blob inputStreamToBlob(final InputStream inputStream) {
         ByteBuffer byteBuffer = inputStreamToByteBuffer(inputStream);
 
         return byteBufferToBlob(byteBuffer);
     }
 
-    public static ByteBuffer inputStreamToByteBuffer(final InputStream inputStream)
-    {
-        try
-        {
+    public static ByteBuffer inputStreamToByteBuffer(final InputStream inputStream) {
+        try {
             ByteBuffer byteBuffer = null;
 
-            try (InputStream in = new BufferedInputStream(inputStream))
-            {
+            try (InputStream in = new BufferedInputStream(inputStream)) {
                 byte[] bytes = in.readAllBytes();
 
                 byteBuffer = ByteBuffer.wrap(bytes);
@@ -163,85 +149,69 @@ public final class R2dbcUtils
 
             return byteBuffer;
         }
-        catch (IOException ex)
-        {
+        catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
     }
 
-    public static String readerToString(final Reader reader)
-    {
-        try
-        {
+    public static String readerToString(final Reader reader) {
+        try {
             String string = null;
 
-            try (BufferedReader bufferedReader = new BufferedReader(reader))
-            {
+            try (BufferedReader bufferedReader = new BufferedReader(reader)) {
                 string = bufferedReader.lines().collect(Collectors.joining());
             }
 
             return string;
         }
-        catch (IOException ex)
-        {
+        catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
     }
 
-    public static Blob sqlBlobToBlob(final java.sql.Blob sqlBlob)
-    {
+    public static Blob sqlBlobToBlob(final java.sql.Blob sqlBlob) {
         ByteBuffer byteBuffer = null;
 
-        try (InputStream inputStream = sqlBlob.getBinaryStream())
-        {
+        try (InputStream inputStream = sqlBlob.getBinaryStream()) {
             byteBuffer = inputStreamToByteBuffer(inputStream);
         }
-        catch (IOException ex)
-        {
+        catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
-        catch (SQLException ex)
-        {
+        catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
 
         return byteBufferToBlob(byteBuffer);
     }
 
-    public static Clob sqlClobToClob(final java.sql.Clob sqlClob)
-    {
+    public static Clob sqlClobToClob(final java.sql.Clob sqlClob) {
         String string = null;
 
-        try (Reader reader = sqlClob.getCharacterStream())
-        {
+        try (Reader reader = sqlClob.getCharacterStream()) {
             string = R2dbcUtils.readerToString(reader);
         }
-        catch (IOException ex)
-        {
+        catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
-        catch (SQLException ex)
-        {
+        catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
 
         return stringToClob(string);
     }
 
-    public static Blob stringToBlob(final String value)
-    {
+    public static Blob stringToBlob(final String value) {
         ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(value);
 
         return byteBufferToBlob(byteBuffer);
     }
 
-    public static Clob stringToClob(final String value)
-    {
+    public static Clob stringToClob(final String value) {
         return Clob.from((Mono.just(value)));
     }
 
-    private R2dbcUtils()
-    {
+    private R2dbcUtils() {
         super();
     }
 }

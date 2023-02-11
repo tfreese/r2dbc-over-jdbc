@@ -29,32 +29,26 @@ import reactor.test.StepVerifier;
 /**
  * @author Thomas Freese
  */
-final class JdbcConnectionTest
-{
+final class JdbcConnectionTest {
     private final Codecs codecs = new DefaultCodecs();
 
     private final Connection connection = mock(Connection.class, RETURNS_SMART_NULLS);
 
     @Test
-    void testBeginTransaction()
-    {
+    void testBeginTransaction() {
         new JdbcConnection(this.connection, this.codecs).beginTransaction().as(StepVerifier::create).verifyComplete();
     }
 
     @Test
-    void testBeginTransactionErrorResponse() throws SQLException
-    {
+    void testBeginTransactionErrorResponse() throws SQLException {
         when(this.connection.getAutoCommit()).thenReturn(true);
-        doThrow(new SQLNonTransientConnectionException("Unable to disable autocommits", "some state", 999)).when(this.connection)
-                .setAutoCommit(ArgumentMatchers.anyBoolean());
+        doThrow(new SQLNonTransientConnectionException("Unable to disable autocommits", "some state", 999)).when(this.connection).setAutoCommit(ArgumentMatchers.anyBoolean());
 
-        new JdbcConnection(this.connection, this.codecs).beginTransaction().as(StepVerifier::create)
-                .verifyErrorMatches(R2dbcNonTransientResourceException.class::isInstance);
+        new JdbcConnection(this.connection, this.codecs).beginTransaction().as(StepVerifier::create).verifyErrorMatches(R2dbcNonTransientResourceException.class::isInstance);
     }
 
     @Test
-    void testBeginTransactionInTransaction() throws SQLException
-    {
+    void testBeginTransactionInTransaction() throws SQLException {
         when(this.connection.getAutoCommit()).thenReturn(true);
         verifyNoMoreInteractions(this.connection);
 
@@ -62,16 +56,14 @@ final class JdbcConnectionTest
     }
 
     @Test
-    void testClose() throws SQLException
-    {
+    void testClose() throws SQLException {
         when(this.connection.isClosed()).thenReturn(false);
 
         new JdbcConnection(this.connection, this.codecs).close().as(StepVerifier::create).verifyComplete();
     }
 
     @Test
-    void testCloseWhenClosed() throws SQLException
-    {
+    void testCloseWhenClosed() throws SQLException {
         when(this.connection.isClosed()).thenReturn(true);
         verifyNoMoreInteractions(this.connection);
 
@@ -79,26 +71,22 @@ final class JdbcConnectionTest
     }
 
     @Test
-    void testCommitTransaction() throws SQLException
-    {
+    void testCommitTransaction() throws SQLException {
         when(this.connection.getAutoCommit()).thenReturn(false);
 
         new JdbcConnection(this.connection, this.codecs).commitTransaction().as(StepVerifier::create).verifyComplete();
     }
 
     @Test
-    void testCommitTransactionErrorResponse() throws SQLException
-    {
+    void testCommitTransactionErrorResponse() throws SQLException {
         when(this.connection.getAutoCommit()).thenReturn(false);
         doThrow(new SQLTransactionRollbackException("can't commit", "some state", 999)).when(this.connection).commit();
 
-        new JdbcConnection(this.connection, this.codecs).commitTransaction().as(StepVerifier::create)
-                .verifyErrorMatches(R2dbcRollbackException.class::isInstance);
+        new JdbcConnection(this.connection, this.codecs).commitTransaction().as(StepVerifier::create).verifyErrorMatches(R2dbcRollbackException.class::isInstance);
     }
 
     @Test
-    void testCommitTransactionNonOpen() throws SQLException
-    {
+    void testCommitTransactionNonOpen() throws SQLException {
         when(this.connection.getAutoCommit()).thenReturn(true);
         verifyNoMoreInteractions(this.connection);
 
@@ -106,35 +94,30 @@ final class JdbcConnectionTest
     }
 
     @Test
-    void testConstructorNoClient()
-    {
+    void testConstructorNoClient() {
         assertThatNullPointerException().isThrownBy(() -> new JdbcConnection(null, null)).withMessage("jdbcConnection must not be null");
     }
 
     @Test
-    void testCreateBatch()
-    {
+    void testCreateBatch() {
         assertThat(new JdbcConnection(this.connection, this.codecs).createBatch()).isInstanceOf(JdbcBatch.class);
         // assertThatThrownBy(jdbcConnection::createBatch).isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test
-    void testCreateSavepoint()
-    {
+    void testCreateSavepoint() {
         new JdbcConnection(this.connection, this.codecs).createSavepoint("test").as(StepVerifier::create).verifyComplete();
     }
 
     @Test
-    void testCreateSavepointNoName()
-    {
+    void testCreateSavepointNoName() {
         // new JdbcConnection(this.connection).createSavepoint(null).as(StepVerifier::create).verifyErrorMatches(IllegalArgumentException.class::isInstance);
 
         assertThatIllegalArgumentException().isThrownBy(() -> new JdbcConnection(this.connection, this.codecs).createSavepoint(null));
     }
 
     @Test
-    void testCreateStatement()
-    {
+    void testCreateStatement() {
         assertThat(new JdbcConnection(this.connection, this.codecs).createStatement("select-query-?")).isInstanceOf(JdbcStatement.class);
         assertThat(new JdbcConnection(this.connection, this.codecs).createStatement("insert-query-?")).isInstanceOf(JdbcStatement.class);
         assertThat(new JdbcConnection(this.connection, this.codecs).createStatement("update-query-?")).isInstanceOf(JdbcStatement.class);
@@ -144,16 +127,14 @@ final class JdbcConnectionTest
     }
 
     @Test
-    void testReleaseSavepoint()
-    {
+    void testReleaseSavepoint() {
         // new JdbcConnection(this.connection).releaseSavepoint("test").as(StepVerifier::create)
         // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
         new JdbcConnection(this.connection, this.codecs).releaseSavepoint("test").as(StepVerifier::create).verifyComplete();
     }
 
     @Test
-    void testReleaseSavepointNoName()
-    {
+    void testReleaseSavepointNoName() {
         // new JdbcConnection(this.connection,codecs).releaseSavepoint(null).as(StepVerifier::create)
         // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
         // new
@@ -163,26 +144,22 @@ final class JdbcConnectionTest
     }
 
     @Test
-    void testRollbackTransaction() throws SQLException
-    {
+    void testRollbackTransaction() throws SQLException {
         when(this.connection.getAutoCommit()).thenReturn(false);
 
         new JdbcConnection(this.connection, this.codecs).rollbackTransaction().as(StepVerifier::create).verifyComplete();
     }
 
     @Test
-    void testRollbackTransactionErrorResponse() throws SQLException
-    {
+    void testRollbackTransactionErrorResponse() throws SQLException {
         when(this.connection.getAutoCommit()).thenReturn(false);
         doThrow(new SQLTransactionRollbackException("can't commit", "some state", 999)).when(this.connection).rollback();
 
-        new JdbcConnection(this.connection, this.codecs).rollbackTransaction().as(StepVerifier::create)
-                .verifyErrorMatches(R2dbcRollbackException.class::isInstance);
+        new JdbcConnection(this.connection, this.codecs).rollbackTransaction().as(StepVerifier::create).verifyErrorMatches(R2dbcRollbackException.class::isInstance);
     }
 
     @Test
-    void testRollbackTransactionNonOpen() throws SQLException
-    {
+    void testRollbackTransactionNonOpen() throws SQLException {
         when(this.connection.getAutoCommit()).thenReturn(true);
         verifyNoMoreInteractions(this.connection);
 
@@ -190,34 +167,28 @@ final class JdbcConnectionTest
     }
 
     @Test
-    void testRollbackTransactionToSavepoint()
-    {
+    void testRollbackTransactionToSavepoint() {
         // new JdbcConnection(this.connection).rollbackTransactionToSavepoint("test").as(StepVerifier::create)
         // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
         new JdbcConnection(this.connection, this.codecs).rollbackTransactionToSavepoint("test").as(StepVerifier::create).verifyComplete();
     }
 
     @Test
-    void testRollbackTransactionToSavepointNoName()
-    {
+    void testRollbackTransactionToSavepointNoName() {
         // new JdbcConnection(this.connection).rollbackTransactionToSavepoint(null).as(StepVerifier::create)
         // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
-        new JdbcConnection(this.connection, this.codecs).rollbackTransactionToSavepoint(null).as(StepVerifier::create)
-                .verifyErrorMatches(NullPointerException.class::isInstance);
+        new JdbcConnection(this.connection, this.codecs).rollbackTransactionToSavepoint(null).as(StepVerifier::create).verifyErrorMatches(NullPointerException.class::isInstance);
     }
 
     @Test
-    void testSetTransactionIsolationLevelNoIsolationLevel()
-    {
+    void testSetTransactionIsolationLevelNoIsolationLevel() {
         // .expectError(NullPointerException.class)
         // .expectNextCount(1).verifyComplete();
-        new JdbcConnection(this.connection, this.codecs).setTransactionIsolationLevel(null).as(StepVerifier::create)
-                .verifyErrorMatches(NullPointerException.class::isInstance);
+        new JdbcConnection(this.connection, this.codecs).setTransactionIsolationLevel(null).as(StepVerifier::create).verifyErrorMatches(NullPointerException.class::isInstance);
     }
 
     @Test
-    void testSetTransactionIsolationLevelReadUncommitted()
-    {
+    void testSetTransactionIsolationLevelReadUncommitted() {
         // when(this.connection.getAutoCommit()).thenReturn(false);
         // when(this.client.execute("SET LOCK_MODE 0")).thenReturn(Mono.empty());
 
@@ -225,8 +196,7 @@ final class JdbcConnectionTest
     }
 
     @Test
-    void testSetTransactionIsolationLevelRepeatableRead()
-    {
+    void testSetTransactionIsolationLevelRepeatableRead() {
         // when(this.connection.getAutoCommit()).thenReturn(false);
         // when(this.client.execute("SET LOCK_MODE 1")).thenReturn(Mono.empty());
 
@@ -234,8 +204,7 @@ final class JdbcConnectionTest
     }
 
     @Test
-    void testSetTransactionIsolationLevelSerializable()
-    {
+    void testSetTransactionIsolationLevelSerializable() {
         // when(this.connection.getAutoCommit()).thenReturn(false);
         // when(this.client.execute("SET LOCK_MODE 1")).thenReturn(Mono.empty());
 

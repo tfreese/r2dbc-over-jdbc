@@ -19,12 +19,10 @@ import reactor.core.publisher.SynchronousSink;
 /**
  * @author Thomas Freese
  */
-public class JdbcStatement extends AbstractJdbcStatement
-{
+public class JdbcStatement extends AbstractJdbcStatement {
     private static final int DEBUG_SQL_LENGTH = 80;
 
-    public JdbcStatement(final java.sql.Connection connection, final String sql, final Codecs codecs)
-    {
+    public JdbcStatement(final java.sql.Connection connection, final String sql, final Codecs codecs) {
         super(connection, sql, codecs);
     }
 
@@ -32,8 +30,7 @@ public class JdbcStatement extends AbstractJdbcStatement
      * @see io.r2dbc.spi.Statement#execute()
      */
     @Override
-    public Flux<Result> execute()
-    {
+    public Flux<Result> execute() {
         getBindings().validateBinds();
 
         // @formatter:off
@@ -62,22 +59,17 @@ public class JdbcStatement extends AbstractJdbcStatement
         // @formatter:on
     }
 
-    protected Mono<Context> createExecuteMono(final java.sql.Connection connection, final String sql)
-    {
-        if (SqlOperation.SELECT.equals(getSqlOperation()))
-        {
-            return Mono.fromCallable(() ->
-            {
-                if (getLogger().isDebugEnabled())
-                {
+    protected Mono<Context> createExecuteMono(final java.sql.Connection connection, final String sql) {
+        if (SqlOperation.SELECT.equals(getSqlOperation())) {
+            return Mono.fromCallable(() -> {
+                if (getLogger().isDebugEnabled()) {
                     getLogger().debug("prepare statement: {}", prepareSqlForLog(sql));
                 }
 
                 PreparedStatement stmt = connection.prepareStatement(sql);
                 getBindings().prepareStatement(stmt, getBindings().getLast());
 
-                if (getLogger().isDebugEnabled())
-                {
+                if (getLogger().isDebugEnabled()) {
                     getLogger().debug("execute statement: {}", prepareSqlForLog(sql));
                 }
 
@@ -86,20 +78,16 @@ public class JdbcStatement extends AbstractJdbcStatement
                 return new Context(stmt, resultSet, null);
             });
         }
-        else if (SqlOperation.INSERT.equals(getSqlOperation()))
-        {
-            return Mono.fromCallable(() ->
-            {
-                if (getLogger().isDebugEnabled())
-                {
+        else if (SqlOperation.INSERT.equals(getSqlOperation())) {
+            return Mono.fromCallable(() -> {
+                if (getLogger().isDebugEnabled()) {
                     getLogger().debug("prepare statement: {}", prepareSqlForLog(sql));
                 }
 
                 PreparedStatement stmt = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
                 getBindings().prepareBatch(stmt);
 
-                if (getLogger().isDebugEnabled())
-                {
+                if (getLogger().isDebugEnabled()) {
                     getLogger().debug("execute statement: {}", prepareSqlForLog(sql));
                 }
 
@@ -111,18 +99,15 @@ public class JdbcStatement extends AbstractJdbcStatement
             });
         }
 
-        return Mono.fromCallable(() ->
-        {
-            if (getLogger().isDebugEnabled())
-            {
+        return Mono.fromCallable(() -> {
+            if (getLogger().isDebugEnabled()) {
                 getLogger().debug("prepare statement: {}", prepareSqlForLog(sql));
             }
 
             PreparedStatement stmt = connection.prepareStatement(sql);
             getBindings().prepareBatch(stmt);
 
-            if (getLogger().isDebugEnabled())
-            {
+            if (getLogger().isDebugEnabled()) {
                 getLogger().debug("execute statement: {}", prepareSqlForLog(sql));
             }
 
@@ -136,22 +121,17 @@ public class JdbcStatement extends AbstractJdbcStatement
      * @param resultSet {@link ResultSet}, optional
      * @param affectedRows int[], optional
      */
-    protected Result createResult(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows) throws SQLException
-    {
+    protected Result createResult(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows) throws SQLException {
         RowMetadata rowMetadata = JdbcRowMetadata.of(resultSet, getCodecs());
 
-        Flux<JdbcRow> rows = Flux.generate((final SynchronousSink<JdbcRow> sink) ->
-        {
-            try
-            {
-                if ((resultSet != null) && resultSet.next())
-                {
+        Flux<JdbcRow> rows = Flux.generate((final SynchronousSink<JdbcRow> sink) -> {
+            try {
+                if ((resultSet != null) && resultSet.next()) {
                     Map<Integer, Object> row = new HashMap<>();
 
                     int index = 0;
 
-                    for (ColumnMetadata columnMetaData : rowMetadata.getColumnMetadatas())
-                    {
+                    for (ColumnMetadata columnMetaData : rowMetadata.getColumnMetadatas()) {
                         String columnLabel = columnMetaData.getName();
                         JDBCType jdbcType = (JDBCType) columnMetaData.getNativeTypeMetadata();
 
@@ -163,10 +143,8 @@ public class JdbcStatement extends AbstractJdbcStatement
 
                     sink.next(new JdbcRow(rowMetadata, row, getCodecs()));
                 }
-                else
-                {
-                    if (resultSet != null)
-                    {
+                else {
+                    if (resultSet != null) {
                         getLogger().debug("close resultSet");
                         resultSet.close();
                     }
@@ -177,8 +155,7 @@ public class JdbcStatement extends AbstractJdbcStatement
                     sink.complete();
                 }
             }
-            catch (SQLException sex)
-            {
+            catch (SQLException sex) {
                 sink.error(sex);
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert);
@@ -189,10 +166,8 @@ public class JdbcStatement extends AbstractJdbcStatement
         return new JdbcResult(rows, Mono.just(rowMetadata), affectedRows);
     }
 
-    protected String prepareSqlForLog(final String sql)
-    {
-        if (sql.length() < DEBUG_SQL_LENGTH)
-        {
+    protected String prepareSqlForLog(final String sql) {
+        if (sql.length() < DEBUG_SQL_LENGTH) {
             return sql;
         }
 

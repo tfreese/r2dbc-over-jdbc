@@ -10,14 +10,12 @@ import io.r2dbc.spi.ConnectionMetadata;
 /**
  * @author Thomas Freese
  */
-public class JdbcConnectionMetadata implements ConnectionMetadata
-{
+public class JdbcConnectionMetadata implements ConnectionMetadata {
     private final String productName;
 
     private final String version;
 
-    public JdbcConnectionMetadata(final DatabaseMetaData databaseMetaData) throws SQLException
-    {
+    public JdbcConnectionMetadata(final DatabaseMetaData databaseMetaData) throws SQLException {
         super();
 
         Objects.requireNonNull(databaseMetaData, "databaseMetaData required");
@@ -26,8 +24,7 @@ public class JdbcConnectionMetadata implements ConnectionMetadata
         this.version = databaseMetaData.getDatabaseProductVersion();
     }
 
-    public JdbcConnectionMetadata(final String productName, final String version)
-    {
+    public JdbcConnectionMetadata(final String productName, final String version) {
         super();
 
         this.productName = Objects.requireNonNull(productName, "productName required");
@@ -35,14 +32,12 @@ public class JdbcConnectionMetadata implements ConnectionMetadata
     }
 
     @Override
-    public String getDatabaseProductName()
-    {
+    public String getDatabaseProductName() {
         return this.productName;
     }
 
     @Override
-    public String getDatabaseVersion()
-    {
+    public String getDatabaseVersion() {
         return this.version;
     }
 }

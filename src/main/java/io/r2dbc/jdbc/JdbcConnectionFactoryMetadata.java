@@ -8,15 +8,13 @@ import io.r2dbc.spi.ConnectionFactoryMetadata;
  *
  * @author Thomas Freese
  */
-public final class JdbcConnectionFactoryMetadata implements ConnectionFactoryMetadata
-{
+public final class JdbcConnectionFactoryMetadata implements ConnectionFactoryMetadata {
     public static final String NAME = "jdbc";
-    
+
     static final JdbcConnectionFactoryMetadata INSTANCE = new JdbcConnectionFactoryMetadata();
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return NAME;
     }
 }

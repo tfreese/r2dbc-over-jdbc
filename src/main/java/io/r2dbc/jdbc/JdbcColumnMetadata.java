@@ -13,8 +13,7 @@ import io.r2dbc.spi.Type;
  *
  * @author Thomas Freese
  */
-public class JdbcColumnMetadata implements ColumnMetadata, Type
-{
+public class JdbcColumnMetadata implements ColumnMetadata, Type {
     private final int column;
 
     private final Class<?> javaType;
@@ -29,9 +28,7 @@ public class JdbcColumnMetadata implements ColumnMetadata, Type
 
     private final int scale;
 
-    public JdbcColumnMetadata(final String name, final int column, final Class<?> javaType, final JDBCType jdbcType, final Nullability nullability,
-                              final int precision, final int scale)
-    {
+    public JdbcColumnMetadata(final String name, final int column, final Class<?> javaType, final JDBCType jdbcType, final Nullability nullability, final int precision, final int scale) {
         super();
 
         this.name = Objects.requireNonNull(name, "name required").toLowerCase();
@@ -47,67 +44,54 @@ public class JdbcColumnMetadata implements ColumnMetadata, Type
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(final Object obj)
-    {
-        if (this == obj)
-        {
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
         }
 
-        if (!(obj instanceof JdbcColumnMetadata other))
-        {
+        if (!(obj instanceof JdbcColumnMetadata other)) {
             return false;
         }
 
-        return (this.column == other.column) && Objects.equals(this.javaType, other.javaType) && (this.jdbcType == other.jdbcType)
-                && Objects.equals(this.name, other.name) && (this.nullability == other.nullability) && (this.precision == other.precision)
-                && (this.scale == other.scale);
+        return (this.column == other.column) && Objects.equals(this.javaType, other.javaType) && (this.jdbcType == other.jdbcType) && Objects.equals(this.name, other.name) && (this.nullability == other.nullability) && (this.precision == other.precision) && (this.scale == other.scale);
     }
 
-    public int getColumn()
-    {
+    public int getColumn() {
         return this.column;
     }
 
     @Override
-    public Class<?> getJavaType()
-    {
+    public Class<?> getJavaType() {
         return this.javaType;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return this.name;
     }
 
     @Override
-    public JDBCType getNativeTypeMetadata()
-    {
+    public JDBCType getNativeTypeMetadata() {
         return this.jdbcType;
     }
 
     @Override
-    public Nullability getNullability()
-    {
+    public Nullability getNullability() {
         return this.nullability;
     }
 
     @Override
-    public Integer getPrecision()
-    {
+    public Integer getPrecision() {
         return this.precision;
     }
 
     @Override
-    public Integer getScale()
-    {
+    public Integer getScale() {
         return this.scale;
     }
 
     @Override
-    public Type getType()
-    {
+    public Type getType() {
         return this;
     }
 
@@ -115,8 +99,7 @@ public class JdbcColumnMetadata implements ColumnMetadata, Type
      * @see java.lang.Object#hashCode()
      */
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(this.column, this.javaType, this.jdbcType, this.name, this.nullability, this.precision, this.scale);
     }
 }

@@ -27,8 +27,7 @@ import reactor.core.publisher.Mono;
  *
  * @author Thomas Freese
  */
-public class JdbcConnection implements Connection
-{
+public class JdbcConnection implements Connection {
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcConnection.class);
 
     private final Codecs codecs;
@@ -39,8 +38,7 @@ public class JdbcConnection implements Connection
 
     private final Map<String, Savepoint> savePoints = new HashMap<>();
 
-    public JdbcConnection(final java.sql.Connection jdbcConnection, final Codecs codecs)
-    {
+    public JdbcConnection(final java.sql.Connection jdbcConnection, final Codecs codecs) {
         super();
 
         this.jdbcConnection = Objects.requireNonNull(jdbcConnection, "jdbcConnection must not be null");
@@ -50,107 +48,85 @@ public class JdbcConnection implements Connection
     }
 
     @Override
-    public Mono<Void> beginTransaction()
-    {
+    public Mono<Void> beginTransaction() {
         return beginTransaction(null);
     }
 
     @Override
-    public Mono<Void> beginTransaction(final TransactionDefinition definition)
-    {
-        return this.jdbcConnectionMono.handle((con, sink) ->
-        {
-            try
-            {
-                if (con.getAutoCommit())
-                {
+    public Mono<Void> beginTransaction(final TransactionDefinition definition) {
+        return this.jdbcConnectionMono.handle((con, sink) -> {
+            try {
+                if (con.getAutoCommit()) {
                     getLogger().debug("begin transaction");
 
                     con.setAutoCommit(false);
                 }
-                else
-                {
+                else {
                     getLogger().debug("Skipping begin transaction because there is one in progress.");
                 }
 
                 sink.next(Mono.empty());
                 sink.complete();
             }
-            catch (SQLException sex)
-            {
+            catch (SQLException sex) {
                 sink.error(sex);
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
     @Override
-    public Mono<Void> close()
-    {
-        return this.jdbcConnectionMono.handle((con, sink) ->
-        {
-            try
-            {
-                if (!con.isClosed())
-                {
+    public Mono<Void> close() {
+        return this.jdbcConnectionMono.handle((con, sink) -> {
+            try {
+                if (!con.isClosed()) {
                     getLogger().debug("close connection");
 
                     con.close();
                 }
-                else
-                {
+                else {
                     getLogger().debug("Skipping closing connection because it is already closed");
                 }
 
                 sink.next(Mono.empty());
                 sink.complete();
             }
-            catch (SQLException sex)
-            {
+            catch (SQLException sex) {
                 sink.error(sex);
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
     @Override
-    public Mono<Void> commitTransaction()
-    {
-        return this.jdbcConnectionMono.handle((con, sink) ->
-        {
-            try
-            {
-                if (!con.getAutoCommit())
-                {
+    public Mono<Void> commitTransaction() {
+        return this.jdbcConnectionMono.handle((con, sink) -> {
+            try {
+                if (!con.getAutoCommit()) {
                     getLogger().debug("commit transaction");
 
                     con.commit();
                     con.setAutoCommit(true);
                 }
-                else
-                {
+                else {
                     getLogger().debug("Skipping commit transaction because no transaction in progress.");
                 }
 
                 sink.next(Mono.empty());
                 sink.complete();
             }
-            catch (SQLException sex)
-            {
+            catch (SQLException sex) {
                 sink.error(sex);
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
     @Override
-    public Batch createBatch()
-    {
+    public Batch createBatch() {
         return new JdbcBatch(this);
     }
 
     @Override
-    public Mono<Void> createSavepoint(final String name)
-    {
-        if (name == null)
-        {
+    public Mono<Void> createSavepoint(final String name) {
+        if (name == null) {
             throw new IllegalArgumentException("name is null");
         }
 
@@ -165,10 +141,8 @@ public class JdbcConnection implements Connection
         // }
 
         // return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
-        return this.jdbcConnectionMono.handle((con, sink) ->
-        {
-            try
-            {
+        return this.jdbcConnectionMono.handle((con, sink) -> {
+            try {
                 Objects.requireNonNull(name, "name must not be null");
 
                 getLogger().debug("create savepoint: {}", name);
@@ -181,18 +155,15 @@ public class JdbcConnection implements Connection
                 sink.next(Mono.empty());
                 sink.complete();
             }
-            catch (SQLException sex)
-            {
+            catch (SQLException sex) {
                 sink.error(sex);
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
     @Override
-    public Statement createStatement(final String sql)
-    {
-        if (sql == null)
-        {
+    public Statement createStatement(final String sql) {
+        if (sql == null) {
             throw new IllegalArgumentException("sql is null");
         }
 
@@ -213,12 +184,9 @@ public class JdbcConnection implements Connection
     }
 
     @Override
-    public ConnectionMetadata getMetadata()
-    {
-        return this.jdbcConnectionMono.handle((con, sink) ->
-        {
-            try
-            {
+    public ConnectionMetadata getMetadata() {
+        return this.jdbcConnectionMono.handle((con, sink) -> {
+            try {
                 getLogger().debug("get Metadata");
 
                 DatabaseMetaData databaseMetaData = con.getMetaData();
@@ -228,59 +196,48 @@ public class JdbcConnection implements Connection
                 sink.next(connectionMetadata);
                 sink.complete();
             }
-            catch (SQLException sex)
-            {
+            catch (SQLException sex) {
                 sink.error(sex);
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).cast(ConnectionMetadata.class).block();
     }
 
     @Override
-    public IsolationLevel getTransactionIsolationLevel()
-    {
-        try
-        {
+    public IsolationLevel getTransactionIsolationLevel() {
+        try {
             getLogger().debug("get transaction isolationLevel");
 
             int transactionIsolation = this.jdbcConnection.getTransactionIsolation();
             IsolationLevel isolationLevel = null;
 
-            if (transactionIsolation == java.sql.Connection.TRANSACTION_READ_COMMITTED)
-            {
+            if (transactionIsolation == java.sql.Connection.TRANSACTION_READ_COMMITTED) {
                 isolationLevel = IsolationLevel.READ_COMMITTED;
             }
-            else if (transactionIsolation == java.sql.Connection.TRANSACTION_READ_UNCOMMITTED)
-            {
+            else if (transactionIsolation == java.sql.Connection.TRANSACTION_READ_UNCOMMITTED) {
                 isolationLevel = IsolationLevel.READ_UNCOMMITTED;
             }
-            else if (transactionIsolation == java.sql.Connection.TRANSACTION_REPEATABLE_READ)
-            {
+            else if (transactionIsolation == java.sql.Connection.TRANSACTION_REPEATABLE_READ) {
                 isolationLevel = IsolationLevel.REPEATABLE_READ;
             }
-            else if (transactionIsolation == java.sql.Connection.TRANSACTION_SERIALIZABLE)
-            {
+            else if (transactionIsolation == java.sql.Connection.TRANSACTION_SERIALIZABLE) {
                 isolationLevel = IsolationLevel.SERIALIZABLE;
             }
 
             return isolationLevel;
         }
-        catch (SQLException sex)
-        {
+        catch (SQLException sex) {
             throw JdbcR2dbcExceptionFactory.convert(sex);
         }
     }
 
     @Override
-    public boolean isAutoCommit()
-    {
-        try
-        {
+    public boolean isAutoCommit() {
+        try {
             getLogger().debug("is autocommit");
 
             return this.jdbcConnection.getAutoCommit();
         }
-        catch (SQLException sex)
-        {
+        catch (SQLException sex) {
             throw JdbcR2dbcExceptionFactory.convert(sex);
         }
 
@@ -300,18 +257,14 @@ public class JdbcConnection implements Connection
     }
 
     @Override
-    public Mono<Void> releaseSavepoint(final String name)
-    {
-        if (name == null)
-        {
+    public Mono<Void> releaseSavepoint(final String name) {
+        if (name == null) {
             throw new IllegalArgumentException("name is null");
         }
 
         // return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
-        return this.jdbcConnectionMono.handle((con, sink) ->
-        {
-            try
-            {
+        return this.jdbcConnectionMono.handle((con, sink) -> {
+            try {
                 Objects.requireNonNull(name, "name must not be null");
 
                 getLogger().debug("release savepoint: {}", name);
@@ -322,49 +275,39 @@ public class JdbcConnection implements Connection
                 sink.next(Mono.empty());
                 sink.complete();
             }
-            catch (SQLException sex)
-            {
+            catch (SQLException sex) {
                 sink.error(sex);
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
     @Override
-    public Mono<Void> rollbackTransaction()
-    {
-        return this.jdbcConnectionMono.handle((con, sink) ->
-        {
-            try
-            {
-                if (!con.getAutoCommit())
-                {
+    public Mono<Void> rollbackTransaction() {
+        return this.jdbcConnectionMono.handle((con, sink) -> {
+            try {
+                if (!con.getAutoCommit()) {
                     getLogger().debug("rollback transaction");
 
                     con.rollback();
                 }
-                else
-                {
+                else {
                     getLogger().debug("Skipping rollback because no transaction in progress.");
                 }
 
                 sink.next(Mono.empty());
                 sink.complete();
             }
-            catch (SQLException sex)
-            {
+            catch (SQLException sex) {
                 sink.error(sex);
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
     @Override
-    public Mono<Void> rollbackTransactionToSavepoint(final String name)
-    {
+    public Mono<Void> rollbackTransactionToSavepoint(final String name) {
         // return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
-        return this.jdbcConnectionMono.handle((con, sink) ->
-        {
-            try
-            {
+        return this.jdbcConnectionMono.handle((con, sink) -> {
+            try {
                 Objects.requireNonNull(name, "name must not be null");
 
                 getLogger().debug("rollback transaction savepoint: {}", name);
@@ -375,20 +318,16 @@ public class JdbcConnection implements Connection
                 sink.next(Mono.empty());
                 sink.complete();
             }
-            catch (SQLException sex)
-            {
+            catch (SQLException sex) {
                 sink.error(sex);
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
     @Override
-    public Mono<Void> setAutoCommit(final boolean autoCommit)
-    {
-        return this.jdbcConnectionMono.handle((con, sink) ->
-        {
-            try
-            {
+    public Mono<Void> setAutoCommit(final boolean autoCommit) {
+        return this.jdbcConnectionMono.handle((con, sink) -> {
+            try {
                 getLogger().debug("autoCommit: {}", autoCommit);
 
                 con.setAutoCommit(autoCommit);
@@ -396,89 +335,72 @@ public class JdbcConnection implements Connection
                 sink.next(Mono.empty());
                 sink.complete();
             }
-            catch (SQLException sex)
-            {
+            catch (SQLException sex) {
                 sink.error(sex);
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
     @Override
-    public Publisher<Void> setLockWaitTimeout(final Duration timeout)
-    {
+    public Publisher<Void> setLockWaitTimeout(final Duration timeout) {
         return Mono.empty();
     }
 
     @Override
-    public Publisher<Void> setStatementTimeout(final Duration timeout)
-    {
+    public Publisher<Void> setStatementTimeout(final Duration timeout) {
         return Mono.empty();
     }
 
     @Override
-    public Mono<Void> setTransactionIsolationLevel(final IsolationLevel isolationLevel)
-    {
-        return this.jdbcConnectionMono.handle((con, sink) ->
-        {
-            try
-            {
+    public Mono<Void> setTransactionIsolationLevel(final IsolationLevel isolationLevel) {
+        return this.jdbcConnectionMono.handle((con, sink) -> {
+            try {
                 Objects.requireNonNull(isolationLevel, "isolationLevel must not be null");
 
                 getLogger().debug("set transaction isolationLevel: {}", isolationLevel);
 
-                if (IsolationLevel.READ_COMMITTED.equals(isolationLevel))
-                {
+                if (IsolationLevel.READ_COMMITTED.equals(isolationLevel)) {
                     con.setTransactionIsolation(java.sql.Connection.TRANSACTION_READ_COMMITTED);
                 }
-                else if (IsolationLevel.READ_UNCOMMITTED.equals(isolationLevel))
-                {
+                else if (IsolationLevel.READ_UNCOMMITTED.equals(isolationLevel)) {
                     con.setTransactionIsolation(java.sql.Connection.TRANSACTION_READ_UNCOMMITTED);
                 }
-                else if (IsolationLevel.REPEATABLE_READ.equals(isolationLevel))
-                {
+                else if (IsolationLevel.REPEATABLE_READ.equals(isolationLevel)) {
                     con.setTransactionIsolation(java.sql.Connection.TRANSACTION_REPEATABLE_READ);
                 }
-                else if (IsolationLevel.SERIALIZABLE.equals(isolationLevel))
-                {
+                else if (IsolationLevel.SERIALIZABLE.equals(isolationLevel)) {
                     con.setTransactionIsolation(java.sql.Connection.TRANSACTION_SERIALIZABLE);
                 }
-                else
-                {
+                else {
                     con.setTransactionIsolation(java.sql.Connection.TRANSACTION_NONE);
                 }
 
                 sink.next(Mono.empty());
                 sink.complete();
             }
-            catch (SQLException sex)
-            {
+            catch (SQLException sex) {
                 sink.error(sex);
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).then();
     }
 
     @Override
-    public Mono<Boolean> validate(final ValidationDepth depth)
-    {
-        return this.jdbcConnectionMono.handle((con, sink) ->
-        {
-            try
-            {
+    public Mono<Boolean> validate(final ValidationDepth depth) {
+        return this.jdbcConnectionMono.handle((con, sink) -> {
+            try {
                 getLogger().debug("validate");
 
                 sink.next(!con.isClosed());
 
                 sink.complete();
             }
-            catch (SQLException sex)
-            {
+            catch (SQLException sex) {
                 sink.error(sex);
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).cast(Boolean.class);
     }
 
-    private Logger getLogger()
-    {
+    private Logger getLogger() {
         return LOGGER;
     }
 }

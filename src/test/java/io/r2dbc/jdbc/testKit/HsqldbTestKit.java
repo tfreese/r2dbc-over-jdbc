@@ -8,8 +8,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 /**
  * @author Thomas Freese
  */
-public class HsqldbTestKit extends AbstractTestKit
-{
+public class HsqldbTestKit extends AbstractTestKit {
     @RegisterExtension
     static final DbServerExtension SERVER = new DbServerExtension(EmbeddedDatabaseType.HSQL);
 
@@ -17,8 +16,7 @@ public class HsqldbTestKit extends AbstractTestKit
      * @see io.r2dbc.jdbc.testKit.AbstractTestKit#getServer()
      */
     @Override
-    DbServerExtension getServer()
-    {
+    DbServerExtension getServer() {
         return SERVER;
     }
 }

@@ -9,10 +9,8 @@ import java.sql.SQLException;
 /**
  * @author Thomas Freese
  */
-public class FloatCodec extends AbstractNumberCodec<Float>
-{
-    public FloatCodec()
-    {
+public class FloatCodec extends AbstractNumberCodec<Float> {
+    public FloatCodec() {
         super(Float.class, JDBCType.FLOAT);
     }
 
@@ -20,12 +18,10 @@ public class FloatCodec extends AbstractNumberCodec<Float>
      * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    public Float mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException
-    {
+    public Float mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         float value = resultSet.getFloat(columnLabel);
 
-        if (resultSet.wasNull())
-        {
+        if (resultSet.wasNull()) {
             return null;
         }
 
@@ -36,14 +32,11 @@ public class FloatCodec extends AbstractNumberCodec<Float>
      * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
      */
     @Override
-    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Float value) throws SQLException
-    {
-        if (value == null)
-        {
+    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Float value) throws SQLException {
+        if (value == null) {
             preparedStatement.setNull(parameterIndex, JDBCType.FLOAT.getVendorTypeNumber());
         }
-        else
-        {
+        else {
             preparedStatement.setFloat(parameterIndex, value);
         }
     }

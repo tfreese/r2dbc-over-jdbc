@@ -9,10 +9,8 @@ import java.sql.SQLException;
 /**
  * @author Thomas Freese
  */
-public class LongCodec extends AbstractNumberCodec<Long>
-{
-    public LongCodec()
-    {
+public class LongCodec extends AbstractNumberCodec<Long> {
+    public LongCodec() {
         super(Long.class, JDBCType.BIGINT, JDBCType.DECIMAL);
     }
 
@@ -20,12 +18,10 @@ public class LongCodec extends AbstractNumberCodec<Long>
      * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    public Long mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException
-    {
+    public Long mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         long value = resultSet.getLong(columnLabel);
 
-        if (resultSet.wasNull())
-        {
+        if (resultSet.wasNull()) {
             return null;
         }
 
@@ -36,14 +32,11 @@ public class LongCodec extends AbstractNumberCodec<Long>
      * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
      */
     @Override
-    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Long value) throws SQLException
-    {
-        if (value == null)
-        {
+    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Long value) throws SQLException {
+        if (value == null) {
             preparedStatement.setNull(parameterIndex, JDBCType.DECIMAL.getVendorTypeNumber());
         }
-        else
-        {
+        else {
             preparedStatement.setLong(parameterIndex, value);
         }
     }

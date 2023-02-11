@@ -9,10 +9,8 @@ import java.sql.SQLException;
 /**
  * @author Thomas Freese
  */
-public class DoubleCodec extends AbstractNumberCodec<Double>
-{
-    public DoubleCodec()
-    {
+public class DoubleCodec extends AbstractNumberCodec<Double> {
+    public DoubleCodec() {
         super(Double.class, JDBCType.DOUBLE);
     }
 
@@ -20,12 +18,10 @@ public class DoubleCodec extends AbstractNumberCodec<Double>
      * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
      */
     @Override
-    public Double mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException
-    {
+    public Double mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         double value = resultSet.getDouble(columnLabel);
 
-        if (resultSet.wasNull())
-        {
+        if (resultSet.wasNull()) {
             return null;
         }
 
@@ -36,14 +32,11 @@ public class DoubleCodec extends AbstractNumberCodec<Double>
      * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
      */
     @Override
-    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Double value) throws SQLException
-    {
-        if (value == null)
-        {
+    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Double value) throws SQLException {
+        if (value == null) {
             preparedStatement.setNull(parameterIndex, JDBCType.DOUBLE.getVendorTypeNumber());
         }
-        else
-        {
+        else {
             preparedStatement.setDouble(parameterIndex, value);
         }
     }

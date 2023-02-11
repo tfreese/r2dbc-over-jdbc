@@ -10,24 +10,20 @@ import io.r2dbc.spi.Parameters;
 /**
  * @author Thomas Freese
  */
-public class ParameterCodec extends AbstractCodec<Parameter>
-{
+public class ParameterCodec extends AbstractCodec<Parameter> {
     private final Codecs codecs;
 
-    public ParameterCodec(Codecs codecs)
-    {
+    public ParameterCodec(Codecs codecs) {
         super(Parameter.class);
 
         this.codecs = codecs;
     }
 
     @Override
-    public Parameter mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException
-    {
+    public Parameter mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         Object value = resultSet.getObject(columnLabel);
 
-        if (value == null)
-        {
+        if (value == null) {
             return null;
         }
 
@@ -35,14 +31,12 @@ public class ParameterCodec extends AbstractCodec<Parameter>
     }
 
     @Override
-    public <M> M mapTo(final Class<M> javaType, final Parameter value)
-    {
+    public <M> M mapTo(final Class<M> javaType, final Parameter value) {
         return (M) codecs.mapTo(codecs.getJdbcType(value.getClass()), value.getType().getJavaType(), value);
     }
 
     @Override
-    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Parameter value) throws SQLException
-    {
+    public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Parameter value) throws SQLException {
         codecs.mapToSql(value.getType().getJavaType(), preparedStatement, parameterIndex, value.getValue());
     }
 }

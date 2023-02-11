@@ -16,15 +16,13 @@ import io.r2dbc.spi.Option;
  *
  * @author Thomas Freese
  */
-public final class JdbcConnectionFactoryProvider implements ConnectionFactoryProvider
-{
+public final class JdbcConnectionFactoryProvider implements ConnectionFactoryProvider {
     public static final Option<Codecs> CODECS = Option.valueOf("codecs");
 
     public static final Option<DataSource> DATASOURCE = Option.valueOf("datasource");
 
     @Override
-    public ConnectionFactory create(final ConnectionFactoryOptions connectionFactoryOptions)
-    {
+    public ConnectionFactory create(final ConnectionFactoryOptions connectionFactoryOptions) {
         Objects.requireNonNull(connectionFactoryOptions, "connectionFactoryOptions must not be null");
 
         // @formatter:off
@@ -37,14 +35,12 @@ public final class JdbcConnectionFactoryProvider implements ConnectionFactoryPro
     }
 
     @Override
-    public String getDriver()
-    {
+    public String getDriver() {
         return "generic";
     }
 
     @Override
-    public boolean supports(final ConnectionFactoryOptions connectionFactoryOptions)
-    {
+    public boolean supports(final ConnectionFactoryOptions connectionFactoryOptions) {
         Objects.requireNonNull(connectionFactoryOptions, "connectionFactoryOptions must not be null");
 
         Object dataSource = connectionFactoryOptions.getValue(DATASOURCE);

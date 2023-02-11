@@ -22,13 +22,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Freese
  */
-public abstract class AbstractJdbcStatement implements Statement
-{
+public abstract class AbstractJdbcStatement implements Statement {
     /**
      * @author Thomas Freese
      */
-    enum SqlOperation
-    {
+    enum SqlOperation {
         DELETE,
         EXECUTE,
         INSERT,
@@ -39,16 +37,14 @@ public abstract class AbstractJdbcStatement implements Statement
     /**
      * @author Thomas Freese
      */
-    static class Context
-    {
+    static class Context {
         private final int[] affectedRows;
 
         private final ResultSet resultSet;
 
         private final PreparedStatement stmt;
 
-        Context(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows)
-        {
+        Context(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows) {
             super();
 
             this.stmt = Objects.requireNonNull(stmt, "stmt must not be null");
@@ -56,18 +52,15 @@ public abstract class AbstractJdbcStatement implements Statement
             this.affectedRows = affectedRows;
         }
 
-        int[] getAffectedRows()
-        {
+        int[] getAffectedRows() {
             return this.affectedRows;
         }
 
-        ResultSet getResultSet()
-        {
+        ResultSet getResultSet() {
             return this.resultSet;
         }
 
-        PreparedStatement getStmt()
-        {
+        PreparedStatement getStmt() {
             return this.stmt;
         }
     }
@@ -75,31 +68,26 @@ public abstract class AbstractJdbcStatement implements Statement
     /**
      * @author Thomas Freese
      */
-    class Bindings
-    {
+    class Bindings {
         private final List<Map<Integer, Object>> binds = new ArrayList<>();
 
         private Map<Integer, Object> current;
 
         private boolean trailingAdd = false;
 
-        public boolean isTrailingAdd()
-        {
+        public boolean isTrailingAdd() {
             return this.trailingAdd;
         }
 
-        void finish()
-        {
+        void finish() {
             validateBinds();
 
             this.current = null;
             this.trailingAdd = true;
         }
 
-        Map<Integer, Object> getCurrent()
-        {
-            if (this.current == null)
-            {
+        Map<Integer, Object> getCurrent() {
+            if (this.current == null) {
                 this.current = new HashMap<>();
                 this.binds.add(this.current);
             }
@@ -109,29 +97,23 @@ public abstract class AbstractJdbcStatement implements Statement
             return this.current;
         }
 
-        Map<Integer, Object> getLast()
-        {
-            if (this.binds.isEmpty())
-            {
+        Map<Integer, Object> getLast() {
+            if (this.binds.isEmpty()) {
                 return getCurrent();
             }
 
             return this.binds.get(this.binds.size() - 1);
         }
 
-        void prepareBatch(final PreparedStatement preparedStatement) throws SQLException
-        {
-            if (this.binds.isEmpty())
-            {
+        void prepareBatch(final PreparedStatement preparedStatement) throws SQLException {
+            if (this.binds.isEmpty()) {
                 preparedStatement.addBatch();
 
                 return;
             }
 
-            for (Map<Integer, Object> bind : this.binds)
-            {
-                if (bind.isEmpty())
-                {
+            for (Map<Integer, Object> bind : this.binds) {
+                if (bind.isEmpty()) {
                     continue;
                 }
 
@@ -141,37 +123,30 @@ public abstract class AbstractJdbcStatement implements Statement
             }
         }
 
-        void prepareStatement(final PreparedStatement preparedStatement, final Map<Integer, Object> bind) throws SQLException
-        {
-            for (Entry<Integer, Object> entry : bind.entrySet())
-            {
+        void prepareStatement(final PreparedStatement preparedStatement, final Map<Integer, Object> bind) throws SQLException {
+            for (Entry<Integer, Object> entry : bind.entrySet()) {
                 Integer index = entry.getKey();
                 Object value = entry.getValue();
 
                 // JDBC fängt bei 1 an !
                 int parameterIndex = index + 1;
 
-                if (value == null)
-                {
+                if (value == null) {
                     // preparedStatement.setNull(parameterIndex, sqlType);
                     preparedStatement.setObject(parameterIndex, null);
                 }
-                else
-                {
+                else {
                     getCodecs().mapToSql(value.getClass(), preparedStatement, parameterIndex, value);
                 }
             }
         }
 
-        void validateBinds()
-        {
-            if (isTrailingAdd())
-            {
+        void validateBinds() {
+            if (isTrailingAdd()) {
                 throw new IllegalStateException("trailing add() in bindings");
             }
 
-            if (this.current == null)
-            {
+            if (this.current == null) {
                 return;
             }
 
@@ -179,8 +154,7 @@ public abstract class AbstractJdbcStatement implements Statement
 
             int bindCount = this.current.size();
 
-            if (bindCount < parameterCount)
-            {
+            if (bindCount < parameterCount) {
                 throw new IllegalStateException("Bindings do not match Parameters: " + bindCount + " != " + parameterCount);
             }
         }
@@ -198,8 +172,7 @@ public abstract class AbstractJdbcStatement implements Statement
 
     private final SqlOperation sqlOperation;
 
-    protected AbstractJdbcStatement(final java.sql.Connection jdbcConnection, final String sql, final Codecs codecs)
-    {
+    protected AbstractJdbcStatement(final java.sql.Connection jdbcConnection, final String sql, final Codecs codecs) {
         super();
 
         this.jdbcConnection = Objects.requireNonNull(jdbcConnection, "jdbcConnection required");
@@ -209,48 +182,39 @@ public abstract class AbstractJdbcStatement implements Statement
         // Determine SQL-Operation.
         String s = sql.substring(0, 6).toLowerCase();
 
-        if (s.startsWith("select") || s.startsWith("with"))
-        {
+        if (s.startsWith("select") || s.startsWith("with")) {
             this.sqlOperation = SqlOperation.SELECT;
         }
-        else if (s.startsWith("delete"))
-        {
+        else if (s.startsWith("delete")) {
             this.sqlOperation = SqlOperation.DELETE;
         }
-        else if (s.startsWith("update"))
-        {
+        else if (s.startsWith("update")) {
             this.sqlOperation = SqlOperation.UPDATE;
         }
-        else if (s.startsWith("insert"))
-        {
+        else if (s.startsWith("insert")) {
             this.sqlOperation = SqlOperation.INSERT;
         }
-        else
-        {
+        else {
             this.sqlOperation = SqlOperation.EXECUTE;
         }
     }
 
     @Override
-    public Statement add()
-    {
+    public Statement add() {
         getBindings().finish();
 
         return this;
     }
 
     @Override
-    public Statement bind(final int index, final Object value)
-    {
+    public Statement bind(final int index, final Object value) {
         requireValidIndex(index);
 
-        if (value == null)
-        {
+        if (value == null) {
             throw new IllegalArgumentException("value is null");
         }
 
-        if (Class.class.equals(value))
-        {
+        if (Class.class.equals(value)) {
             throw new IllegalArgumentException("value is type of class");
         }
 
@@ -260,36 +224,28 @@ public abstract class AbstractJdbcStatement implements Statement
     }
 
     @Override
-    public Statement bind(final String name, final Object value)
-    {
-        if (name == null)
-        {
+    public Statement bind(final String name, final Object value) {
+        if (name == null) {
             throw new IllegalArgumentException("name is null");
         }
 
-        if (value == null)
-        {
+        if (value == null) {
             throw new IllegalArgumentException("value is null");
         }
 
-        try
-        {
+        try {
             return bind(Integer.parseInt(name), value);
         }
-        catch (Exception ex)
-        {
-            throw new NoSuchElementException(
-                    String.format("Name '%s' is not valid. Should either be an Integer index or a String represented integer.", name));
+        catch (Exception ex) {
+            throw new NoSuchElementException(String.format("Name '%s' is not valid. Should either be an Integer index or a String represented integer.", name));
         }
     }
 
     @Override
-    public Statement bindNull(final int index, final Class<?> type)
-    {
+    public Statement bindNull(final int index, final Class<?> type) {
         requireValidIndex(index);
 
-        if (type == null)
-        {
+        if (type == null) {
             throw new IllegalArgumentException("type is null");
         }
 
@@ -315,26 +271,20 @@ public abstract class AbstractJdbcStatement implements Statement
     // }
 
     @Override
-    public Statement bindNull(final String name, final Class<?> type)
-    {
-        if (name == null)
-        {
+    public Statement bindNull(final String name, final Class<?> type) {
+        if (name == null) {
             throw new IllegalArgumentException("name is null");
         }
 
-        if (type == null)
-        {
+        if (type == null) {
             throw new IllegalArgumentException("type is null");
         }
 
-        try
-        {
+        try {
             return bind(Integer.parseInt(name), type);
         }
-        catch (Exception ex)
-        {
-            throw new IllegalArgumentException(
-                    String.format("Name '%s' is not valid. Should either be an Integer index or a String represented integer.", name));
+        catch (Exception ex) {
+            throw new IllegalArgumentException(String.format("Name '%s' is not valid. Should either be an Integer index or a String represented integer.", name));
         }
     }
 
@@ -354,33 +304,27 @@ public abstract class AbstractJdbcStatement implements Statement
     // String.format("Identifier '%s' is not a valid identifier. Should either be an Integer index or a String represented integer.", identifier));
     // }
 
-    protected Bindings getBindings()
-    {
+    protected Bindings getBindings() {
         return this.bindings;
     }
 
-    protected Codecs getCodecs()
-    {
+    protected Codecs getCodecs() {
         return this.codecs;
     }
 
-    protected java.sql.Connection getJdbcConnection()
-    {
+    protected java.sql.Connection getJdbcConnection() {
         return this.jdbcConnection;
     }
 
-    protected Logger getLogger()
-    {
+    protected Logger getLogger() {
         return this.logger;
     }
 
-    protected String getSql()
-    {
+    protected String getSql() {
         return this.sql;
     }
 
-    protected SqlOperation getSqlOperation()
-    {
+    protected SqlOperation getSqlOperation() {
         return this.sqlOperation;
     }
 
@@ -391,10 +335,8 @@ public abstract class AbstractJdbcStatement implements Statement
      *
      * @throws IndexOutOfBoundsException If the {@code index} is outside the valid range.
      */
-    protected void requireValidIndex(final int index)
-    {
-        if ((index < 0) || (index > this.bindings.binds.size()))
-        {
+    protected void requireValidIndex(final int index) {
+        if ((index < 0) || (index > this.bindings.binds.size())) {
             throw new IndexOutOfBoundsException("Parameter index is non-positive: " + index);
         }
     }

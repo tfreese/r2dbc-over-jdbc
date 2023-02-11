@@ -20,27 +20,23 @@ import reactor.test.StepVerifier;
 /**
  * @author Thomas Freese
  */
-final class ParameterizedConnectionFactoryTest
-{
+final class ParameterizedConnectionFactoryTest {
     @RegisterExtension
     static final MultiDatabaseExtension DATABASE_EXTENSION = new MultiDatabaseExtension();
 
-    static Stream<Arguments> getDatabases()
-    {
+    static Stream<Arguments> getDatabases() {
         return DATABASE_EXTENSION.getServers().stream().map(server -> Arguments.of(server.getDatabaseType(), server));
     }
 
     @Test
-    void testConstructorNoConfiguration()
-    {
+    void testConstructorNoConfiguration() {
         assertThatNullPointerException().isThrownBy(() -> new JdbcConnectionFactory(null, null)).withMessage("dataSource must not be null");
     }
 
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testCreate") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testCreate(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
-    {
+    void testCreate(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
         JdbcConnectionConfiguration configuration = JdbcConnectionConfiguration.builder().dataSource(server.getDataSource()).build();
 
         new JdbcConnectionFactory(configuration).create().as(StepVerifier::create).expectNextCount(1).verifyComplete();
@@ -49,8 +45,7 @@ final class ParameterizedConnectionFactoryTest
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testGetMetadata") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testGetMetadata(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
-    {
+    void testGetMetadata(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
         JdbcConnectionConfiguration configuration = JdbcConnectionConfiguration.builder().dataSource(server.getDataSource()).build();
 
         assertThat(new JdbcConnectionFactory(configuration).getMetadata()).isNotNull();
@@ -59,8 +54,7 @@ final class ParameterizedConnectionFactoryTest
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testOptions") // Ohne Parameter
     @MethodSource("getDatabases")
-    void testOptions(final EmbeddedDatabaseType databaseType, final DbServerExtension server)
-    {
+    void testOptions(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
         JdbcConnectionConfiguration configuration = JdbcConnectionConfiguration.builder().dataSource(server.getDataSource()).build();
 
         assertThat(configuration.getDataSource()).isEqualTo(server.getDataSource());

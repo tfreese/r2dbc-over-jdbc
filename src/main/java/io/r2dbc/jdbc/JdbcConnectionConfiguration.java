@@ -13,21 +13,17 @@ import io.r2dbc.jdbc.codecs.DefaultCodecs;
  *
  * @author Thomas Freese
  */
-final class JdbcConnectionConfiguration
-{
+final class JdbcConnectionConfiguration {
     /**
      * @author Thomas Freese
      */
-    static final class Builder
-    {
+    static final class Builder {
         private Codecs codecs;
 
         private DataSource dataSource;
 
-        public JdbcConnectionConfiguration build()
-        {
-            if (this.codecs == null)
-            {
+        public JdbcConnectionConfiguration build() {
+            if (this.codecs == null) {
                 this.codecs = new DefaultCodecs();
             }
 
@@ -35,15 +31,13 @@ final class JdbcConnectionConfiguration
 
         }
 
-        public Builder codecs(final Codecs codecs)
-        {
+        public Builder codecs(final Codecs codecs) {
             this.codecs = codecs;
 
             return this;
         }
 
-        public Builder dataSource(final DataSource dataSource)
-        {
+        public Builder dataSource(final DataSource dataSource) {
             this.dataSource = dataSource;
 
             return this;
@@ -53,8 +47,7 @@ final class JdbcConnectionConfiguration
          * @see java.lang.Object#toString()
          */
         @Override
-        public String toString()
-        {
+        public String toString() {
             StringBuilder builder = new StringBuilder();
             builder.append("Builder [");
             builder.append("dataSource=").append(this.dataSource);
@@ -65,8 +58,7 @@ final class JdbcConnectionConfiguration
         }
     }
 
-    public static Builder builder()
-    {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -74,21 +66,18 @@ final class JdbcConnectionConfiguration
 
     private final DataSource dataSource;
 
-    private JdbcConnectionConfiguration(final DataSource dataSource, final Codecs codecs)
-    {
+    private JdbcConnectionConfiguration(final DataSource dataSource, final Codecs codecs) {
         super();
 
         this.dataSource = Objects.requireNonNull(dataSource, "dataSource must not be null");
         this.codecs = Objects.requireNonNull(codecs, "codecs must not be null");
     }
 
-    public Codecs getCodecs()
-    {
+    public Codecs getCodecs() {
         return this.codecs;
     }
 
-    public DataSource getDataSource()
-    {
+    public DataSource getDataSource() {
         return this.dataSource;
     }
 
@@ -96,8 +85,7 @@ final class JdbcConnectionConfiguration
      * @see java.lang.Object#toString()
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("JdbcConnectionConfiguration [");
         builder.append("dataSource=").append(this.dataSource);
