@@ -32,7 +32,9 @@ public class ParameterCodec extends AbstractCodec<Parameter> {
 
     @Override
     public <M> M mapTo(final Class<M> javaType, final Parameter value) {
-        return (M) codecs.mapTo(codecs.getJdbcType(value.getClass()), value.getType().getJavaType(), value);
+        Object mappedObject = codecs.mapTo(codecs.getJdbcType(value.getClass()), value.getType().getJavaType(), value);
+
+        return javaType.cast(mappedObject);
     }
 
     @Override
