@@ -1,5 +1,6 @@
 package io.r2dbc.jdbc.codecs;
 
+import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,7 +28,10 @@ public class ParameterCodec extends AbstractCodec<Parameter> {
             return null;
         }
 
-        return Parameters.inOut((Object) codecs.mapFromSql(codecs.getJdbcType(value.getClass()), resultSet, columnLabel));
+        JDBCType jdbcType = codecs.getJdbcType(value.getClass());
+        value = codecs.mapFromSql(jdbcType, resultSet, columnLabel);
+
+        return Parameters.inOut(value);
     }
 
     @Override
