@@ -16,9 +16,6 @@
     <name>${project.groupId} - ${project.artifactId}</name>
     <description>Reactive Relational Database Connectivity over JDBC Implementation.</description>
 
-    <properties>
-    </properties>
-
     <dependencies>
         <!-- compile scope -->
         <dependency>
