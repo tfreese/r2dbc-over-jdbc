@@ -1,6 +1,8 @@
 // Created: 14.06.2019
 package io.r2dbc.jdbc.util;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.util.Objects;
@@ -78,9 +80,6 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
         this.databaseType = Objects.requireNonNull(databaseType, "databaseType required");
     }
 
-    /**
-     * @see org.junit.jupiter.api.extension.AfterAllCallback#afterAll(org.junit.jupiter.api.extension.ExtensionContext)
-     */
     @Override
     public void afterAll(final ExtensionContext context) throws Exception {
         if (LOGGER.isDebugEnabled()) {
@@ -96,15 +95,15 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
         switch (getDatabaseType()) {
             case HSQL:
             case H2:
-                //                try (Connection connection = this.dataSource.getConnection();
-                //                     Statement statement = connection.createStatement())
-                //                {
-                //                    statement.execute("SHUTDOWN");
-                //                }
-                //                catch (Exception ex)
-                //                {
-                //                    LOGGER.error(ex.getMessage());
-                //                }
+                // Handled already by hsql with 'shutdown=true'.
+                try (Connection connection = this.dataSource.getConnection();
+                     Statement statement = connection.createStatement()) {
+                    statement.execute("SHUTDOWN COMPACT");
+                }
+                catch (Exception ex) {
+                    LOGGER.error(ex.getMessage());
+                }
+
                 break;
 
             case DERBY:
@@ -134,9 +133,6 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
         System.gc();
     }
 
-    /**
-     * @see org.junit.jupiter.api.extension.AfterTestExecutionCallback#afterTestExecution(org.junit.jupiter.api.extension.ExtensionContext)
-     */
     @Override
     public void afterTestExecution(final ExtensionContext context) throws Exception {
         // Method testMethod = context.getRequiredTestMethod();
@@ -147,9 +143,6 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
         // LOGGER.debug("{} - Idle Connections = {}", this.databaseType, this.dataSource.getHikariPoolMXBean().getIdleConnections());
     }
 
-    /**
-     * @see org.junit.jupiter.api.extension.BeforeAllCallback#beforeAll(org.junit.jupiter.api.extension.ExtensionContext)
-     */
     @Override
     public void beforeAll(final ExtensionContext context) throws Exception {
         LOGGER.debug("{} - beforeAll", this.databaseType);
@@ -201,9 +194,6 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
         // populator.execute(dataSource);
     }
 
-    /**
-     * @see org.junit.jupiter.api.extension.BeforeTestExecutionCallback#beforeTestExecution(org.junit.jupiter.api.extension.ExtensionContext)
-     */
     @Override
     public void beforeTestExecution(final ExtensionContext context) throws Exception {
         getStoreForMethod(context).put("start-time", System.currentTimeMillis());
@@ -217,9 +207,6 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
         return this.databaseType;
     }
 
-    /**
-     * @return String
-     */
     public String getDriver() {
         return this.dataSource.getDriverClassName();
     }

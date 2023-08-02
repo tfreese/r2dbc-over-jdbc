@@ -31,9 +31,6 @@ public class MultiDatabaseExtension implements BeforeAllCallback, AfterAllCallba
         this.servers.computeIfAbsent(EmbeddedDatabaseType.DERBY, DbServerExtension::new);
     }
 
-    /**
-     * @see org.junit.jupiter.api.extension.AfterAllCallback#afterAll(org.junit.jupiter.api.extension.ExtensionContext)
-     */
     @Override
     public void afterAll(final ExtensionContext context) throws Exception {
         for (DbServerExtension server : this.servers.values()) {
@@ -41,9 +38,6 @@ public class MultiDatabaseExtension implements BeforeAllCallback, AfterAllCallba
         }
     }
 
-    /**
-     * @see org.junit.jupiter.api.extension.BeforeAllCallback#beforeAll(org.junit.jupiter.api.extension.ExtensionContext)
-     */
     @Override
     public void beforeAll(final ExtensionContext context) throws Exception {
         for (DbServerExtension server : this.servers.values()) {
@@ -59,9 +53,6 @@ public class MultiDatabaseExtension implements BeforeAllCallback, AfterAllCallba
         return this.servers.values();
     }
 
-    // /**
-    // * @see org.junit.jupiter.params.provider.ArgumentsProvider#provideArguments(org.junit.jupiter.api.extension.ExtensionContext)
-    // */
     // @Override
     // public Stream<? extends Arguments> provideArguments(final ExtensionContext context) throws Exception
     // {
