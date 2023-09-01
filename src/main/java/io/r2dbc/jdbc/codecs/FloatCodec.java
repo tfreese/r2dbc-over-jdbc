@@ -14,9 +14,6 @@ public class FloatCodec extends AbstractNumberCodec<Float> {
         super(Float.class, JDBCType.FLOAT);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
-     */
     @Override
     public Float mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         float value = resultSet.getFloat(columnLabel);
@@ -28,9 +25,6 @@ public class FloatCodec extends AbstractNumberCodec<Float> {
         return value;
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
-     */
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Float value) throws SQLException {
         if (value == null) {

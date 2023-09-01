@@ -14,9 +14,6 @@ public class DoubleCodec extends AbstractNumberCodec<Double> {
         super(Double.class, JDBCType.DOUBLE);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
-     */
     @Override
     public Double mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         double value = resultSet.getDouble(columnLabel);
@@ -28,9 +25,6 @@ public class DoubleCodec extends AbstractNumberCodec<Double> {
         return value;
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
-     */
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Double value) throws SQLException {
         if (value == null) {

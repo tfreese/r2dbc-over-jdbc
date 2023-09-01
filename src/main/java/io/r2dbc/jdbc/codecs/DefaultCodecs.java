@@ -42,9 +42,6 @@ public class DefaultCodecs implements Codecs {
         this.codecsForJavaType.put(codec.getJavaType(), codec);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codecs#getJavaType(java.sql.JDBCType)
-     */
     @Override
     public Class<?> getJavaType(final JDBCType jdbcType) {
         return get(jdbcType).getJavaType();
@@ -55,9 +52,6 @@ public class DefaultCodecs implements Codecs {
         return get(javaType).supportedJdbcTypes().iterator().next();
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codecs#mapFromSql(java.sql.JDBCType, java.sql.ResultSet, java.lang.String)
-     */
     @Override
     @SuppressWarnings("unchecked")
     public <T> T mapFromSql(final JDBCType jdbcType, final ResultSet resultSet, final String columnLabel) throws SQLException {
@@ -69,9 +63,6 @@ public class DefaultCodecs implements Codecs {
         return ((Codec<T>) codec).mapFromSql(resultSet, columnLabel);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codecs#mapTo(java.sql.JDBCType, java.lang.Class, java.lang.Object)
-     */
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> T mapTo(final JDBCType jdbcType, final Class<? extends T> javaType, final Object value) {
@@ -82,9 +73,6 @@ public class DefaultCodecs implements Codecs {
         return (T) codec.mapTo(javaType, value);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codecs#mapToSql(java.lang.Class, java.sql.PreparedStatement, int, java.lang.Object)
-     */
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public void mapToSql(final Class<?> javaType, final PreparedStatement preparedStatement, final int parameterIndex, final Object value) throws SQLException {

@@ -26,9 +26,6 @@ public class JdbcStatement extends AbstractJdbcStatement {
         super(connection, sql, codecs);
     }
 
-    /**
-     * @see io.r2dbc.spi.Statement#execute()
-     */
     @Override
     public Flux<Result> execute() {
         getBindings().validateBinds();

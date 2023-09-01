@@ -43,9 +43,6 @@ final class JdbcConnectionConfiguration {
             return this;
         }
 
-        /**
-         * @see java.lang.Object#toString()
-         */
         @Override
         public String toString() {
             StringBuilder builder = new StringBuilder();
@@ -81,9 +78,6 @@ final class JdbcConnectionConfiguration {
         return this.dataSource;
     }
 
-    /**
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

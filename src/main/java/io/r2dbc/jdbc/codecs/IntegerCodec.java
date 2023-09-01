@@ -14,9 +14,6 @@ public class IntegerCodec extends AbstractNumberCodec<Integer> {
         super(Integer.class, JDBCType.INTEGER);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
-     */
     @Override
     public Integer mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         int value = resultSet.getInt(columnLabel);
@@ -28,9 +25,6 @@ public class IntegerCodec extends AbstractNumberCodec<Integer> {
         return value;
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
-     */
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Integer value) throws SQLException {
         if (value == null) {

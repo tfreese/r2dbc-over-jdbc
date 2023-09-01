@@ -39,17 +39,11 @@ public abstract class AbstractCodec<T> implements Codec<T> {
         }
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#getJavaType()
-     */
     @Override
     public Class<T> getJavaType() {
         return this.javaType;
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#supportedJdbcTypes()
-     */
     @Override
     public Set<JDBCType> supportedJdbcTypes() {
         return this.supportedJdbcTypes;

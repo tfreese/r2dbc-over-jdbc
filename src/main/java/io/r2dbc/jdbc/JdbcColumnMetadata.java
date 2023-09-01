@@ -40,9 +40,6 @@ public class JdbcColumnMetadata implements ColumnMetadata, Type {
         this.scale = scale;
     }
 
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
@@ -95,9 +92,6 @@ public class JdbcColumnMetadata implements ColumnMetadata, Type {
         return this;
     }
 
-    /**
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return Objects.hash(this.column, this.javaType, this.jdbcType, this.name, this.nullability, this.precision, this.scale);

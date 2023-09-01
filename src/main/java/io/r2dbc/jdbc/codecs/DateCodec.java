@@ -19,9 +19,6 @@ public class DateCodec extends AbstractCodec<Date> {
         super(Date.class, JDBCType.DATE, JDBCType.TIME, JDBCType.TIMESTAMP);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
-     */
     @Override
     public Date mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         java.sql.Date sqlDate = resultSet.getDate(columnLabel);
@@ -34,9 +31,6 @@ public class DateCodec extends AbstractCodec<Date> {
         return new Date(sqlDate.getTime());
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapTo(java.lang.Class, java.lang.Object)
-     */
     @SuppressWarnings("unchecked")
     @Override
     public <M> M mapTo(final Class<M> javaType, final Date value) {
@@ -71,9 +65,6 @@ public class DateCodec extends AbstractCodec<Date> {
         throw throwCanNotMapException(value);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
-     */
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Date value) throws SQLException {
         java.sql.Date sqlDate = new java.sql.Date(value.getTime());

@@ -20,9 +20,6 @@ public class ClobCodec extends AbstractCodec<Clob> {
         super(Clob.class, JDBCType.CLOB);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
-     */
     @Override
     public Clob mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         java.sql.Clob value = resultSet.getClob(columnLabel);
@@ -34,9 +31,6 @@ public class ClobCodec extends AbstractCodec<Clob> {
         return R2dbcUtils.sqlClobToClob(value);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapTo(java.lang.Class, java.lang.Object)
-     */
     @SuppressWarnings("unchecked")
     @Override
     public <M> M mapTo(final Class<M> javaType, final Clob value) {
@@ -61,9 +55,6 @@ public class ClobCodec extends AbstractCodec<Clob> {
         throw throwCanNotMapException(value);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
-     */
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Clob value) throws SQLException {
         java.sql.Clob clob = preparedStatement.getConnection().createClob();

@@ -12,9 +12,6 @@ public class HsqldbTestKit extends AbstractTestKit {
     @RegisterExtension
     static final DbServerExtension SERVER = new DbServerExtension(EmbeddedDatabaseType.HSQL);
 
-    /**
-     * @see io.r2dbc.jdbc.testKit.AbstractTestKit#getServer()
-     */
     @Override
     DbServerExtension getServer() {
         return SERVER;

@@ -14,9 +14,6 @@ public class LongCodec extends AbstractNumberCodec<Long> {
         super(Long.class, JDBCType.BIGINT, JDBCType.DECIMAL);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
-     */
     @Override
     public Long mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         long value = resultSet.getLong(columnLabel);
@@ -28,9 +25,6 @@ public class LongCodec extends AbstractNumberCodec<Long> {
         return value;
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
-     */
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Long value) throws SQLException {
         if (value == null) {

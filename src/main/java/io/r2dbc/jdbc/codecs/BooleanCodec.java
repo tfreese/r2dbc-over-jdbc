@@ -14,9 +14,6 @@ public class BooleanCodec extends AbstractCodec<Boolean> {
         super(Boolean.class, JDBCType.BIT, JDBCType.BOOLEAN);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
-     */
     @Override
     public Boolean mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         boolean value = resultSet.getBoolean(columnLabel);
@@ -28,9 +25,6 @@ public class BooleanCodec extends AbstractCodec<Boolean> {
         return value;
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapTo(java.lang.Class, java.lang.Object)
-     */
     @SuppressWarnings("unchecked")
     @Override
     public <M> M mapTo(final Class<M> javaType, final Boolean value) {
@@ -50,9 +44,6 @@ public class BooleanCodec extends AbstractCodec<Boolean> {
         throw throwCanNotMapException(value);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
-     */
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Boolean value) throws SQLException {
         if (value == null) {

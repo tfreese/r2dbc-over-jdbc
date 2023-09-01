@@ -14,9 +14,6 @@ public class ObjectCodec extends AbstractCodec<Object> {
         super(Object.class, JDBCType.OTHER);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
-     */
     @Override
     public Object mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         Object value = resultSet.getObject(columnLabel);
@@ -28,9 +25,6 @@ public class ObjectCodec extends AbstractCodec<Object> {
         return value;
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapTo(java.lang.Class, java.lang.Object)
-     */
     @SuppressWarnings("unchecked")
     @Override
     public <M> M mapTo(final Class<M> javaType, final Object value) {
@@ -50,9 +44,6 @@ public class ObjectCodec extends AbstractCodec<Object> {
         throw throwCanNotMapException(value);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
-     */
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Object value) throws SQLException {
         preparedStatement.setObject(parameterIndex, value);

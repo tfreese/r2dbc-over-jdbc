@@ -348,7 +348,6 @@ public abstract class AbstractJdbcStatement implements Statement {
     // *
     // * @param affectedRows int[]
     // * @return int[]
-    // * @see JdbcPreparedStatementDeleteOld
     // */
     // protected int[] normalizeAffectedRowsForReactive(final int[] affectedRows)
     // {

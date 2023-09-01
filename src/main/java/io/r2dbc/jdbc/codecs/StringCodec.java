@@ -18,9 +18,6 @@ public class StringCodec extends AbstractCodec<String> {
         super(String.class, JDBCType.CHAR, JDBCType.VARCHAR);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
-     */
     @Override
     public String mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         String value = resultSet.getString(columnLabel);
@@ -32,9 +29,6 @@ public class StringCodec extends AbstractCodec<String> {
         return value;
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapTo(java.lang.Class, java.lang.Object)
-     */
     @SuppressWarnings("unchecked")
     @Override
     public <M> M mapTo(final Class<M> javaType, final String value) {
@@ -59,9 +53,6 @@ public class StringCodec extends AbstractCodec<String> {
         throw throwCanNotMapException(value);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
-     */
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final String value) throws SQLException {
         preparedStatement.setString(parameterIndex, value);

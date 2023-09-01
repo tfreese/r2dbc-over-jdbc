@@ -22,9 +22,6 @@ public class BlobCodec extends AbstractCodec<Blob> {
         super(Blob.class, JDBCType.BINARY, JDBCType.BLOB);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapFromSql(java.sql.ResultSet, java.lang.String)
-     */
     @Override
     public Blob mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         java.sql.Blob value = resultSet.getBlob(columnLabel);
@@ -36,9 +33,6 @@ public class BlobCodec extends AbstractCodec<Blob> {
         return R2dbcUtils.sqlBlobToBlob(value);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapTo(java.lang.Class, java.lang.Object)
-     */
     @SuppressWarnings("unchecked")
     @Override
     public <M> M mapTo(final Class<M> javaType, final Blob value) {
@@ -67,9 +61,6 @@ public class BlobCodec extends AbstractCodec<Blob> {
         throw throwCanNotMapException(value);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapToSql(java.sql.PreparedStatement, int, java.lang.Object)
-     */
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Blob value) throws SQLException {
         java.sql.Blob blob = preparedStatement.getConnection().createBlob();

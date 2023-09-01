@@ -19,10 +19,6 @@ import org.springframework.jdbc.core.JdbcOperations;
 public class JanitorInvocationInterceptor implements InvocationInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(JanitorInvocationInterceptor.class);
 
-    /**
-     * @see org.junit.jupiter.api.extension.InvocationInterceptor#interceptTestMethod(org.junit.jupiter.api.extension.InvocationInterceptor.Invocation,
-     * org.junit.jupiter.api.extension.ReflectiveInvocationContext, org.junit.jupiter.api.extension.ExtensionContext)
-     */
     @Override
     public void interceptTestMethod(final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext, final ExtensionContext extensionContext) throws Throwable {
         List<Object> arguments = invocationContext.getArguments();
@@ -52,10 +48,6 @@ public class JanitorInvocationInterceptor implements InvocationInterceptor {
         }
     }
 
-    /**
-     * @see org.junit.jupiter.api.extension.InvocationInterceptor#interceptTestTemplateMethod(org.junit.jupiter.api.extension.InvocationInterceptor.Invocation,
-     * org.junit.jupiter.api.extension.ReflectiveInvocationContext, org.junit.jupiter.api.extension.ExtensionContext)
-     */
     @Override
     public void interceptTestTemplateMethod(final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext, final ExtensionContext extensionContext) throws Throwable {
         interceptTestMethod(invocation, invocationContext, extensionContext);

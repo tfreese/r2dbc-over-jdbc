@@ -11,9 +11,6 @@ abstract class AbstractNumberCodec<T extends Number> extends AbstractCodec<T> {
         super(javaType, supportedJdbcTypes);
     }
 
-    /**
-     * @see io.r2dbc.jdbc.codecs.Codec#mapTo(java.lang.Class, java.lang.Object)
-     */
     @SuppressWarnings("unchecked")
     @Override
     public <M> M mapTo(final Class<M> javaType, final T value) {
