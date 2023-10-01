@@ -1,0 +1,42 @@
+plugins {
+    id "java"
+    id "io.spring.dependency-management" version "$version_springDependencyManagement"
+    id "de.freese.gradle.plugin.conventions" version "$version_myConventionPlugin"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:$version_springBoot")
+    }
+
+    dependencies {
+        def r2dbcSpiVersion = dependencyManagement.importedProperties["r2dbc-spi.version"]
+
+        dependency("io.r2dbc:r2dbc-spi-test:$r2dbcSpiVersion")
+
+//        dependencySet(group: "io.r2dbc", version: dependencyManagement.importedProperties["r2dbc-spi.version"]) {
+//            entry "r2dbc-spi-test"
+//        }
+    }
+}
+
+dependencies {
+    implementation("io.projectreactor:reactor-core")
+    implementation("io.r2dbc:r2dbc-spi")
+    implementation("org.slf4j:slf4j-api")
+
+    testImplementation("com.zaxxer:HikariCP")
+    testImplementation("io.projectreactor:reactor-test")
+    testImplementation("io.projectreactor.addons:reactor-extra")
+    testImplementation("io.r2dbc:r2dbc-spi-test")
+    testImplementation("org.apache.derby:derby")
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation("org.springframework:spring-jdbc")
+
+    testRuntimeOnly("com.h2database:h2")
+    testRuntimeOnly("org.hsqldb:hsqldb")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("org.slf4j:slf4j-simple")
+}
