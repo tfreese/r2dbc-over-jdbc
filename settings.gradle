@@ -1,52 +1,10 @@
 pluginManagement {
     repositories {
-        mavenLocal()
         mavenCentral()
         gradlePluginPortal()
-//        maven {
-//            url "https://teraphim.jfrog.io/artifactory/default-maven-virtual"
-//            name "jfrog"
-//            content {
-//                excludeGroupAndSubgroups("de.freese")
-//            }
-//            mavenContent {
-//                releasesOnly()
-//                //snapshotsOnly()
-//            }
-//        }
-//     ivy {
-//        url <URL>
-//        name "my-ivy"
-//        patternLayout {
-//            artifact "app1/[organisation]/jars/[artifact]-[revision].[ext]"
-//            artifact "app2/[organisation]/jars/[artifact]-[revision].[ext]"
-//        }
-//        metadataSources {
-//            artifact() // Only look for Jar.
-//        }
-//        content {
-//            excludeGroup "or.orga"
-//            excludeGroupByRegex("com.\\.*")
-//            excludeGroupByRegex "io.\\.*"
-//            excludeGroupByRegex "jakarta.\\.*"
-//            excludeGroupByRegex "org.\\.*"
-//        }
-//    }
-//    Ivy Dependencies.
-//    implementation("app1:artifact:version") // app1/app1/jars/artifact-version.jar
+        mavenLocal()
     }
 }
 
-//buildCache {
-//    local {
-//        directory = new File("/tmp", "build-cache")
-//        removeUnusedEntriesAfterDays = 1
-//    }
-//}
-//caches {
-//    cleanup = Cleanup.DEFAULT
-//    releasedWrappers.removeUnusedEntriesAfterDays = 7
-//    snapshotWrappers.removeUnusedEntriesAfterDays = 7
-//    downloadedResources.removeUnusedEntriesAfterDays = 7
-//    createdResources.removeUnusedEntriesAfterDays = 7
-//}
+// Without rootProject.name the Name of the Projekt-Directory is used.
+//rootProject.name = "r2dbc-over-jdbc"
