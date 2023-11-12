@@ -28,22 +28,22 @@ public class JanitorInvocationInterceptor implements InvocationInterceptor {
             lastArgument = arguments.get(arguments.size() - 1);
         }
 
-        DbServerExtension server = null;
+        DbServerExtension serverExtension = null;
 
-        if (lastArgument instanceof DbServerExtension) {
-            server = (DbServerExtension) lastArgument;
+        if (lastArgument instanceof DbServerExtension se) {
+            serverExtension = se;
         }
 
-        if (server != null) {
-            createTable(server.getJdbcOperations());
+        if (serverExtension != null) {
+            createTable(serverExtension.getJdbcOperations());
         }
 
         try {
             invocation.proceed();
         }
         finally {
-            if (server != null) {
-                dropTable(server.getJdbcOperations());
+            if (serverExtension != null) {
+                dropTable(serverExtension.getJdbcOperations());
             }
         }
     }
