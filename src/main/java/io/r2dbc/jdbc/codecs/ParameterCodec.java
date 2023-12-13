@@ -14,7 +14,7 @@ import io.r2dbc.spi.Parameters;
 public class ParameterCodec extends AbstractCodec<Parameter> {
     private final Codecs codecs;
 
-    public ParameterCodec(Codecs codecs) {
+    public ParameterCodec(final Codecs codecs) {
         super(Parameter.class);
 
         this.codecs = codecs;
