@@ -21,7 +21,7 @@ public class JanitorInvocationInterceptor implements InvocationInterceptor {
 
     @Override
     public void interceptTestMethod(final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext, final ExtensionContext extensionContext) throws Throwable {
-        List<Object> arguments = invocationContext.getArguments();
+        final List<Object> arguments = invocationContext.getArguments();
         Object lastArgument = null;
 
         if (!arguments.isEmpty()) {

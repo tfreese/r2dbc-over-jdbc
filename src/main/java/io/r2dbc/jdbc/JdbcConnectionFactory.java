@@ -20,7 +20,6 @@ import reactor.core.publisher.Mono;
  */
 public final class JdbcConnectionFactory implements ConnectionFactory {
     private final Codecs codecs;
-
     private final Mono<Connection> jdbcConnectionFactory;
 
     public JdbcConnectionFactory(final DataSource dataSource, final Codecs codecs) {

@@ -20,7 +20,7 @@ public class StringCodec extends AbstractCodec<String> {
 
     @Override
     public String mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
-        String value = resultSet.getString(columnLabel);
+        final String value = resultSet.getString(columnLabel);
 
         if (resultSet.wasNull()) {
             return null;
@@ -40,12 +40,12 @@ public class StringCodec extends AbstractCodec<String> {
             return (M) value;
         }
         else if (Blob.class.isAssignableFrom(javaType)) {
-            Blob blob = R2dbcUtils.stringToBlob(value);
+            final Blob blob = R2dbcUtils.stringToBlob(value);
 
             return (M) blob;
         }
         else if (Clob.class.isAssignableFrom(javaType)) {
-            Clob clob = R2dbcUtils.stringToClob(value);
+            final Clob clob = R2dbcUtils.stringToClob(value);
 
             return (M) clob;
         }

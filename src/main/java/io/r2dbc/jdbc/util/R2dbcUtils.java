@@ -26,7 +26,7 @@ import reactor.core.publisher.Mono;
  */
 public final class R2dbcUtils {
     public static byte[] blobToByteArray(final Blob blob) {
-        // ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         //
         // Flux.from(blob.stream()).subscribe(byteBuffer -> {
         // // baos.writeBytes(byteBuffer.array());
@@ -61,7 +61,7 @@ public final class R2dbcUtils {
 
     public static ByteBuffer blobToByteBuffer(final Blob blob) {
         //        // @formatter:off
-//        ByteBuffer byteBuffer = Flux.from(blob.stream())
+//        final ByteBuffer byteBuffer = Flux.from(blob.stream())
 //            .reduce(ByteBuffer::put)
 //            .concatWith(Mono.from(blob.discard())
 //                    .then(Mono.empty())
@@ -74,9 +74,9 @@ public final class R2dbcUtils {
         //
         // return byteBuffer;
 
-        byte[] bytes = blobToByteArray(blob);
+        final byte[] bytes = blobToByteArray(blob);
 
-        // ByteBuffer byteBuffer = ByteBuffer.allocateDirect(bytes.length);
+        // final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(bytes.length);
         // byteBuffer.put(bytes);
         // byteBuffer.flip();
 
@@ -84,7 +84,7 @@ public final class R2dbcUtils {
     }
 
     public static InputStream blobToInputStream(final Blob blob) {
-        byte[] bytes = blobToByteArray(blob);
+        final byte[] bytes = blobToByteArray(blob);
 
         return new ByteArrayInputStream(bytes);
     }
@@ -93,13 +93,13 @@ public final class R2dbcUtils {
         ByteBuffer byteBuffer = blobToByteBuffer(blob);
 
         byteBuffer = Base64.getEncoder().encode(byteBuffer);
-        CharBuffer charBuffer = StandardCharsets.UTF_8.decode(byteBuffer);
+        final CharBuffer charBuffer = StandardCharsets.UTF_8.decode(byteBuffer);
 
         return charBuffer.toString();
     }
 
     public static Blob byteArrayToBlob(final byte[] bytes) {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+        final ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
 
         return byteBufferToBlob(byteBuffer);
     }
@@ -109,7 +109,7 @@ public final class R2dbcUtils {
     }
 
     public static byte[] byteBufferToByteArray(final ByteBuffer byteBuffer) {
-        byte[] bytes = new byte[byteBuffer.remaining()];
+        final byte[] bytes = new byte[byteBuffer.remaining()];
         byteBuffer.get(bytes);
 
         return bytes;
@@ -132,7 +132,7 @@ public final class R2dbcUtils {
     }
 
     public static Blob inputStreamToBlob(final InputStream inputStream) {
-        ByteBuffer byteBuffer = inputStreamToByteBuffer(inputStream);
+        final ByteBuffer byteBuffer = inputStreamToByteBuffer(inputStream);
 
         return byteBufferToBlob(byteBuffer);
     }
@@ -142,7 +142,7 @@ public final class R2dbcUtils {
             ByteBuffer byteBuffer = null;
 
             try (InputStream in = new BufferedInputStream(inputStream)) {
-                byte[] bytes = in.readAllBytes();
+                final byte[] bytes = in.readAllBytes();
 
                 byteBuffer = ByteBuffer.wrap(bytes);
             }
@@ -202,7 +202,7 @@ public final class R2dbcUtils {
     }
 
     public static Blob stringToBlob(final String value) {
-        ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(value);
+        final ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(value);
 
         return byteBufferToBlob(byteBuffer);
     }

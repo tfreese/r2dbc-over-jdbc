@@ -12,7 +12,6 @@ import io.r2dbc.spi.ConnectionMetadata;
  */
 public class JdbcConnectionMetadata implements ConnectionMetadata {
     private final String productName;
-
     private final String version;
 
     public JdbcConnectionMetadata(final DatabaseMetaData databaseMetaData) throws SQLException {

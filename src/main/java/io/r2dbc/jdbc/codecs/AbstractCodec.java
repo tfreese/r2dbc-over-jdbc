@@ -15,7 +15,6 @@ import java.util.stream.Stream;
  */
 public abstract class AbstractCodec<T> implements Codec<T> {
     private final Class<T> javaType;
-
     private final Set<JDBCType> supportedJdbcTypes;
 
     // @SuppressWarnings("unchecked")

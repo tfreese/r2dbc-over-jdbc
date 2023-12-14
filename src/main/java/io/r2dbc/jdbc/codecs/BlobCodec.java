@@ -24,7 +24,7 @@ public class BlobCodec extends AbstractCodec<Blob> {
 
     @Override
     public Blob mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
-        java.sql.Blob value = resultSet.getBlob(columnLabel);
+        final java.sql.Blob value = resultSet.getBlob(columnLabel);
 
         if (resultSet.wasNull()) {
             return NULL_BLOB;
@@ -63,9 +63,9 @@ public class BlobCodec extends AbstractCodec<Blob> {
 
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Blob value) throws SQLException {
-        java.sql.Blob blob = preparedStatement.getConnection().createBlob();
+        final java.sql.Blob blob = preparedStatement.getConnection().createBlob();
 
-        byte[] bytes = R2dbcUtils.blobToByteArray(value);
+        final byte[] bytes = R2dbcUtils.blobToByteArray(value);
 
         blob.setBytes(1, bytes);
 

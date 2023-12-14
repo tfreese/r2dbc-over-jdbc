@@ -65,7 +65,7 @@ abstract class AbstractTestKit implements TestKit<Integer> {
     public void prepareStatement() {
         // Der Original Testfall erwartet 10 RowsUpdated ... expectNextCount(10)
         Flux.usingWhen(getConnectionFactory().create(), connection -> {
-            Statement statement = connection.createStatement(expand(TestStatement.INSERT_VALUE_PLACEHOLDER, getPlaceholder(0)));
+            final Statement statement = connection.createStatement(expand(TestStatement.INSERT_VALUE_PLACEHOLDER, getPlaceholder(0)));
 
             IntStream.range(0, 10).forEach((i) -> {
                 TestKit.bind(statement, getIdentifier(0), i);

@@ -57,8 +57,8 @@ final class ParameterizedRowTest {
 
     @Test
     void testConstructorNoValues() {
-        JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-1", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
-        JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
+        final JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-1", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
+        final JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
         assertThatNullPointerException().isThrownBy(() -> new JdbcRow(null, new HashMap<>(), this.codecs)).withMessage("rowMetadata required");
         assertThatNullPointerException().isThrownBy(() -> new JdbcRow(rowMetadata, null, this.codecs)).withMessage("values required");
@@ -66,12 +66,12 @@ final class ParameterizedRowTest {
 
     @Test
     void testGetByIndex() {
-        JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-1", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
-        JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
+        final JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-1", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
+        final JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
-        Object value = new Object();
+        final Object value = new Object();
 
-        Map<Integer, Object> values = new HashMap<>();
+        final Map<Integer, Object> values = new HashMap<>();
         values.put(0, value);
 
         assertThat(new JdbcRow(rowMetadata, values, this.codecs).get(0, Object.class)).isSameAs(value);
@@ -79,12 +79,12 @@ final class ParameterizedRowTest {
 
     @Test
     void testGetByName() {
-        JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-2", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
-        JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
+        final JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-2", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
+        final JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
-        Object value = new Object();
+        final Object value = new Object();
 
-        Map<Integer, Object> values = new HashMap<>();
+        final Map<Integer, Object> values = new HashMap<>();
         values.put(0, value);
 
         assertThat(new JdbcRow(rowMetadata, values, this.codecs).get("test-name-2", Object.class)).isSameAs(value);
@@ -92,26 +92,26 @@ final class ParameterizedRowTest {
 
     @Test
     void testGetInvalidIdentifier() {
-        ColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
-        RowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
+        final ColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
+        final RowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
         assertThat(new JdbcRow(rowMetadata, new HashMap<>(), this.codecs).get(3, Object.class)).isNull();
     }
 
     @Test
     void testGetNoIdentifier() {
-        JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
-        JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
+        final JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
+        final JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
         assertThatIllegalArgumentException().isThrownBy(() -> new JdbcRow(rowMetadata, new HashMap<>(), this.codecs).get(null, Object.class)).withMessage("name is null");
     }
 
     @Test
     void testGetNull() {
-        JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-3", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
-        JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
+        final JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-3", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
+        final JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
-        Map<Integer, Object> values = new HashMap<>();
+        final Map<Integer, Object> values = new HashMap<>();
         values.put(0, null);
 
         assertThat(new JdbcRow(rowMetadata, values, this.codecs).get("test-name-3", Object.class)).isNull();
@@ -119,10 +119,10 @@ final class ParameterizedRowTest {
 
     @Test
     void testGetWrongIdentifierType() {
-        String identifier = "-";
+        final String identifier = "-";
 
-        JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
-        JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
+        final JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
+        final JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
         assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> new JdbcRow(rowMetadata, new HashMap<>(), this.codecs).get(identifier, Object.class)).withMessage("No MetaData for Name: %s", identifier);
     }
@@ -131,7 +131,7 @@ final class ParameterizedRowTest {
     @DisplayName("testSelectWithAliases") // Ohne Parameter
     @MethodSource("getDatabases")
     void testSelectWithAliases(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+        final ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         server.getJdbcOperations().execute("INSERT INTO test VALUES (100)");
 
@@ -155,7 +155,7 @@ final class ParameterizedRowTest {
     @DisplayName("testSelectWithoutAliases") // Ohne Parameter
     @MethodSource("getDatabases")
     void testSelectWithoutAliases(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+        final ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         // server.getJdbcOperations().execute("INSERT INTO test VALUES (100)");
         //
@@ -169,7 +169,7 @@ final class ParameterizedRowTest {
 //        .verifyComplete();
         // @formatter:on
 
-        Connection connection = Mono.from(connectionFactory.create()).block(DbServerExtension.getSqlTimeout());
+        final Connection connection = Mono.from(connectionFactory.create()).block(DbServerExtension.getSqlTimeout());
 
         try {
             // awaitExecution(connection.createStatement("CREATE TABLE test ( test_value INTEGER )"));

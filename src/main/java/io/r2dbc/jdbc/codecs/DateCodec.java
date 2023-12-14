@@ -21,7 +21,7 @@ public class DateCodec extends AbstractCodec<Date> {
 
     @Override
     public Date mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
-        java.sql.Date sqlDate = resultSet.getDate(columnLabel);
+        final java.sql.Date sqlDate = resultSet.getDate(columnLabel);
 
         if (resultSet.wasNull()) {
             return null;
@@ -42,22 +42,22 @@ public class DateCodec extends AbstractCodec<Date> {
             return (M) value;
         }
         else if (LocalDate.class.equals(javaType)) {
-            LocalDate localDate = LocalDate.ofInstant(value.toInstant(), ZoneId.systemDefault());
+            final LocalDate localDate = LocalDate.ofInstant(value.toInstant(), ZoneId.systemDefault());
 
             return (M) localDate;
         }
         else if (LocalDateTime.class.equals(javaType)) {
-            LocalDateTime localDateTime = value.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            final LocalDateTime localDateTime = value.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
             return (M) localDateTime;
         }
         else if (LocalTime.class.equals(javaType)) {
-            LocalTime localTime = LocalTime.ofInstant(value.toInstant(), ZoneId.systemDefault());
+            final LocalTime localTime = LocalTime.ofInstant(value.toInstant(), ZoneId.systemDefault());
 
             return (M) localTime;
         }
         else if (String.class.equals(javaType)) {
-            String formatted = String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", value);
+            final String formatted = String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", value);
 
             return (M) formatted;
         }
@@ -67,7 +67,7 @@ public class DateCodec extends AbstractCodec<Date> {
 
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Date value) throws SQLException {
-        java.sql.Date sqlDate = new java.sql.Date(value.getTime());
+        final java.sql.Date sqlDate = new java.sql.Date(value.getTime());
 
         preparedStatement.setDate(parameterIndex, sqlDate);
     }

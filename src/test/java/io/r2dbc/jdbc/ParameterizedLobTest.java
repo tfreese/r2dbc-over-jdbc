@@ -80,11 +80,11 @@ class ParameterizedLobTest {
     @DisplayName("testBigBlob") // Ohne Parameter
     @MethodSource("getDatabases")
     void testBigBlob(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+        final ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         createTable(getConnection(connectionFactory), "BLOB");
 
-        int i = 50 + new Random().nextInt(1);
+        final int i = 50 + new Random().nextInt(1);
 
         // Connection connection = getConnection();
         //
@@ -135,13 +135,13 @@ class ParameterizedLobTest {
     @DisplayName("testBigClob") // Ohne Parameter
     @MethodSource("getDatabases")
     void testBigClob(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+        final ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         createTable(getConnection(connectionFactory), "CLOB");
 
-        int i = 50 + new Random().nextInt(100);
+        final int i = 50 + new Random().nextInt(100);
 
-        String testString = "foo你好bar";
+        final String testString = "foo你好bar";
 
         // Connection connection = getConnection(connectionFactory);
         //
@@ -189,7 +189,7 @@ class ParameterizedLobTest {
     @DisplayName("testNullBlob") // Ohne Parameter
     @MethodSource("getDatabases")
     void testNullBlob(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+        final ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         createTable(getConnection(connectionFactory), "BLOB");
 
@@ -223,7 +223,7 @@ class ParameterizedLobTest {
     @DisplayName("testNullClob") // Ohne Parameter
     @MethodSource("getDatabases")
     void testNullClob(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+        final ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         createTable(getConnection(connectionFactory), "CLOB");
 

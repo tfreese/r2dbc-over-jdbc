@@ -39,9 +39,7 @@ public abstract class AbstractJdbcStatement implements Statement {
      */
     static class Context {
         private final int[] affectedRows;
-
         private final ResultSet resultSet;
-
         private final PreparedStatement stmt;
 
         Context(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows) {
@@ -125,11 +123,11 @@ public abstract class AbstractJdbcStatement implements Statement {
 
         void prepareStatement(final PreparedStatement preparedStatement, final Map<Integer, Object> bind) throws SQLException {
             for (Entry<Integer, Object> entry : bind.entrySet()) {
-                Integer index = entry.getKey();
-                Object value = entry.getValue();
+                final Integer index = entry.getKey();
+                final Object value = entry.getValue();
 
                 // JDBC fängt bei 1 an !
-                int parameterIndex = index + 1;
+                final int parameterIndex = index + 1;
 
                 if (value == null) {
                     // preparedStatement.setNull(parameterIndex, sqlType);
@@ -150,9 +148,9 @@ public abstract class AbstractJdbcStatement implements Statement {
                 return;
             }
 
-            long parameterCount = getSql().chars().filter(ch -> ch == '?').count();
+            final long parameterCount = getSql().chars().filter(ch -> ch == '?').count();
 
-            int bindCount = this.current.size();
+            final int bindCount = this.current.size();
 
             if (bindCount < parameterCount) {
                 throw new IllegalStateException("Bindings do not match Parameters: " + bindCount + " != " + parameterCount);
@@ -161,15 +159,10 @@ public abstract class AbstractJdbcStatement implements Statement {
     }
 
     private final Bindings bindings = new Bindings();
-
     private final Codecs codecs;
-
     private final java.sql.Connection jdbcConnection;
-
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
     private final String sql;
-
     private final SqlOperation sqlOperation;
 
     protected AbstractJdbcStatement(final java.sql.Connection jdbcConnection, final String sql, final Codecs codecs) {
@@ -180,7 +173,7 @@ public abstract class AbstractJdbcStatement implements Statement {
         this.codecs = Objects.requireNonNull(codecs, "codecs required");
 
         // Determine SQL-Operation.
-        String s = sql.substring(0, 6).toLowerCase();
+        final String s = sql.substring(0, 6).toLowerCase();
 
         if (s.startsWith("select") || s.startsWith("with")) {
             this.sqlOperation = SqlOperation.SELECT;

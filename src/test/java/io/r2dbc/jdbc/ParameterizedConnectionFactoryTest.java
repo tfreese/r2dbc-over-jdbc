@@ -37,7 +37,7 @@ final class ParameterizedConnectionFactoryTest {
     @DisplayName("testCreate") // Ohne Parameter
     @MethodSource("getDatabases")
     void testCreate(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        JdbcConnectionConfiguration configuration = JdbcConnectionConfiguration.builder().dataSource(server.getDataSource()).build();
+        final JdbcConnectionConfiguration configuration = JdbcConnectionConfiguration.builder().dataSource(server.getDataSource()).build();
 
         new JdbcConnectionFactory(configuration).create().as(StepVerifier::create).expectNextCount(1).verifyComplete();
     }
@@ -46,7 +46,7 @@ final class ParameterizedConnectionFactoryTest {
     @DisplayName("testGetMetadata") // Ohne Parameter
     @MethodSource("getDatabases")
     void testGetMetadata(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        JdbcConnectionConfiguration configuration = JdbcConnectionConfiguration.builder().dataSource(server.getDataSource()).build();
+        final JdbcConnectionConfiguration configuration = JdbcConnectionConfiguration.builder().dataSource(server.getDataSource()).build();
 
         assertThat(new JdbcConnectionFactory(configuration).getMetadata()).isNotNull();
     }
@@ -55,7 +55,7 @@ final class ParameterizedConnectionFactoryTest {
     @DisplayName("testOptions") // Ohne Parameter
     @MethodSource("getDatabases")
     void testOptions(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        JdbcConnectionConfiguration configuration = JdbcConnectionConfiguration.builder().dataSource(server.getDataSource()).build();
+        final JdbcConnectionConfiguration configuration = JdbcConnectionConfiguration.builder().dataSource(server.getDataSource()).build();
 
         assertThat(configuration.getDataSource()).isEqualTo(server.getDataSource());
     }

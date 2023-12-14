@@ -16,7 +16,7 @@ public class IntegerCodec extends AbstractNumberCodec<Integer> {
 
     @Override
     public Integer mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
-        int value = resultSet.getInt(columnLabel);
+        final int value = resultSet.getInt(columnLabel);
 
         if (resultSet.wasNull()) {
             return null;

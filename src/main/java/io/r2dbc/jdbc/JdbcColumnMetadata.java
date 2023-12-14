@@ -15,17 +15,11 @@ import io.r2dbc.spi.Type;
  */
 public class JdbcColumnMetadata implements ColumnMetadata, Type {
     private final int column;
-
     private final Class<?> javaType;
-
     private final JDBCType jdbcType;
-
     private final String name;
-
     private final Nullability nullability;
-
     private final int precision;
-
     private final int scale;
 
     public JdbcColumnMetadata(final String name, final int column, final Class<?> javaType, final JDBCType jdbcType, final Nullability nullability, final int precision, final int scale) {

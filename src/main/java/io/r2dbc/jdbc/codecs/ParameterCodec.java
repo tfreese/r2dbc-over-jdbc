@@ -28,7 +28,7 @@ public class ParameterCodec extends AbstractCodec<Parameter> {
             return null;
         }
 
-        JDBCType jdbcType = codecs.getJdbcType(value.getClass());
+        final JDBCType jdbcType = codecs.getJdbcType(value.getClass());
         value = codecs.mapFromSql(jdbcType, resultSet, columnLabel);
 
         return Parameters.inOut(value);
@@ -36,7 +36,7 @@ public class ParameterCodec extends AbstractCodec<Parameter> {
 
     @Override
     public <M> M mapTo(final Class<M> javaType, final Parameter value) {
-        Object mappedObject = codecs.mapTo(codecs.getJdbcType(value.getClass()), value.getType().getJavaType(), value);
+        final Object mappedObject = codecs.mapTo(codecs.getJdbcType(value.getClass()), value.getType().getJavaType(), value);
 
         return javaType.cast(mappedObject);
     }

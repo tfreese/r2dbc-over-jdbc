@@ -48,7 +48,7 @@ public class JdbcResult implements Result {
             return new JdbcResult(Flux.empty(), rowMetadata, null);
         }
 
-        Flux<JdbcRow> filteredSegments = this.rows.filter(filter);
+        final Flux<JdbcRow> filteredSegments = this.rows.filter(filter);
 
         return new JdbcResult(filteredSegments, rowMetadata, affectedRows);
     }
@@ -59,7 +59,7 @@ public class JdbcResult implements Result {
 
         if (rowsUpdated != null) {
             return Flux.just((UpdateCount) () -> rowsUpdated).flatMap(segment -> {
-                Publisher<? extends T> result = mappingFunction.apply(segment);
+                final Publisher<? extends T> result = mappingFunction.apply(segment);
 
                 if (result == null) {
                     return Mono.error(new IllegalStateException("The mapper returned a null Publisher"));
@@ -74,7 +74,7 @@ public class JdbcResult implements Result {
         }
 
         return this.rows.flatMap(segment -> {
-            Publisher<? extends T> result = mappingFunction.apply(segment);
+            final Publisher<? extends T> result = mappingFunction.apply(segment);
 
             if (result == null) {
                 return Mono.error(new IllegalStateException("The mapper returned a null Publisher"));

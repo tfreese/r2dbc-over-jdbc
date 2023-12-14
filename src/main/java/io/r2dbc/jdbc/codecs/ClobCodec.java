@@ -22,7 +22,7 @@ public class ClobCodec extends AbstractCodec<Clob> {
 
     @Override
     public Clob mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
-        java.sql.Clob value = resultSet.getClob(columnLabel);
+        final java.sql.Clob value = resultSet.getClob(columnLabel);
 
         if (resultSet.wasNull()) {
             return NULL_CLOB;
@@ -57,9 +57,9 @@ public class ClobCodec extends AbstractCodec<Clob> {
 
     @Override
     public void mapToSql(final PreparedStatement preparedStatement, final int parameterIndex, final Clob value) throws SQLException {
-        java.sql.Clob clob = preparedStatement.getConnection().createClob();
+        final java.sql.Clob clob = preparedStatement.getConnection().createClob();
 
-        String string = R2dbcUtils.clobToString(value);
+        final String string = R2dbcUtils.clobToString(value);
 
         clob.setString(1, string);
 

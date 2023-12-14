@@ -19,7 +19,6 @@ final class JdbcConnectionConfiguration {
      */
     static final class Builder {
         private Codecs codecs;
-
         private DataSource dataSource;
 
         public JdbcConnectionConfiguration build() {
@@ -45,7 +44,7 @@ final class JdbcConnectionConfiguration {
 
         @Override
         public String toString() {
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder();
             builder.append("Builder [");
             builder.append("dataSource=").append(this.dataSource);
             builder.append(", codecs=").append(this.codecs);
@@ -60,7 +59,6 @@ final class JdbcConnectionConfiguration {
     }
 
     private final Codecs codecs;
-
     private final DataSource dataSource;
 
     private JdbcConnectionConfiguration(final DataSource dataSource, final Codecs codecs) {
@@ -80,7 +78,7 @@ final class JdbcConnectionConfiguration {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         builder.append("JdbcConnectionConfiguration [");
         builder.append("dataSource=").append(this.dataSource);
         builder.append(", codecs=").append(this.codecs);

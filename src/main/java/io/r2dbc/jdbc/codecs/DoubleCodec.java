@@ -16,7 +16,7 @@ public class DoubleCodec extends AbstractNumberCodec<Double> {
 
     @Override
     public Double mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
-        double value = resultSet.getDouble(columnLabel);
+        final double value = resultSet.getDouble(columnLabel);
 
         if (resultSet.wasNull()) {
             return null;

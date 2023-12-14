@@ -18,7 +18,6 @@ import io.r2dbc.spi.Option;
  */
 public final class JdbcConnectionFactoryProvider implements ConnectionFactoryProvider {
     public static final Option<Codecs> CODECS = Option.valueOf("codecs");
-
     public static final Option<DataSource> DATASOURCE = Option.valueOf("datasource");
 
     @Override
@@ -26,7 +25,7 @@ public final class JdbcConnectionFactoryProvider implements ConnectionFactoryPro
         Objects.requireNonNull(connectionFactoryOptions, "connectionFactoryOptions must not be null");
 
         // @formatter:off
-        JdbcConnectionConfiguration.Builder builder = JdbcConnectionConfiguration.builder()
+        final JdbcConnectionConfiguration.Builder builder = JdbcConnectionConfiguration.builder()
                 .dataSource((DataSource) connectionFactoryOptions.getValue(DATASOURCE))
                 .codecs((Codecs) connectionFactoryOptions.getValue(CODECS));
         // @formatter:on
@@ -43,7 +42,7 @@ public final class JdbcConnectionFactoryProvider implements ConnectionFactoryPro
     public boolean supports(final ConnectionFactoryOptions connectionFactoryOptions) {
         Objects.requireNonNull(connectionFactoryOptions, "connectionFactoryOptions must not be null");
 
-        Object dataSource = connectionFactoryOptions.getValue(DATASOURCE);
+        final Object dataSource = connectionFactoryOptions.getValue(DATASOURCE);
 
         return dataSource != null;
     }

@@ -16,7 +16,7 @@ public class FloatCodec extends AbstractNumberCodec<Float> {
 
     @Override
     public Float mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
-        float value = resultSet.getFloat(columnLabel);
+        final float value = resultSet.getFloat(columnLabel);
 
         if (resultSet.wasNull()) {
             return null;

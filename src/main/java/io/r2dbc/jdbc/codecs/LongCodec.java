@@ -16,7 +16,7 @@ public class LongCodec extends AbstractNumberCodec<Long> {
 
     @Override
     public Long mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
-        long value = resultSet.getLong(columnLabel);
+        final long value = resultSet.getLong(columnLabel);
 
         if (resultSet.wasNull()) {
             return null;

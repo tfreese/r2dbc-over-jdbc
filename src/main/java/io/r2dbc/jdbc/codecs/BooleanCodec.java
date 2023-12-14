@@ -16,7 +16,7 @@ public class BooleanCodec extends AbstractCodec<Boolean> {
 
     @Override
     public Boolean mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
-        boolean value = resultSet.getBoolean(columnLabel);
+        final boolean value = resultSet.getBoolean(columnLabel);
 
         if (resultSet.wasNull()) {
             return null;
@@ -36,7 +36,7 @@ public class BooleanCodec extends AbstractCodec<Boolean> {
             return (M) value;
         }
         else if (CharSequence.class.isAssignableFrom(javaType)) {
-            String s = value.toString();
+            final String s = value.toString();
 
             return (M) s;
         }

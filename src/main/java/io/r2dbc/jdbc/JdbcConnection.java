@@ -31,11 +31,8 @@ public class JdbcConnection implements Connection {
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcConnection.class);
 
     private final Codecs codecs;
-
     private final java.sql.Connection jdbcConnection;
-
     private final Mono<java.sql.Connection> jdbcConnectionMono;
-
     private final Map<String, Savepoint> savePoints = new HashMap<>();
 
     public JdbcConnection(final java.sql.Connection jdbcConnection, final Codecs codecs) {
@@ -149,7 +146,7 @@ public class JdbcConnection implements Connection {
 
                 this.jdbcConnection.setAutoCommit(false);
 
-                Savepoint savepoint = con.setSavepoint(name);
+                final Savepoint savepoint = con.setSavepoint(name);
                 this.savePoints.put(name, savepoint);
 
                 sink.next(Mono.empty());
@@ -189,9 +186,9 @@ public class JdbcConnection implements Connection {
             try {
                 getLogger().debug("get Metadata");
 
-                DatabaseMetaData databaseMetaData = con.getMetaData();
+                final DatabaseMetaData databaseMetaData = con.getMetaData();
 
-                ConnectionMetadata connectionMetadata = new JdbcConnectionMetadata(databaseMetaData);
+                final ConnectionMetadata connectionMetadata = new JdbcConnectionMetadata(databaseMetaData);
 
                 sink.next(connectionMetadata);
                 sink.complete();
@@ -207,7 +204,7 @@ public class JdbcConnection implements Connection {
         try {
             getLogger().debug("get transaction isolationLevel");
 
-            int transactionIsolation = this.jdbcConnection.getTransactionIsolation();
+            final int transactionIsolation = this.jdbcConnection.getTransactionIsolation();
             IsolationLevel isolationLevel = null;
 
             if (transactionIsolation == java.sql.Connection.TRANSACTION_READ_COMMITTED) {
@@ -269,7 +266,7 @@ public class JdbcConnection implements Connection {
 
                 getLogger().debug("release savepoint: {}", name);
 
-                Savepoint savepoint = this.savePoints.remove(name);
+                final Savepoint savepoint = this.savePoints.remove(name);
                 con.releaseSavepoint(savepoint);
 
                 sink.next(Mono.empty());
@@ -312,7 +309,7 @@ public class JdbcConnection implements Connection {
 
                 getLogger().debug("rollback transaction savepoint: {}", name);
 
-                Savepoint savepoint = this.savePoints.remove(name);
+                final Savepoint savepoint = this.savePoints.remove(name);
                 con.rollback(savepoint);
 
                 sink.next(Mono.empty());

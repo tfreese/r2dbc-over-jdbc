@@ -86,7 +86,7 @@ final class JdbcRowMetadataTest {
 
     @Test
     void testGetColumnMetadataWrongIdentifierType() throws SQLException {
-        String identifier = "-";
+        final String identifier = "-";
 
         assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> JdbcRowMetadata.of(this.resultSet, this.codecs).getColumnMetadata(identifier));
     }

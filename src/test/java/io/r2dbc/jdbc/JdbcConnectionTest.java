@@ -31,7 +31,6 @@ import reactor.test.StepVerifier;
  */
 final class JdbcConnectionTest {
     private final Codecs codecs = new DefaultCodecs();
-
     private final Connection connection = mock(Connection.class, RETURNS_SMART_NULLS);
 
     @Test

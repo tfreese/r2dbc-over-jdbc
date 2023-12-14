@@ -37,11 +37,11 @@ public class JdbcStatement extends AbstractJdbcStatement {
                      createExecuteMono(getJdbcConnection(), sql).handle((context, sink) -> {
                         try
                         {
-                            PreparedStatement stmt = context.getStmt();
-                            ResultSet resultSet = context.getResultSet();
-                            int[] affectedRows = context.getAffectedRows();
+                            final PreparedStatement stmt = context.getStmt();
+                            final ResultSet resultSet = context.getResultSet();
+                            final int[] affectedRows = context.getAffectedRows();
 
-                            Result result = createResult(stmt, resultSet, affectedRows);
+                            final Result result = createResult(stmt, resultSet, affectedRows);
 
                             sink.next(result);
 
@@ -63,14 +63,14 @@ public class JdbcStatement extends AbstractJdbcStatement {
                     getLogger().debug("prepare statement: {}", prepareSqlForLog(sql));
                 }
 
-                PreparedStatement stmt = connection.prepareStatement(sql);
+                final PreparedStatement stmt = connection.prepareStatement(sql);
                 getBindings().prepareStatement(stmt, getBindings().getLast());
 
                 if (getLogger().isDebugEnabled()) {
                     getLogger().debug("execute statement: {}", prepareSqlForLog(sql));
                 }
 
-                ResultSet resultSet = stmt.executeQuery();
+                final ResultSet resultSet = stmt.executeQuery();
 
                 return new Context(stmt, resultSet, null);
             });
@@ -81,16 +81,16 @@ public class JdbcStatement extends AbstractJdbcStatement {
                     getLogger().debug("prepare statement: {}", prepareSqlForLog(sql));
                 }
 
-                PreparedStatement stmt = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
+                final PreparedStatement stmt = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
                 getBindings().prepareBatch(stmt);
 
                 if (getLogger().isDebugEnabled()) {
                     getLogger().debug("execute statement: {}", prepareSqlForLog(sql));
                 }
 
-                int[] affectedRows = stmt.executeBatch();
+                final int[] affectedRows = stmt.executeBatch();
 
-                ResultSet resultSet = stmt.getGeneratedKeys();
+                final ResultSet resultSet = stmt.getGeneratedKeys();
 
                 return new Context(stmt, resultSet, affectedRows);
             });
@@ -101,14 +101,14 @@ public class JdbcStatement extends AbstractJdbcStatement {
                 getLogger().debug("prepare statement: {}", prepareSqlForLog(sql));
             }
 
-            PreparedStatement stmt = connection.prepareStatement(sql);
+            final PreparedStatement stmt = connection.prepareStatement(sql);
             getBindings().prepareBatch(stmt);
 
             if (getLogger().isDebugEnabled()) {
                 getLogger().debug("execute statement: {}", prepareSqlForLog(sql));
             }
 
-            int[] affectedRows = stmt.executeBatch();
+            final int[] affectedRows = stmt.executeBatch();
 
             return new Context(stmt, null, affectedRows);
         });
@@ -119,20 +119,20 @@ public class JdbcStatement extends AbstractJdbcStatement {
      * @param affectedRows int[], optional
      */
     protected Result createResult(final PreparedStatement stmt, final ResultSet resultSet, final int[] affectedRows) throws SQLException {
-        RowMetadata rowMetadata = JdbcRowMetadata.of(resultSet, getCodecs());
+        final RowMetadata rowMetadata = JdbcRowMetadata.of(resultSet, getCodecs());
 
-        Flux<JdbcRow> rows = Flux.generate((final SynchronousSink<JdbcRow> sink) -> {
+        final Flux<JdbcRow> rows = Flux.generate((final SynchronousSink<JdbcRow> sink) -> {
             try {
                 if ((resultSet != null) && resultSet.next()) {
-                    Map<Integer, Object> row = new HashMap<>();
+                    final Map<Integer, Object> row = new HashMap<>();
 
                     int index = 0;
 
                     for (ColumnMetadata columnMetaData : rowMetadata.getColumnMetadatas()) {
-                        String columnLabel = columnMetaData.getName();
-                        JDBCType jdbcType = (JDBCType) columnMetaData.getNativeTypeMetadata();
+                        final String columnLabel = columnMetaData.getName();
+                        final JDBCType jdbcType = (JDBCType) columnMetaData.getNativeTypeMetadata();
 
-                        Object value = getCodecs().mapFromSql(jdbcType, resultSet, columnLabel);
+                        final Object value = getCodecs().mapFromSql(jdbcType, resultSet, columnLabel);
 
                         row.put(index, value);
                         index++;

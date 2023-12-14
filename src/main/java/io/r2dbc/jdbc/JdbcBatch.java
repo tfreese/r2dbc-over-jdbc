@@ -16,7 +16,6 @@ import reactor.core.publisher.Flux;
  */
 public class JdbcBatch implements Batch {
     private final Connection connection;
-
     private final List<String> statements = new ArrayList<>();
 
     public JdbcBatch(final Connection connection) {

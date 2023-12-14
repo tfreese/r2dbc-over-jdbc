@@ -29,24 +29,24 @@ public class JdbcRowMetadata implements RowMetadata {
             return new JdbcRowMetadata(Collections.emptyList());
         }
 
-        ResultSetMetaData metaData = resultSet.getMetaData();
-        List<ColumnMetadata> list = new ArrayList<>();
+        final ResultSetMetaData metaData = resultSet.getMetaData();
+        final List<ColumnMetadata> list = new ArrayList<>();
 
         for (int column = 1; column <= metaData.getColumnCount(); column++) {
-            String name = metaData.getColumnLabel(column);
-            int sqlType = metaData.getColumnType(column);
-            JDBCType jdbcType = JDBCType.valueOf(sqlType);
-            int precision = metaData.getPrecision(column);
-            int scale = metaData.getScale(column);
+            final String name = metaData.getColumnLabel(column);
+            final int sqlType = metaData.getColumnType(column);
+            final JDBCType jdbcType = JDBCType.valueOf(sqlType);
+            final int precision = metaData.getPrecision(column);
+            final int scale = metaData.getScale(column);
 
-            Nullability nullability = switch (metaData.isNullable(column)) {
+            final Nullability nullability = switch (metaData.isNullable(column)) {
                 case ResultSetMetaData.columnNoNulls -> Nullability.NON_NULL;
                 case ResultSetMetaData.columnNullable -> Nullability.NULLABLE;
 
                 default -> Nullability.UNKNOWN;
             };
 
-            Class<?> javaType = codecs.getJavaType(jdbcType);
+            final Class<?> javaType = codecs.getJavaType(jdbcType);
 
             list.add(new JdbcColumnMetadata(name, column - 1, javaType, jdbcType, nullability, precision, scale));
         }
@@ -55,7 +55,6 @@ public class JdbcRowMetadata implements RowMetadata {
     }
 
     private final List<ColumnMetadata> columnMetaDatas;
-
     private final Map<String, ColumnMetadata> columnMetaDatasByName = new LinkedHashMap<>();
 
     public JdbcRowMetadata(final List<ColumnMetadata> columnMetaDatas) {
@@ -65,9 +64,9 @@ public class JdbcRowMetadata implements RowMetadata {
 
         columnMetaDatas.forEach(cmd -> {
             // Bei Spalten mit identischen Namen, immer den ersten nehmen, laut Spezifikation.
-            String name = cmd.getName().toLowerCase();
+            final String name = cmd.getName().toLowerCase();
 
-            ColumnMetadata old = this.columnMetaDatasByName.put(name, cmd);
+            final ColumnMetadata old = this.columnMetaDatasByName.put(name, cmd);
 
             if (old != null) {
                 this.columnMetaDatasByName.put(name, old);
@@ -86,7 +85,7 @@ public class JdbcRowMetadata implements RowMetadata {
             throw new IllegalArgumentException("name is null");
         }
 
-        ColumnMetadata metaData = this.columnMetaDatasByName.get(name.toLowerCase());
+        final ColumnMetadata metaData = this.columnMetaDatasByName.get(name.toLowerCase());
 
         if (metaData == null) {
             throw new NoSuchElementException("No MetaData for Name: " + name);
@@ -101,7 +100,7 @@ public class JdbcRowMetadata implements RowMetadata {
             throw new ArrayIndexOutOfBoundsException("Index: " + index + ", Size: " + this.columnMetaDatas.size());
         }
 
-        ColumnMetadata metaData = this.columnMetaDatas.get(index);
+        final ColumnMetadata metaData = this.columnMetaDatas.get(index);
 
         if (metaData == null) {
             throw new NoSuchElementException("No MetaData for Index: " + index);

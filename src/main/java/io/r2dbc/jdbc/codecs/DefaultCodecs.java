@@ -58,7 +58,7 @@ public class DefaultCodecs implements Codecs {
         Objects.requireNonNull(resultSet, "resultSet must not be null");
         Objects.requireNonNull(columnLabel, "columnLabel must not be null");
 
-        Codec<?> codec = get(jdbcType);
+        final Codec<?> codec = get(jdbcType);
 
         return ((Codec<T>) codec).mapFromSql(resultSet, columnLabel);
     }
@@ -68,7 +68,7 @@ public class DefaultCodecs implements Codecs {
     public <T> T mapTo(final JDBCType jdbcType, final Class<? extends T> javaType, final Object value) {
         Objects.requireNonNull(javaType, "javaType must not be null");
 
-        Codec codec = get(jdbcType);
+        final Codec codec = get(jdbcType);
 
         return (T) codec.mapTo(javaType, value);
     }
@@ -80,7 +80,7 @@ public class DefaultCodecs implements Codecs {
         Objects.requireNonNull(preparedStatement, "preparedStatement must not be null");
         Objects.checkIndex(parameterIndex, Integer.MAX_VALUE);
 
-        Codec codec = get(javaType);
+        final Codec codec = get(javaType);
 
         codec.mapToSql(preparedStatement, parameterIndex, value);
     }
@@ -117,7 +117,7 @@ public class DefaultCodecs implements Codecs {
     protected <T> Codec<T> get(final JDBCType jdbcType) {
         Objects.requireNonNull(jdbcType, "jdbcType must not be null");
 
-        Codec<?> codec = this.codecsForJDBCType.get(jdbcType);
+        final Codec<?> codec = this.codecsForJDBCType.get(jdbcType);
 
         if (codec == null) {
             throw new IllegalArgumentException(String.format("No Codec found for JDBCType '%s'", jdbcType.getName()));

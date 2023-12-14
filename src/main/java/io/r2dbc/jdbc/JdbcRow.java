@@ -21,9 +21,7 @@ import io.r2dbc.spi.RowMetadata;
  */
 public class JdbcRow implements Row, Result.RowSegment {
     private final Codecs codecs;
-
     private final RowMetadata rowMetadata;
-
     private final Map<Integer, Object> values;
 
     public JdbcRow(final RowMetadata rowMetadata, final Map<Integer, Object> values, final Codecs codecs) {
@@ -36,7 +34,7 @@ public class JdbcRow implements Row, Result.RowSegment {
 
     @Override
     public Object get(final int index) {
-        ColumnMetadata metadata = getMetadata().getColumnMetadata(index);
+        final ColumnMetadata metadata = getMetadata().getColumnMetadata(index);
 
         if (Clob.class.equals(metadata.getJavaType())) {
             // Clobs immer als String liefern.
@@ -56,23 +54,23 @@ public class JdbcRow implements Row, Result.RowSegment {
             throw new IllegalArgumentException("type is null");
         }
 
-        Object value = this.values.get(index);
+        final Object value = this.values.get(index);
 
         if (value == null) {
             return null;
         }
 
-        ColumnMetadata metadata = getMetadata().getColumnMetadata(index);
-        JDBCType jdbcType = (JDBCType) metadata.getNativeTypeMetadata();
+        final ColumnMetadata metadata = getMetadata().getColumnMetadata(index);
+        final JDBCType jdbcType = (JDBCType) metadata.getNativeTypeMetadata();
 
         return this.codecs.mapTo(jdbcType, type, value);
     }
 
     @Override
     public Object get(final String name) {
-        ColumnMetadata metadata = getMetadata().getColumnMetadata(name);
+        final ColumnMetadata metadata = getMetadata().getColumnMetadata(name);
 
-        int column = ((JdbcColumnMetadata) metadata).getColumn();
+        final int column = ((JdbcColumnMetadata) metadata).getColumn();
 
         return get(column);
     }
@@ -87,9 +85,9 @@ public class JdbcRow implements Row, Result.RowSegment {
             throw new IllegalArgumentException("type is null");
         }
 
-        ColumnMetadata metadata = getMetadata().getColumnMetadata(name);
+        final ColumnMetadata metadata = getMetadata().getColumnMetadata(name);
 
-        int column = ((JdbcColumnMetadata) metadata).getColumn();
+        final int column = ((JdbcColumnMetadata) metadata).getColumn();
 
         return get(column, type);
     }

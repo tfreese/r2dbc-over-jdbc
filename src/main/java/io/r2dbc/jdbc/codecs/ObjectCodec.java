@@ -16,7 +16,7 @@ public class ObjectCodec extends AbstractCodec<Object> {
 
     @Override
     public Object mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
-        Object value = resultSet.getObject(columnLabel);
+        final Object value = resultSet.getObject(columnLabel);
 
         if (resultSet.wasNull()) {
             return null;
@@ -36,7 +36,7 @@ public class ObjectCodec extends AbstractCodec<Object> {
             return (M) value;
         }
         else if (CharSequence.class.isAssignableFrom(javaType)) {
-            String s = value.toString();
+            final String s = value.toString();
 
             return (M) s;
         }
