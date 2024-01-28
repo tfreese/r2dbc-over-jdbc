@@ -20,7 +20,8 @@ public class JanitorInvocationInterceptor implements InvocationInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(JanitorInvocationInterceptor.class);
 
     @Override
-    public void interceptTestMethod(final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext, final ExtensionContext extensionContext) throws Throwable {
+    public void interceptTestMethod(final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext, final ExtensionContext extensionContext)
+            throws Throwable {
         final List<Object> arguments = invocationContext.getArguments();
         Object lastArgument = null;
 
@@ -49,7 +50,8 @@ public class JanitorInvocationInterceptor implements InvocationInterceptor {
     }
 
     @Override
-    public void interceptTestTemplateMethod(final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext, final ExtensionContext extensionContext) throws Throwable {
+    public void interceptTestTemplateMethod(final Invocation<Void> invocation, final ReflectiveInvocationContext<Method> invocationContext, final ExtensionContext extensionContext)
+            throws Throwable {
         interceptTestMethod(invocation, invocationContext, extensionContext);
     }
 

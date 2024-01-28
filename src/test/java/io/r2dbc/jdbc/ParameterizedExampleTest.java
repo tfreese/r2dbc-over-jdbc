@@ -49,7 +49,8 @@ final class ParameterizedExampleTest {
     @DisplayName("testBatch") // Ohne Parameter
     @MethodSource("getDatabases")
     void testBatch(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        final ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+        final ConnectionFactory connectionFactory = ConnectionFactories.get(
+                ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         final Connection connection = getConnection(connectionFactory);
 
@@ -131,7 +132,8 @@ final class ParameterizedExampleTest {
     @DisplayName("testBatchWithCommit") // Ohne Parameter
     @MethodSource("getDatabases")
     void testBatchWithCommit(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        final ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+        final ConnectionFactory connectionFactory = ConnectionFactories.get(
+                ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         final Connection connection = getConnection(connectionFactory);
 
@@ -212,7 +214,8 @@ final class ParameterizedExampleTest {
     @DisplayName("testBatchWithRollback") // Ohne Parameter
     @MethodSource("getDatabases")
     void testBatchWithRollback(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        final ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+        final ConnectionFactory connectionFactory = ConnectionFactories.get(
+                ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         final Connection connection = getConnection(connectionFactory);
 
@@ -247,7 +250,8 @@ final class ParameterizedExampleTest {
     @DisplayName("testDeleteBatch") // Ohne Parameter
     @MethodSource("getDatabases")
     void testDeleteBatch(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        final ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+        final ConnectionFactory connectionFactory = ConnectionFactories.get(
+                ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         final Connection connection = getConnection(connectionFactory);
 
@@ -294,7 +298,8 @@ final class ParameterizedExampleTest {
     @DisplayName("testInsert") // Ohne Parameter
     @MethodSource("getDatabases")
     void testInsert(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        final ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+        final ConnectionFactory connectionFactory = ConnectionFactories.get(
+                ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         final Connection connection = getConnection(connectionFactory);
 
@@ -335,7 +340,8 @@ final class ParameterizedExampleTest {
     @DisplayName("testSelectWithConverter") // Ohne Parameter
     @MethodSource("getDatabases")
     void testSelectWithConverter(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        final ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+        final ConnectionFactory connectionFactory = ConnectionFactories.get(
+                ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         server.getJdbcOperations().execute("INSERT INTO test VALUES (100), (200)");
 
@@ -371,7 +377,8 @@ final class ParameterizedExampleTest {
     @DisplayName("testUpdate") // Ohne Parameter
     @MethodSource("getDatabases")
     void testUpdate(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        final ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+        final ConnectionFactory connectionFactory = ConnectionFactories.get(
+                ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         final Connection connection = getConnection(connectionFactory);
 

@@ -22,7 +22,8 @@ public class JdbcColumnMetadata implements ColumnMetadata, Type {
     private final int precision;
     private final int scale;
 
-    public JdbcColumnMetadata(final String name, final int column, final Class<?> javaType, final JDBCType jdbcType, final Nullability nullability, final int precision, final int scale) {
+    public JdbcColumnMetadata(final String name, final int column, final Class<?> javaType, final JDBCType jdbcType, final Nullability nullability, final int precision,
+                              final int scale) {
         super();
 
         this.name = Objects.requireNonNull(name, "name required").toLowerCase();
@@ -44,7 +45,8 @@ public class JdbcColumnMetadata implements ColumnMetadata, Type {
             return false;
         }
 
-        return (this.column == other.column) && Objects.equals(this.javaType, other.javaType) && (this.jdbcType == other.jdbcType) && Objects.equals(this.name, other.name) && (this.nullability == other.nullability) && (this.precision == other.precision) && (this.scale == other.scale);
+        return (this.column == other.column) && Objects.equals(this.javaType, other.javaType) && (this.jdbcType == other.jdbcType) && Objects.equals(this.name,
+                other.name) && (this.nullability == other.nullability) && (this.precision == other.precision) && (this.scale == other.scale);
     }
 
     public int getColumn() {

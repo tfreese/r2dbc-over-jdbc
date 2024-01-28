@@ -39,7 +39,8 @@ final class JdbcResultTest {
 
         final Result result = mock(JdbcResult.class, RETURNS_SMART_NULLS);
 
-        when(result.map(mappingFunction)).thenAnswer(arg -> Flux.error(new SQLIntegrityConstraintViolationException("can't do something", "some state", 999)).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert));
+        when(result.map(mappingFunction)).thenAnswer(arg -> Flux.error(new SQLIntegrityConstraintViolationException("can't do something", "some state", 999))
+                .onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert));
         when(result.getRowsUpdated()).thenReturn(Mono.empty());
 
         Flux.from(result.map(mappingFunction)).as(StepVerifier::create).verifyError(R2dbcDataIntegrityViolationException.class);

@@ -38,7 +38,8 @@ final class JdbcRowMetadataTest {
 
     private final Codecs codecs = new DefaultCodecs();
 
-    private final List<ColumnMetadata> columnMetadatas = Arrays.asList(new JdbcColumnMetadata("TEST-NAME-1", 0, Object.class, JDBCType.OTHER, NULLABLE, 100, 500), new JdbcColumnMetadata("TEST-NAME-2", 1, Object.class, JDBCType.OTHER, NULLABLE, 300, 600));
+    private final List<ColumnMetadata> columnMetadatas = Arrays.asList(new JdbcColumnMetadata("TEST-NAME-1", 0, Object.class, JDBCType.OTHER, NULLABLE, 100, 500),
+            new JdbcColumnMetadata("TEST-NAME-2", 1, Object.class, JDBCType.OTHER, NULLABLE, 300, 600));
 
     private final ResultSet resultSet = mock(ResultSet.class, RETURNS_SMART_NULLS);
 

@@ -124,14 +124,16 @@ final class ParameterizedRowTest {
         final JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
         final JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
-        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> new JdbcRow(rowMetadata, new HashMap<>(), this.codecs).get(identifier, Object.class)).withMessage("No MetaData for Name: %s", identifier);
+        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> new JdbcRow(rowMetadata, new HashMap<>(), this.codecs).get(identifier, Object.class))
+                .withMessage("No MetaData for Name: %s", identifier);
     }
 
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testSelectWithAliases") // Ohne Parameter
     @MethodSource("getDatabases")
     void testSelectWithAliases(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        final ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+        final ConnectionFactory connectionFactory = ConnectionFactories.get(
+                ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         server.getJdbcOperations().execute("INSERT INTO test VALUES (100)");
 
@@ -155,7 +157,8 @@ final class ParameterizedRowTest {
     @DisplayName("testSelectWithoutAliases") // Ohne Parameter
     @MethodSource("getDatabases")
     void testSelectWithoutAliases(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        final ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
+        final ConnectionFactory connectionFactory = ConnectionFactories.get(
+                ConnectionFactoryOptions.builder().option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource()).build());
 
         // server.getJdbcOperations().execute("INSERT INTO test VALUES (100)");
         //
