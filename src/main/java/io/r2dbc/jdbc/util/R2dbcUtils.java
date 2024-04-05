@@ -60,14 +60,12 @@ public final class R2dbcUtils {
     }
 
     public static ByteBuffer blobToByteBuffer(final Blob blob) {
-        //        // @formatter:off
-//        final ByteBuffer byteBuffer = Flux.from(blob.stream())
-//            .reduce(ByteBuffer::put)
-//            .concatWith(Mono.from(blob.discard())
-//                    .then(Mono.empty())
-//                    )
-//            .blockFirst();
-//        // @formatter:on
+        // final ByteBuffer byteBuffer = Flux.from(blob.stream())
+        //         .reduce(ByteBuffer::put)
+        //         .concatWith(Mono.from(blob.discard())
+        //                 .then(Mono.empty())
+        //         )
+        //         .blockFirst();
         //
         // byteBuffer.limit(byteBuffer.capacity());
         // // byteBuffer.flip();
@@ -105,7 +103,7 @@ public final class R2dbcUtils {
     }
 
     public static Blob byteBufferToBlob(final ByteBuffer byteBuffer) {
-        return Blob.from((Mono.just(byteBuffer)));
+        return Blob.from(Mono.just(byteBuffer));
     }
 
     public static byte[] byteBufferToByteArray(final ByteBuffer byteBuffer) {
@@ -208,7 +206,7 @@ public final class R2dbcUtils {
     }
 
     public static Clob stringToClob(final String value) {
-        return Clob.from((Mono.just(value)));
+        return Clob.from(Mono.just(value));
     }
 
     private R2dbcUtils() {

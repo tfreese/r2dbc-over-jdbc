@@ -29,8 +29,8 @@ public class DefaultCodecs implements Codecs {
     public void add(final Codec<?> codec) {
         for (JDBCType jdbcType : codec.supportedJdbcTypes()) {
             if (this.codecsForJDBCType.containsKey(jdbcType)) {
-                throw new IllegalArgumentException(
-                        String.format("JDBCType '%s' already supported by %s", jdbcType.getName(), this.codecsForJDBCType.get(jdbcType).getClass().getSimpleName()));
+                final String message = String.format("JDBCType '%s' already supported by %s", jdbcType.getName(), this.codecsForJDBCType.get(jdbcType).getClass().getSimpleName());
+                throw new IllegalArgumentException(message);
             }
 
             this.codecsForJDBCType.put(jdbcType, codec);

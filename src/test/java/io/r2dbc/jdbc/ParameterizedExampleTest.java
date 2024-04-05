@@ -55,15 +55,13 @@ final class ParameterizedExampleTest {
         final Connection connection = getConnection(connectionFactory);
 
         try {
-            // @formatter:off
             awaitUpdate(5L, connection.createStatement("INSERT INTO test VALUES (?)")
                     .bind(0, 1).add()
                     .bind(0, 2).add()
                     .bind(0, 3).add()
                     .bind(0, 4).add()
                     .bind(0, 5)
-                    );
-            // @formatter:on
+            );
         }
         finally {
             awaitNone(connection.close());
@@ -71,61 +69,54 @@ final class ParameterizedExampleTest {
 
         assertTrue(true);
 
-        //        // @formatter:off
-//        Mono.from(connectionFactory.create())
-//            .flatMapMany(connection -> {
-//                final Statement statement = connection.createStatement("INSERT INTO test VALUES (?)");
-//
-//                IntStream.range(0, 10).forEach(i -> statement.bind(0, i).add());
-//
-//                return Flux.from(statement.execute())
-//                        .flatMap(TestKit::extractRowsUpdated)
-//                        .concatWith(TestKit.close(connection));
-//            })
-//            .as(StepVerifier::create)
-//            .expectNext(10).as("values from insertions")
-//            .verifyComplete();
-//        // @formatter:on
+        // Mono.from(connectionFactory.create())
+        //         .flatMapMany(connection -> {
+        //             final Statement statement = connection.createStatement("INSERT INTO test VALUES (?)");
+        //
+        //             IntStream.range(0, 10).forEach(i -> statement.bind(0, i).add());
+        //
+        //             return Flux.from(statement.execute())
+        //                     .flatMap(TestKit::extractRowsUpdated)
+        //                     .concatWith(TestKit.close(connection));
+        //         })
+        //         .as(StepVerifier::create)
+        //         .expectNext(10).as("values from insertions")
+        //         .verifyComplete();
     }
 
     @ParameterizedTest(name = "{index} -> {0}")
     @DisplayName("testBatchAutoIncrement") // Ohne Parameter
     @MethodSource("getDatabases")
     void testBatchAutoIncrement(final EmbeddedDatabaseType databaseType, final DbServerExtension server) {
-        // @formatter:off
         final ConnectionFactoryOptions options = ConnectionFactoryOptions.builder()
                 .option(JdbcConnectionFactoryProvider.DATASOURCE, server.getDataSource())
                 //.option(JdbcConnectionFactoryProvider.CODECS, new MyCodecs()) // optional
-                .build()
-                ;
+                .build();
+
         final ConnectionFactory connectionFactory = ConnectionFactories.get(options);
-        // @formatter:on
 
-        // @formatter:off
         Flux.usingWhen(connectionFactory.create(),
-            connection -> {
-                final Statement statement = connection.createStatement("INSERT INTO test_auto (test_value) VALUES (?)");
+                        connection -> {
+                            final Statement statement = connection.createStatement("INSERT INTO test_auto (test_value) VALUES (?)");
 
-                IntStream.range(0, 10).forEach((i) -> {
-                    statement.bind(0, i);
+                            IntStream.range(0, 10).forEach(i -> {
+                                statement.bind(0, i);
 
-                    if (i != 9) {
-                        statement.add();
-                    }
-                });
+                                if (i != 9) {
+                                    statement.add();
+                                }
+                            });
 
-                return Flux.from(statement.returnGeneratedValues().execute())
-                        .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Integer.class)))
-                                .collectList())
-                        ;
-            }
-            , Connection::close)
-            .as(StepVerifier::create)
-//            .expectNext(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).as("values from insertions")
-//            .expectNext(List.of(10)).as("values from insertions")
-            .expectNext(EmbeddedDatabaseType.DERBY.equals(databaseType) ? List.of(10) : List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).as("values from insertions")
-            .verifyComplete();
-        // @formatter:on
+                            return Flux.from(statement.returnGeneratedValues().execute())
+                                    .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Integer.class)))
+                                            .collectList())
+                                    ;
+                        }, Connection::close)
+                .as(StepVerifier::create)
+                // .expectNext(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).as("values from insertions")
+                // .expectNext(List.of(10)).as("values from insertions")
+                .expectNext(EmbeddedDatabaseType.DERBY.equals(databaseType) ? List.of(10) : List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).as("values from insertions")
+                .verifyComplete();
     }
 
     @ParameterizedTest(name = "{index} -> {0}")
@@ -165,49 +156,44 @@ final class ParameterizedExampleTest {
 
         // server.getJdbcOperations().execute("INSERT INTO test VALUES (100)");
         //
-        //        // @formatter:off
-//        Mono.from(connectionFactory.create())
-//            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-//                    .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO test VALUES (?)")
-//                                .bind(0, 200)
-//                                .add().bind(0, 300)
-//                                .add().bind(0, 400)
-//                                .execute())
-//                            .flatMap(TestKit::extractRowsUpdated))
-//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
-//                                .execute())
-//                            .flatMap(TestKit::extractColumns))
-//                    .concatWith(connection.commitTransaction())
-//
-//
-//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
-//                                .execute())
-//                            .flatMap(TestKit::extractColumns))
-//
-//
-//                    .concatWith(connection.beginTransaction())
-//                    .concatWith(Flux.from(connection.createStatement("DELETE FROM test where test_value < ?")
-//                                .bind(0, 255)
-//                                .execute())
-//                            .flatMap(TestKit::extractRowsUpdated))
-//                    .concatWith(connection.commitTransaction())
-//
-//
-//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
-//                                .execute())
-//                            .flatMap(TestKit::extractColumns))
-//
-//                    .concatWith(TestKit.close(connection))
-//            )
-//            .as(StepVerifier::create)
-//            .expectNext(3).as("rows inserted")
-//            .expectNext(List.of(100, 200, 300, 400)).as("values from select before commit")
-//            .expectNext(List.of(100, 200, 300, 400)).as("values from select after commit")
-//            .expectNext(2).as("rows deleted")
-//            .expectNext(List.of(300, 400)).as("values from select after delete after commit")
-//            .verifyComplete()
-//            ;
-//       // @formatter:on
+        // Mono.from(connectionFactory.create())
+        //         .flatMapMany(connection -> Mono.from(connection.beginTransaction())
+        //                 .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO test VALUES (?)")
+        //                                 .bind(0, 200)
+        //                                 .add().bind(0, 300)
+        //                                 .add().bind(0, 400)
+        //                                 .execute())
+        //                         .flatMap(TestKit::extractRowsUpdated))
+        //                 .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
+        //                                 .execute())
+        //                         .flatMap(TestKit::extractColumns))
+        //                 .concatWith(connection.commitTransaction())
+        //
+        //                 .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
+        //                                 .execute())
+        //                         .flatMap(TestKit::extractColumns))
+        //
+        //                 .concatWith(connection.beginTransaction())
+        //                 .concatWith(Flux.from(connection.createStatement("DELETE FROM test where test_value < ?")
+        //                                 .bind(0, 255)
+        //                                 .execute())
+        //                         .flatMap(TestKit::extractRowsUpdated))
+        //                 .concatWith(connection.commitTransaction())
+        //
+        //                 .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
+        //                                 .execute())
+        //                         .flatMap(TestKit::extractColumns))
+        //
+        //                 .concatWith(TestKit.close(connection))
+        //         )
+        //         .as(StepVerifier::create)
+        //         .expectNext(3).as("rows inserted")
+        //         .expectNext(List.of(100, 200, 300, 400)).as("values from select before commit")
+        //         .expectNext(List.of(100, 200, 300, 400)).as("values from select after commit")
+        //         .expectNext(2).as("rows deleted")
+        //         .expectNext(List.of(300, 400)).as("values from select after delete after commit")
+        //         .verifyComplete()
+        // ;
     }
 
     @ParameterizedTest(name = "{index} -> {0}")
@@ -269,29 +255,26 @@ final class ParameterizedExampleTest {
 
         // server.getJdbcOperations().execute("INSERT INTO test VALUES (100, 200, 300, 400, 500)");
         //
-        //        // @formatter:off
-//        Mono.from(connectionFactory.create())
-//            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-//                    .<Object>thenMany(Flux.from(connection.createStatement("DELETE FROM test where test_value < ?")
-//                                .bind(0, 300)
-//                                .add().bind(0, 400)
-//                                .execute())
-//                            .flatMap(TestKit::extractRowsUpdated))
-//                    .concatWith(connection.commitTransaction())
-//
-//
-//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
-//                                .execute())
-//                            .flatMap(TestKit::extractColumns))
-//
-//                    .concatWith(TestKit.close(connection))
-//            )
-//            .as(StepVerifier::create)
-//            .expectNext(3).as("rows deleted")
-//            .expectNext(List.of(400, 500)).as("values from select after delete after commit")
-//            .verifyComplete()
-//            ;
-//       // @formatter:on
+        // Mono.from(connectionFactory.create())
+        //         .flatMapMany(connection -> Mono.from(connection.beginTransaction())
+        //                 .<Object>thenMany(Flux.from(connection.createStatement("DELETE FROM test where test_value < ?")
+        //                                 .bind(0, 300)
+        //                                 .add().bind(0, 400)
+        //                                 .execute())
+        //                         .flatMap(TestKit::extractRowsUpdated))
+        //                 .concatWith(connection.commitTransaction())
+        //
+        //                 .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
+        //                                 .execute())
+        //                         .flatMap(TestKit::extractColumns))
+        //
+        //                 .concatWith(TestKit.close(connection))
+        //         )
+        //         .as(StepVerifier::create)
+        //         .expectNext(3).as("rows deleted")
+        //         .expectNext(List.of(400, 500)).as("values from select after delete after commit")
+        //         .verifyComplete()
+        // ;
     }
 
     @ParameterizedTest(name = "{index} -> {0}")
@@ -316,24 +299,21 @@ final class ParameterizedExampleTest {
 
         assertTrue(true);
 
-        //        // @formatter:off
-//       Mono.from(connectionFactory.create())
-//           .flatMapMany(connection -> {
-//               Statement statement = connection.createStatement("INSERT INTO test VALUES (?)")
-//                       .bind(0, 2)
-//                       .add()
-//                       .add()
-//                       .add()
-//                       ;
-//
-//               return Flux.from(statement.execute())
-//                       .flatMap(TestKit::extractRowsUpdated)
-//                       .concatWith(TestKit.close(connection));
-//           })
-//           .as(StepVerifier::create)
-//           .expectNext(1).as("value from insertion")
-//           .verifyComplete();
-//       // @formatter:on
+        // Mono.from(connectionFactory.create())
+        //         .flatMapMany(connection -> {
+        //             final Statement statement = connection.createStatement("INSERT INTO test VALUES (?)")
+        //                     .bind(0, 2)
+        //                     .add()
+        //                     .add()
+        //                     .add();
+        //
+        //             return Flux.from(statement.execute())
+        //                     .flatMap(TestKit::extractRowsUpdated)
+        //                     .concatWith(TestKit.close(connection));
+        //         })
+        //         .as(StepVerifier::create)
+        //         .expectNext(1).as("value from insertion")
+        //         .verifyComplete();
     }
 
     @ParameterizedTest(name = "{index} -> {0}")
@@ -345,32 +325,29 @@ final class ParameterizedExampleTest {
 
         server.getJdbcOperations().execute("INSERT INTO test VALUES (100), (200)");
 
-        // @formatter:off
         Flux.usingWhen(connectionFactory.create(),
-                connection -> Mono.from(connection
-                        .beginTransaction())
-                        .<Object>thenMany(Flux.from(connection.createStatement("SELECT test_value FROM test")
-                                .execute())
-                            .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Integer.class)))
-                                    .collectList()))
+                        connection -> Mono.from(connection
+                                        .beginTransaction())
+                                .<Object>thenMany(Flux.from(connection.createStatement("SELECT test_value FROM test")
+                                                .execute())
+                                        .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Integer.class)))
+                                                .collectList()))
 
-                        .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
-                                .execute())
-                            .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, String.class)))
-                                    .collectList()))
+                                .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
+                                                .execute())
+                                        .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, String.class)))
+                                                .collectList()))
 
-                        .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
-                                .execute())
-                            .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Double.class)))
-                                    .collectList()))
-            , Connection::close)
-            .as(StepVerifier::create)
-            .expectNext(List.of(100, 200)).as("value from Integer select")
-            .expectNext(List.of("100", "200")).as("values from String select")
-            .expectNext(List.of(100D, 200D)).as("values from Double select")
-            .verifyComplete()
-            ;
-       // @formatter:on
+                                .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
+                                                .execute())
+                                        .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get(0, Double.class)))
+                                                .collectList())), Connection::close)
+                .as(StepVerifier::create)
+                .expectNext(List.of(100, 200)).as("value from Integer select")
+                .expectNext(List.of("100", "200")).as("values from String select")
+                .expectNext(List.of(100D, 200D)).as("values from Double select")
+                .verifyComplete()
+        ;
     }
 
     @ParameterizedTest(name = "{index} -> {0}")
@@ -417,51 +394,46 @@ final class ParameterizedExampleTest {
 
         // server.getJdbcOperations().execute("INSERT INTO test VALUES (100)");
         //
-        //        // @formatter:off
-//        Mono.from(connectionFactory.create())
-//            .flatMapMany(connection -> Mono.from(connection.beginTransaction())
-//                    .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO test VALUES (?)")
-//                                .bind(0, 200)
-//                                .add().bind(0, 300)
-//                                .add().bind(0, 400)
-//                                .execute())
-//                            .flatMap(TestKit::extractRowsUpdated))
-//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
-//                                .execute())
-//                            .flatMap(TestKit::extractColumns))
-//                    .concatWith(connection.commitTransaction())
-//
-//
-//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
-//                                .execute())
-//                            .flatMap(TestKit::extractColumns))
-//
-//
-//                    .concatWith(connection.beginTransaction())
-//                    .concatWith(Flux.from(connection.createStatement("UPDATE test set test_value = ? where test_value = ?")
-//                                .bind(0, 199).bind(1, 100)
-//                                .add().bind(0, 299).bind(1, 200)
-//                                .add().bind(0, 399).bind(1, 300)
-//                                .add().bind(0, 499).bind(1, 400)
-//                                .execute())
-//                            .flatMap(TestKit::extractRowsUpdated))
-//                    .concatWith(connection.commitTransaction())
-//
-//
-//                    .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
-//                                .execute())
-//                            .flatMap(TestKit::extractColumns))
-//
-//                    .concatWith(TestKit.close(connection))
-//            )
-//            .as(StepVerifier::create)
-//            .expectNext(3).as("rows inserted")
-//            .expectNext(List.of(100, 200, 300, 400)).as("values from select before commit")
-//            .expectNext(List.of(100, 200, 300, 400)).as("values from select after commit")
-//            .expectNext(4).as("rows updated")
-//            .expectNext(List.of(199, 299, 399, 499)).as("values from select after update after commit")
-//            .verifyComplete()
-//            ;
-//       // @formatter:on
+        // Mono.from(connectionFactory.create())
+        //         .flatMapMany(connection -> Mono.from(connection.beginTransaction())
+        //                 .<Object>thenMany(Flux.from(connection.createStatement("INSERT INTO test VALUES (?)")
+        //                                 .bind(0, 200)
+        //                                 .add().bind(0, 300)
+        //                                 .add().bind(0, 400)
+        //                                 .execute())
+        //                         .flatMap(TestKit::extractRowsUpdated))
+        //                 .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
+        //                                 .execute())
+        //                         .flatMap(TestKit::extractColumns))
+        //                 .concatWith(connection.commitTransaction())
+        //
+        //                 .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
+        //                                 .execute())
+        //                         .flatMap(TestKit::extractColumns))
+        //
+        //                 .concatWith(connection.beginTransaction())
+        //                 .concatWith(Flux.from(connection.createStatement("UPDATE test set test_value = ? where test_value = ?")
+        //                                 .bind(0, 199).bind(1, 100)
+        //                                 .add().bind(0, 299).bind(1, 200)
+        //                                 .add().bind(0, 399).bind(1, 300)
+        //                                 .add().bind(0, 499).bind(1, 400)
+        //                                 .execute())
+        //                         .flatMap(TestKit::extractRowsUpdated))
+        //                 .concatWith(connection.commitTransaction())
+        //
+        //                 .concatWith(Flux.from(connection.createStatement("SELECT test_value FROM test")
+        //                                 .execute())
+        //                         .flatMap(TestKit::extractColumns))
+        //
+        //                 .concatWith(TestKit.close(connection))
+        //         )
+        //         .as(StepVerifier::create)
+        //         .expectNext(3).as("rows inserted")
+        //         .expectNext(List.of(100, 200, 300, 400)).as("values from select before commit")
+        //         .expectNext(List.of(100, 200, 300, 400)).as("values from select after commit")
+        //         .expectNext(4).as("rows updated")
+        //         .expectNext(List.of(199, 299, 399, 499)).as("values from select after update after commit")
+        //         .verifyComplete()
+        // ;
     }
 }

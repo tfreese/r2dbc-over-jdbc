@@ -123,7 +123,7 @@ public class JdbcStatement extends AbstractJdbcStatement {
 
         final Flux<JdbcRow> rows = Flux.generate((final SynchronousSink<JdbcRow> sink) -> {
             try {
-                if ((resultSet != null) && resultSet.next()) {
+                if (resultSet != null && resultSet.next()) {
                     final Map<Integer, Object> row = new HashMap<>();
 
                     int index = 0;

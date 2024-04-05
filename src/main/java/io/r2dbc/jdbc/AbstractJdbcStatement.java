@@ -71,7 +71,7 @@ public abstract class AbstractJdbcStatement implements Statement {
 
         private Map<Integer, Object> current;
 
-        private boolean trailingAdd = false;
+        private boolean trailingAdd;
 
         public boolean isTrailingAdd() {
             return this.trailingAdd;
@@ -329,7 +329,7 @@ public abstract class AbstractJdbcStatement implements Statement {
      * @throws IndexOutOfBoundsException If the {@code index} is outside the valid range.
      */
     protected void requireValidIndex(final int index) {
-        if ((index < 0) || (index > this.bindings.binds.size())) {
+        if (index < 0 || index > this.bindings.binds.size()) {
             throw new IndexOutOfBoundsException("Parameter index is non-positive: " + index);
         }
     }

@@ -137,20 +137,14 @@ final class ParameterizedRowTest {
 
         server.getJdbcOperations().execute("INSERT INTO test VALUES (100)");
 
-        // @formatter:off
         Flux.usingWhen(connectionFactory.create(),
-                connection ->  Flux.from(connection.createStatement("SELECT test_value as ALIASED_VALUE FROM test").execute())
-                .flatMap(result -> Flux.from(result.map((row, rowMetadata) ->
-                            row.get("ALIASED_VALUE", Integer.class)
-                            )
-                        )
-                        .collectList()
-                )
-            ,Connection::close)
-            .as(StepVerifier::create)
-            .expectNext(List.of(100))
-            .verifyComplete();
-        // @formatter:on
+                        connection -> Flux.from(connection.createStatement("SELECT test_value as ALIASED_VALUE FROM test").execute())
+                                .flatMap(result -> Flux.from(result.map((row, rowMetadata) -> row.get("ALIASED_VALUE", Integer.class)))
+                                        .collectList()
+                                ), Connection::close)
+                .as(StepVerifier::create)
+                .expectNext(List.of(100))
+                .verifyComplete();
     }
 
     @ParameterizedTest(name = "{index} -> {0}")
@@ -162,15 +156,13 @@ final class ParameterizedRowTest {
 
         // server.getJdbcOperations().execute("INSERT INTO test VALUES (100)");
         //
-        // @formatter:off
-//        Mono.from(this.connectionFactory.create())
-//            .flatMapMany(connection -> Flux.from(connection.createStatement("SELECT test_value FROM test").execute())
-//                .flatMap(TestKit::extractColumns)
-//                .concatWith(TestKit.close(connection)))
-//        .as(StepVerifier::create)
-//        .expectNext(List.of(100))
-//        .verifyComplete();
-        // @formatter:on
+        // Mono.from(this.connectionFactory.create())
+        //         .flatMapMany(connection -> Flux.from(connection.createStatement("SELECT test_value FROM test").execute())
+        //                 .flatMap(TestKit::extractColumns)
+        //                 .concatWith(TestKit.close(connection)))
+        //         .as(StepVerifier::create)
+        //         .expectNext(List.of(100))
+        //         .verifyComplete();
 
         final Connection connection = Mono.from(connectionFactory.create()).block(DbServerExtension.getSqlTimeout());
 

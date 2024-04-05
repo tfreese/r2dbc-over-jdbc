@@ -14,7 +14,7 @@ public final class Assert {
     }
 
     public static void assertNotNullOrBlank(final String value, final String message) throws SQLException {
-        if ((value == null) || value.isBlank()) {
+        if (value == null || value.isBlank()) {
             throw new SQLException(message);
         }
     }

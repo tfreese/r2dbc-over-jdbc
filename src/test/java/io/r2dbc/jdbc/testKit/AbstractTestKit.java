@@ -67,7 +67,7 @@ abstract class AbstractTestKit implements TestKit<Integer> {
         Flux.usingWhen(getConnectionFactory().create(), connection -> {
             final Statement statement = connection.createStatement(expand(TestStatement.INSERT_VALUE_PLACEHOLDER, getPlaceholder(0)));
 
-            IntStream.range(0, 10).forEach((i) -> {
+            IntStream.range(0, 10).forEach(i -> {
                 TestKit.bind(statement, getIdentifier(0), i);
 
                 if (i != 9) {

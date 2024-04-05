@@ -45,8 +45,8 @@ public class JdbcColumnMetadata implements ColumnMetadata, Type {
             return false;
         }
 
-        return (this.column == other.column) && Objects.equals(this.javaType, other.javaType) && (this.jdbcType == other.jdbcType) && Objects.equals(this.name,
-                other.name) && (this.nullability == other.nullability) && (this.precision == other.precision) && (this.scale == other.scale);
+        return this.column == other.column && Objects.equals(this.javaType, other.javaType) && this.jdbcType == other.jdbcType && Objects.equals(this.name,
+                other.name) && this.nullability == other.nullability && this.precision == other.precision && this.scale == other.scale;
     }
 
     public int getColumn() {

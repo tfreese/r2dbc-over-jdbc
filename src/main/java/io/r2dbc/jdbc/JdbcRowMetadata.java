@@ -96,7 +96,7 @@ public class JdbcRowMetadata implements RowMetadata {
 
     @Override
     public ColumnMetadata getColumnMetadata(final int index) {
-        if ((index < 0) || (index >= this.columnMetaDatas.size())) {
+        if (index < 0 || index >= this.columnMetaDatas.size()) {
             throw new ArrayIndexOutOfBoundsException("Index: " + index + ", Size: " + this.columnMetaDatas.size());
         }
 
