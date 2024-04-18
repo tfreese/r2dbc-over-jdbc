@@ -58,22 +58,20 @@ class ParameterizedLobTest {
     void createTable(final Connection connection, final String columnType) {
         // "DROP TABLE IF EXISTS lob_test"
 
-        // @formatter:off
         Flux.from(connection.createStatement("DROP TABLE lob_test")
-                .execute()
+                        .execute()
                 )
                 .flatMap(Result::getRowsUpdated)
                 .onErrorResume(e -> Mono.empty())
                 .thenMany(
                         Flux.from(connection.createStatement("CREATE TABLE lob_test (my_col " + columnType + ")")
-                                .execute()
+                                        .execute()
                                 )
                                 .flatMap(Result::getRowsUpdated)
-                        )
+                )
                 .as(StepVerifier::create)
                 .expectNext(0L)
                 .verifyComplete();
-        // @formatter:on
     }
 
     @ParameterizedTest(name = "{index} -> {0}")
@@ -89,8 +87,7 @@ class ParameterizedLobTest {
 
         // Connection connection = getConnection();
         //
-        // try
-        // {
+        // try {
         // awaitNone(connection.beginTransaction());
         // awaitUpdate(1,
         // connection.createStatement("INSERT INTO lob_test values(?)").bind(0, Blob.from(Flux.range(0, i).map(it -> ByteBuffer.wrap(ALL_BYTES)))));
@@ -103,11 +100,10 @@ class ParameterizedLobTest {
 
         Connection connection = getConnection(connectionFactory);
 
-        // @formatter:off
         Flux.from(connection.createStatement("INSERT INTO lob_test values(?)")
-                .bind(0, Blob.from(Flux.range(0, i).map(it -> ByteBuffer.wrap(ALL_BYTES))))
-                //.bind(0, R2dbcUtils.byteArrayToBlob(ALL_BYTES))
-                .execute()
+                        .bind(0, Blob.from(Flux.range(0, i).map(it -> ByteBuffer.wrap(ALL_BYTES))))
+                        //.bind(0, R2dbcUtils.byteArrayToBlob(ALL_BYTES))
+                        .execute()
                 )
                 .flatMap(Result::getRowsUpdated)
                 .as(StepVerifier::create)
@@ -115,11 +111,10 @@ class ParameterizedLobTest {
                 .expectNextCount(1).as("blobs inserted")
                 .verifyComplete();
 
-
         connection = getConnection(connectionFactory);
 
         Flux.from(connection.createStatement("SELECT my_col FROM lob_test")
-                .execute()
+                        .execute()
                 )
                 .flatMap(result -> result.map((row, rowMetadata) -> row.get("my_col", Blob.class)))
                 .flatMap(Blob::stream)
@@ -129,7 +124,6 @@ class ParameterizedLobTest {
                 .as(StepVerifier::create)
                 .expectNext(i * ALL_BYTES.length)
                 .verifyComplete();
-        // @formatter:on
     }
 
     @ParameterizedTest(name = "{index} -> {0}")
@@ -147,23 +141,20 @@ class ParameterizedLobTest {
 
         // Connection connection = getConnection(connectionFactory);
         //
-        // try
-        // {
+        // try {
         // awaitNone(connection.beginTransaction());
         // awaitUpdate(1, connection.createStatement("INSERT INTO lob_test values(?)").bind(0, Clob.from(Flux.range(0, i).map(it -> testString))));
         // awaitNone(connection.commitTransaction());
         // }
-        // finally
-        // {
+        // finally {
         // awaitNone(connection.close());
         // }
 
         Connection connection = getConnection(connectionFactory);
 
-        // @formatter:off
         Flux.from(connection.createStatement("INSERT INTO lob_test values(?)")
-                .bind(0, Clob.from(Flux.range(0, i).map(it -> testString)))
-                .execute()
+                        .bind(0, Clob.from(Flux.range(0, i).map(it -> testString)))
+                        .execute()
                 )
                 .flatMap(Result::getRowsUpdated)
                 .as(StepVerifier::create)
@@ -174,7 +165,7 @@ class ParameterizedLobTest {
         connection = getConnection(connectionFactory);
 
         Flux.from(connection.createStatement("SELECT my_col FROM lob_test")
-                .execute()
+                        .execute()
                 )
                 .flatMap(it -> it.map((row, rowMetadata) -> row.get("my_col", Clob.class)))
                 .flatMap(Clob::stream)
@@ -184,7 +175,6 @@ class ParameterizedLobTest {
                 .as(StepVerifier::create)
                 .expectNext(i * testString.length())
                 .verifyComplete();
-        // @formatter:on
     }
 
     @ParameterizedTest(name = "{index} -> {0}")
@@ -198,28 +188,24 @@ class ParameterizedLobTest {
 
         Connection connection = getConnection(connectionFactory);
 
-        // @formatter:off
         Flux.from(connection.createStatement("INSERT INTO lob_test values(?)")
-                .bindNull(0, Blob.class)
-                .execute()
+                        .bindNull(0, Blob.class)
+                        .execute()
                 )
                 .flatMap(Result::getRowsUpdated)
                 .as(StepVerifier::create)
                 .expectNextCount(1).as("null blobs inserted")
                 .verifyComplete();
-        // @formatter:on
 
         connection = getConnection(connectionFactory);
 
-        // @formatter:off
         Flux.from(connection.createStatement("SELECT my_col FROM lob_test")
-                .execute()
+                        .execute()
                 )
                 .flatMap(it -> it.map((row, rowMetadata) -> row.get("my_col", Blob.class)))
                 .as(StepVerifier::create)
                 .consumeNextWith(actual -> Assertions.assertThat(actual).isSameAs(BlobCodec.NULL_BLOB))
                 .verifyComplete();
-        // @formatter:on
     }
 
     @ParameterizedTest(name = "{index} -> {0}")
@@ -233,27 +219,23 @@ class ParameterizedLobTest {
 
         Connection connection = getConnection(connectionFactory);
 
-        // @formatter:off
         Flux.from(connection.createStatement("INSERT INTO lob_test values(?)")
-                .bindNull(0, Clob.class)
-                .execute()
+                        .bindNull(0, Clob.class)
+                        .execute()
                 )
                 .flatMap(Result::getRowsUpdated)
                 .as(StepVerifier::create)
                 .expectNextCount(1).as("null clobs inserted")
                 .verifyComplete();
-        // @formatter:on
 
         connection = getConnection(connectionFactory);
 
-        // @formatter:off
         Flux.from(connection.createStatement("SELECT my_col FROM lob_test")
-                .execute()
+                        .execute()
                 )
                 .flatMap(it -> it.map((row, rowMetadata) -> row.get("my_col", Clob.class)))
                 .as(StepVerifier::create)
                 .consumeNextWith(actual -> Assertions.assertThat(actual).isSameAs(ClobCodec.NULL_CLOB))
                 .verifyComplete();
-        // @formatter:on
     }
 }

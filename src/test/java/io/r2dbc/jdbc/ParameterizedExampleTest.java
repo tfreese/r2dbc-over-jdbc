@@ -287,11 +287,9 @@ final class ParameterizedExampleTest {
         final Connection connection = getConnection(connectionFactory);
 
         try {
-            // @formatter:off
             awaitUpdate(1, connection.createStatement("INSERT INTO test VALUES (?)")
                     .bind(0, 1)
-                    );
-            // @formatter:on
+            );
         }
         finally {
             awaitNone(connection.close());
@@ -370,18 +368,16 @@ final class ParameterizedExampleTest {
             awaitQuery(List.of(100, 200, 300, 400), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
             awaitQuery(List.of(100, 200, 300, 400), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
 
-            // @formatter:off
             awaitNone(connection.beginTransaction());
             awaitUpdate(4, connection.createStatement("UPDATE test set test_value = ? where test_value = ?")
                     .bind(0, 199).bind(1, 100)
                     .add().bind(0, 299).bind(1, 200)
                     .add().bind(0, 399).bind(1, 300)
                     .add().bind(0, 499).bind(1, 400)
-                    );
+            );
             awaitQuery(List.of(199, 299, 399, 499), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
             awaitQuery(List.of(199, 299, 399, 499), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));
             awaitNone(connection.commitTransaction());
-            // @formatter:on
 
             awaitQuery(List.of(199, 299, 399, 499), row -> row.get(0, Integer.class), connection.createStatement("SELECT test_value FROM test"));
             awaitQuery(List.of(199, 299, 399, 499), row -> row.get("test_value", Integer.class), connection.createStatement("SELECT test_value FROM test"));

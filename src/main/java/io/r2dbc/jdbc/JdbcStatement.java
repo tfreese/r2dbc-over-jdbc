@@ -30,30 +30,26 @@ public class JdbcStatement extends AbstractJdbcStatement {
     public Flux<Result> execute() {
         getBindings().validateBinds();
 
-        // @formatter:off
         return Flux.fromArray(getSql().split(";"))
                 .map(String::strip)
                 .flatMap(sql ->
-                     createExecuteMono(getJdbcConnection(), sql).handle((context, sink) -> {
-                        try
-                        {
-                            final PreparedStatement stmt = context.getStmt();
-                            final ResultSet resultSet = context.getResultSet();
-                            final int[] affectedRows = context.getAffectedRows();
+                        createExecuteMono(getJdbcConnection(), sql).handle((context, sink) -> {
+                            try {
+                                final PreparedStatement stmt = context.getStmt();
+                                final ResultSet resultSet = context.getResultSet();
+                                final int[] affectedRows = context.getAffectedRows();
 
-                            final Result result = createResult(stmt, resultSet, affectedRows);
+                                final Result result = createResult(stmt, resultSet, affectedRows);
 
-                            sink.next(result);
+                                sink.next(result);
 
-                            sink.complete();
-                        }
-                        catch (SQLException sex)
-                        {
-                            sink.error(sex);
-                        }
-                    }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).cast(JdbcResult.class)
-        );
-        // @formatter:on
+                                sink.complete();
+                            }
+                            catch (SQLException sex) {
+                                sink.error(sex);
+                            }
+                        }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert).cast(JdbcResult.class)
+                );
     }
 
     protected Mono<Context> createExecuteMono(final java.sql.Connection connection, final String sql) {

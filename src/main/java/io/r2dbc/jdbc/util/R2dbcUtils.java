@@ -40,12 +40,10 @@ public final class R2dbcUtils {
         //
         // byte[] bytes = baos.toByteArray();
 
-        // @formatter:off
         return Flux.from(blob.stream())
                 .reduce(new ByteArrayOutputStream(), (baos, byteBuffer) -> {
                     // baos.writeBytes(byteBuffer.array());
-                    while (byteBuffer.hasRemaining())
-                    {
+                    while (byteBuffer.hasRemaining()) {
                         baos.write(byteBuffer.get());
                     }
 
@@ -56,7 +54,6 @@ public final class R2dbcUtils {
                         .then(Mono.empty()))
                 .blockFirst()
                 ;
-        // @formatter:on
     }
 
     public static ByteBuffer blobToByteBuffer(final Blob blob) {
@@ -118,7 +115,6 @@ public final class R2dbcUtils {
     }
 
     public static String clobToString(final Clob clob) {
-        // @formatter:off
         return Flux.from(clob.stream())
                 .reduce(new StringBuilder(), StringBuilder::append)
                 .map(StringBuilder::toString)
@@ -126,7 +122,6 @@ public final class R2dbcUtils {
                         .then(Mono.empty()))
                 .blockFirst()
                 ;
-        // @formatter:on
     }
 
     public static Blob inputStreamToBlob(final InputStream inputStream) {

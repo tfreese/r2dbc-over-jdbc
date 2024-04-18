@@ -24,11 +24,9 @@ public final class JdbcConnectionFactoryProvider implements ConnectionFactoryPro
     public ConnectionFactory create(final ConnectionFactoryOptions connectionFactoryOptions) {
         Objects.requireNonNull(connectionFactoryOptions, "connectionFactoryOptions must not be null");
 
-        // @formatter:off
         final JdbcConnectionConfiguration.Builder builder = JdbcConnectionConfiguration.builder()
                 .dataSource((DataSource) connectionFactoryOptions.getValue(DATASOURCE))
                 .codecs((Codecs) connectionFactoryOptions.getValue(CODECS));
-        // @formatter:on
 
         return new JdbcConnectionFactory(builder.build());
     }
