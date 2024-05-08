@@ -1,7 +1,7 @@
 plugins {
     id "java"
+    id "de.freese.gradle.conventions" version "$version_myConventionPlugin"
     id "io.spring.dependency-management" version "$version_springDependencyManagement"
-    id "de.freese.gradle.plugin.conventions" version "$version_myConventionPlugin"
 }
 
 dependencyManagement {
