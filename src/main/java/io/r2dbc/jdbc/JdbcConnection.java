@@ -31,17 +31,17 @@ public class JdbcConnection implements Connection {
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcConnection.class);
 
     private final Codecs codecs;
-    private final java.sql.Connection jdbcConnection;
-    private final Mono<java.sql.Connection> jdbcConnectionMono;
+    private final java.sql.Connection connection;
+    private final Mono<java.sql.Connection> connectionMono;
     private final Map<String, Savepoint> savePoints = new HashMap<>();
 
-    public JdbcConnection(final java.sql.Connection jdbcConnection, final Codecs codecs) {
+    public JdbcConnection(final java.sql.Connection connection, final Codecs codecs) {
         super();
 
-        this.jdbcConnection = Objects.requireNonNull(jdbcConnection, "jdbcConnection must not be null");
+        this.connection = Objects.requireNonNull(connection, "connection must not be null");
         this.codecs = Objects.requireNonNull(codecs, "codecs must not be null");
 
-        this.jdbcConnectionMono = Mono.just(this.jdbcConnection);
+        this.connectionMono = Mono.just(this.connection);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public Mono<Void> beginTransaction(final TransactionDefinition definition) {
-        return this.jdbcConnectionMono.handle((con, sink) -> {
+        return this.connectionMono.handle((con, sink) -> {
             try {
                 if (con.getAutoCommit()) {
                     getLogger().debug("begin transaction");
@@ -73,7 +73,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public Mono<Void> close() {
-        return this.jdbcConnectionMono.handle((con, sink) -> {
+        return this.connectionMono.handle((con, sink) -> {
             try {
                 if (!con.isClosed()) {
                     getLogger().debug("close connection");
@@ -95,7 +95,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public Mono<Void> commitTransaction() {
-        return this.jdbcConnectionMono.handle((con, sink) -> {
+        return this.connectionMono.handle((con, sink) -> {
             try {
                 if (!con.getAutoCommit()) {
                     getLogger().debug("commit transaction");
@@ -138,13 +138,13 @@ public class JdbcConnection implements Connection {
         // }
 
         // return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
-        return this.jdbcConnectionMono.handle((con, sink) -> {
+        return this.connectionMono.handle((con, sink) -> {
             try {
                 Objects.requireNonNull(name, "name must not be null");
 
                 getLogger().debug("create savepoint: {}", name);
 
-                this.jdbcConnection.setAutoCommit(false);
+                this.connection.setAutoCommit(false);
 
                 final Savepoint savepoint = con.setSavepoint(name);
                 this.savePoints.put(name, savepoint);
@@ -164,17 +164,15 @@ public class JdbcConnection implements Connection {
             throw new IllegalArgumentException("sql is null");
         }
 
-        return new JdbcStatement(this.jdbcConnection, sql, this.codecs);
+        return new JdbcStatement(this.connection, sql, this.codecs);
         // return this.connectionMono.handle((connection, sink) -> {
-        // try
-        // {
+        // try {
         // getLogger().debug("create statement");
         // sink.next(new JdbcStatement(connection, sql));
         //
         // sink.complete();
         // }
-        // catch (Exception sex)
-        // {
+        // catch (Exception sex) {
         // sink.error(sex);
         // }
         // }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(JdbcStatement.class).block();
@@ -182,7 +180,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public ConnectionMetadata getMetadata() {
-        return this.jdbcConnectionMono.handle((con, sink) -> {
+        return this.connectionMono.handle((con, sink) -> {
             try {
                 getLogger().debug("get Metadata");
 
@@ -204,7 +202,7 @@ public class JdbcConnection implements Connection {
         try {
             getLogger().debug("get transaction isolationLevel");
 
-            final int transactionIsolation = this.jdbcConnection.getTransactionIsolation();
+            final int transactionIsolation = this.connection.getTransactionIsolation();
             IsolationLevel isolationLevel = null;
 
             if (transactionIsolation == java.sql.Connection.TRANSACTION_READ_COMMITTED) {
@@ -232,22 +230,20 @@ public class JdbcConnection implements Connection {
         try {
             getLogger().debug("is autocommit");
 
-            return this.jdbcConnection.getAutoCommit();
+            return this.connection.getAutoCommit();
         }
         catch (SQLException sex) {
             throw JdbcR2dbcExceptionFactory.convert(sex);
         }
 
         // return this.connectionMono.handle((connection, sink) -> {
-        // try
-        // {
+        // try {
         // getLogger().debug("is autocommit");
         //
         // sink.next(connection.getAutoCommit());
         // sink.complete();
         // }
-        // catch (SQLException sex)
-        // {
+        // catch (SQLException sex) {
         // sink.error(sex);
         // }
         // }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).cast(Boolean.class).block();
@@ -260,7 +256,7 @@ public class JdbcConnection implements Connection {
         }
 
         // return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
-        return this.jdbcConnectionMono.handle((con, sink) -> {
+        return this.connectionMono.handle((con, sink) -> {
             try {
                 Objects.requireNonNull(name, "name must not be null");
 
@@ -280,7 +276,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public Mono<Void> rollbackTransaction() {
-        return this.jdbcConnectionMono.handle((con, sink) -> {
+        return this.connectionMono.handle((con, sink) -> {
             try {
                 if (!con.getAutoCommit()) {
                     getLogger().debug("rollback transaction");
@@ -303,7 +299,7 @@ public class JdbcConnection implements Connection {
     @Override
     public Mono<Void> rollbackTransactionToSavepoint(final String name) {
         // return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
-        return this.jdbcConnectionMono.handle((con, sink) -> {
+        return this.connectionMono.handle((con, sink) -> {
             try {
                 Objects.requireNonNull(name, "name must not be null");
 
@@ -323,7 +319,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public Mono<Void> setAutoCommit(final boolean autoCommit) {
-        return this.jdbcConnectionMono.handle((con, sink) -> {
+        return this.connectionMono.handle((con, sink) -> {
             try {
                 getLogger().debug("autoCommit: {}", autoCommit);
 
@@ -350,7 +346,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public Mono<Void> setTransactionIsolationLevel(final IsolationLevel isolationLevel) {
-        return this.jdbcConnectionMono.handle((con, sink) -> {
+        return this.connectionMono.handle((con, sink) -> {
             try {
                 Objects.requireNonNull(isolationLevel, "isolationLevel must not be null");
 
@@ -383,7 +379,7 @@ public class JdbcConnection implements Connection {
 
     @Override
     public Mono<Boolean> validate(final ValidationDepth depth) {
-        return this.jdbcConnectionMono.handle((con, sink) -> {
+        return this.connectionMono.handle((con, sink) -> {
             try {
                 getLogger().debug("validate");
 

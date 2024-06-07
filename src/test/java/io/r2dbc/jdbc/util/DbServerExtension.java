@@ -54,10 +54,10 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
 
         final NumberFormat format = NumberFormat.getInstance();
 
-        LOGGER.debug("Free memory: " + format.format(freeMemory / divider) + unit);
-        LOGGER.debug("Allocated memory: " + format.format(allocatedMemory / divider) + unit);
-        LOGGER.debug("Max memory: " + format.format(maxMemory / divider) + unit);
-        LOGGER.debug("Total free memory: " + format.format((freeMemory + (maxMemory - allocatedMemory)) / divider) + unit);
+        LOGGER.debug("Free memory: {}", format.format(freeMemory / divider) + unit);
+        LOGGER.debug("Allocated memory: {}", format.format(allocatedMemory / divider) + unit);
+        LOGGER.debug("Max memory: {}", format.format(maxMemory / divider) + unit);
+        LOGGER.debug("Total free memory: {}", format.format((freeMemory + (maxMemory - allocatedMemory)) / divider) + unit);
     }
 
     private final EmbeddedDatabaseType databaseType;

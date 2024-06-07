@@ -94,7 +94,7 @@ final class JdbcConnectionTest {
 
     @Test
     void testConstructorNoClient() {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcConnection(null, null)).withMessage("jdbcConnection must not be null");
+        assertThatNullPointerException().isThrownBy(() -> new JdbcConnection(null, null)).withMessage("connection must not be null");
     }
 
     @Test

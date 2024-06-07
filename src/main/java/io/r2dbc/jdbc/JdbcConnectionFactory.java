@@ -8,7 +8,6 @@ import java.util.Objects;
 import javax.sql.DataSource;
 
 import io.r2dbc.jdbc.codecs.Codecs;
-import io.r2dbc.jdbc.codecs.DefaultCodecs;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryMetadata;
 import reactor.core.publisher.Mono;
@@ -20,15 +19,15 @@ import reactor.core.publisher.Mono;
  */
 public final class JdbcConnectionFactory implements ConnectionFactory {
     private final Codecs codecs;
-    private final Mono<Connection> jdbcConnectionFactory;
+    private final Mono<Connection> connectionFactory;
 
     public JdbcConnectionFactory(final DataSource dataSource, final Codecs codecs) {
         super();
 
         Objects.requireNonNull(dataSource, "dataSource must not be null");
 
-        this.jdbcConnectionFactory = Mono.fromCallable(dataSource::getConnection).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert);
-        this.codecs = new DefaultCodecs();
+        this.connectionFactory = Mono.fromCallable(dataSource::getConnection).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert);
+        this.codecs = codecs;
     }
 
     public JdbcConnectionFactory(final JdbcConnectionConfiguration connectionConfiguration) {
@@ -37,7 +36,7 @@ public final class JdbcConnectionFactory implements ConnectionFactory {
 
     @Override
     public Mono<io.r2dbc.spi.Connection> create() {
-        return this.jdbcConnectionFactory.map(jdbcConnection -> new JdbcConnection(jdbcConnection, this.codecs));
+        return this.connectionFactory.map(jdbcConnection -> new JdbcConnection(jdbcConnection, this.codecs));
     }
 
     @Override
