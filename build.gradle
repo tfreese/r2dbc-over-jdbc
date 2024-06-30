@@ -42,3 +42,11 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testRuntimeOnly("org.slf4j:slf4j-simple")
 }
+
+// For Composite Build.
+tasks.register("cleanAll", GradleBuild) {
+    tasks = ["clean"]
+}
+tasks.register("buildAll", GradleBuild) {
+    tasks = ["build"]
+}
