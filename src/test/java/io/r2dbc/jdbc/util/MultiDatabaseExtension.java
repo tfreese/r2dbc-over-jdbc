@@ -54,8 +54,7 @@ public class MultiDatabaseExtension implements BeforeAllCallback, AfterAllCallba
     }
 
     // @Override
-    // public Stream<? extends Arguments> provideArguments(final ExtensionContext context) throws Exception
-    // {
+    // public Stream<? extends Arguments> provideArguments(final ExtensionContext context) throws Exception {
     // return getServers().stream().map(server -> Arguments.of(server.getDatabaseType(), server));
     // }
 }

@@ -85,7 +85,11 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
 
             final HikariPoolMXBean poolMXBean = this.dataSource.getHikariPoolMXBean();
 
-            LOGGER.debug("{} - Connections: idle={}, active={}, waiting={}", this.databaseType, poolMXBean.getIdleConnections(), poolMXBean.getActiveConnections(),
+            LOGGER.debug("{} - Connections: idle={}, active={}, total={}, waitingThreads={}",
+                    this.databaseType,
+                    poolMXBean.getIdleConnections(),
+                    poolMXBean.getActiveConnections(),
+                    poolMXBean.getTotalConnections(),
                     poolMXBean.getThreadsAwaitingConnection());
         }
 
@@ -177,6 +181,8 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
         config.setMaximumPoolSize(16);
         config.setConnectionTimeout(getSqlTimeout().toMillis());
         config.setAutoCommit(true);
+        config.setTransactionIsolation("TRANSACTION_READ_COMMITTED");
+        config.setConnectionTimeout(getSqlTimeout().toMillis());
 
         this.dataSource = new HikariDataSource(config);
 
