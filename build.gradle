@@ -1,9 +1,9 @@
 plugins {
     id "java"
-    id "de.freese.gradle.conventions" version "$version_myConventionPlugin"
+    id "de.freese.gradle.java.conventions" version "$version_myJavaConventionPlugin"
     id "io.spring.dependency-management" version "$version_springDependencyManagement"
-    // id "name.remal.sonarlint" version "$version_nameRemalSonarlint"
-    // id "de.freese.gradle.sonarlint-conventions" version "$version_myConventionPlugin"
+    // id "name.remal.sonarlint" version "version_nameRemalSonarlintPlugin"
+    // id "de.freese.gradle.sonarlint-conventions" version "$version_my.javaConventionPlugin"
 }
 
 dependencyManagement {
