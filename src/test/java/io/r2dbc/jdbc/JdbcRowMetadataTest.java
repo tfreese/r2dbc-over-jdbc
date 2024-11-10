@@ -67,11 +67,11 @@ final class JdbcRowMetadataTest {
 
     @Test
     void testGetColumnMetadataIndex() throws SQLException {
-        assertThat(JdbcRowMetadata.of(this.resultSet, this.codecs).getColumnMetadata(0)).isEqualTo(this.columnMetadatas.get(0));
+        assertThat(JdbcRowMetadata.of(this.resultSet, this.codecs).getColumnMetadata(0)).isEqualTo(this.columnMetadatas.getFirst());
     }
 
     @Test
-    void testGetColumnMetadataInvalidName() throws SQLException {
+    void testGetColumnMetadataInvalidName() {
         assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> JdbcRowMetadata.of(this.resultSet, this.codecs).getColumnMetadata("test-name-3"));
     }
 
@@ -86,7 +86,7 @@ final class JdbcRowMetadataTest {
     }
 
     @Test
-    void testGetColumnMetadataWrongIdentifierType() throws SQLException {
+    void testGetColumnMetadataWrongIdentifierType() {
         final String identifier = "-";
 
         assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> JdbcRowMetadata.of(this.resultSet, this.codecs).getColumnMetadata(identifier));

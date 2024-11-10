@@ -26,7 +26,7 @@ public abstract class AbstractJdbcStatement implements Statement {
     /**
      * @author Thomas Freese
      */
-    enum SqlOperation {
+    protected enum SqlOperation {
         DELETE,
         EXECUTE,
         INSERT,
@@ -37,7 +37,7 @@ public abstract class AbstractJdbcStatement implements Statement {
     /**
      * @author Thomas Freese
      */
-    static class Context {
+    protected static class Context {
         private final int[] affectedRows;
         private final ResultSet resultSet;
         private final PreparedStatement stmt;
@@ -66,7 +66,7 @@ public abstract class AbstractJdbcStatement implements Statement {
     /**
      * @author Thomas Freese
      */
-    class Bindings {
+    protected class Bindings {
         private final List<Map<Integer, Object>> binds = new ArrayList<>();
 
         private Map<Integer, Object> current;
@@ -100,7 +100,7 @@ public abstract class AbstractJdbcStatement implements Statement {
                 return getCurrent();
             }
 
-            return this.binds.get(this.binds.size() - 1);
+            return this.binds.getLast();
         }
 
         void prepareBatch(final PreparedStatement preparedStatement) throws SQLException {

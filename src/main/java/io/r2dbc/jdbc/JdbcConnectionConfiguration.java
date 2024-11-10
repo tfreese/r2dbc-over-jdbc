@@ -13,7 +13,7 @@ import io.r2dbc.jdbc.codecs.DefaultCodecs;
  *
  * @author Thomas Freese
  */
-final class JdbcConnectionConfiguration {
+public final class JdbcConnectionConfiguration {
     /**
      * @author Thomas Freese
      */
