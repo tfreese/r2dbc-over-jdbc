@@ -2,8 +2,8 @@ plugins {
     id "java"
     id "de.freese.gradle.java.conventions" version "$version_myJavaConventionPlugin"
     id "io.spring.dependency-management" version "$version_springDependencyManagement"
-    // id "name.remal.sonarlint" version "version_nameRemalSonarlintPlugin"
-    // id "de.freese.gradle.sonarlint-conventions" version "$version_my.javaConventionPlugin"
+    id "name.remal.sonarlint" version "$version_nameRemalSonarlintPlugin"
+    id "de.freese.gradle.sonarlint-conventions" version "$version_myJavaConventionPlugin"
 }
 
 dependencyManagement {
@@ -31,6 +31,7 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("io.projectreactor.addons:reactor-extra")
     testImplementation("io.r2dbc:r2dbc-spi-test")
+    testImplementation("org.awaitility:awaitility")
     testImplementation("org.apache.derby:derby")
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")

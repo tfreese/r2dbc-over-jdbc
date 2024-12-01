@@ -47,16 +47,16 @@ final class JdbcRowMetadataTest {
 
     @BeforeEach
     void beforeEach() throws SQLException {
-        when(this.resultSet.getMetaData()).thenReturn(this.resultSetMetaData);
+        when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
 
-        when(this.resultSetMetaData.getColumnCount()).thenReturn(this.columnMetadatas.size());
+        when(resultSetMetaData.getColumnCount()).thenReturn(columnMetadatas.size());
 
-        for (int i = 0; i < this.columnMetadatas.size(); i++) {
-            when(this.resultSetMetaData.getColumnLabel(i + 1)).thenReturn(this.columnMetadatas.get(i).getName());
-            when(this.resultSetMetaData.getColumnType(i + 1)).thenReturn(((JDBCType) this.columnMetadatas.get(i).getNativeTypeMetadata()).getVendorTypeNumber());
-            when(this.resultSetMetaData.isNullable(i + 1)).thenReturn(ResultSetMetaData.columnNullable);
-            when(this.resultSetMetaData.getPrecision(i + 1)).thenReturn(this.columnMetadatas.get(i).getPrecision());
-            when(this.resultSetMetaData.getScale(i + 1)).thenReturn(this.columnMetadatas.get(i).getScale());
+        for (int i = 0; i < columnMetadatas.size(); i++) {
+            when(resultSetMetaData.getColumnLabel(i + 1)).thenReturn(columnMetadatas.get(i).getName());
+            when(resultSetMetaData.getColumnType(i + 1)).thenReturn(((JDBCType) columnMetadatas.get(i).getNativeTypeMetadata()).getVendorTypeNumber());
+            when(resultSetMetaData.isNullable(i + 1)).thenReturn(ResultSetMetaData.columnNullable);
+            when(resultSetMetaData.getPrecision(i + 1)).thenReturn(columnMetadatas.get(i).getPrecision());
+            when(resultSetMetaData.getScale(i + 1)).thenReturn(columnMetadatas.get(i).getScale());
         }
     }
 
@@ -67,29 +67,29 @@ final class JdbcRowMetadataTest {
 
     @Test
     void testGetColumnMetadataIndex() throws SQLException {
-        assertThat(JdbcRowMetadata.of(this.resultSet, this.codecs).getColumnMetadata(0)).isEqualTo(this.columnMetadatas.getFirst());
+        assertThat(JdbcRowMetadata.of(resultSet, codecs).getColumnMetadata(0)).isEqualTo(columnMetadatas.getFirst());
     }
 
     @Test
     void testGetColumnMetadataInvalidName() {
-        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> JdbcRowMetadata.of(this.resultSet, this.codecs).getColumnMetadata("test-name-3"));
+        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> JdbcRowMetadata.of(resultSet, codecs).getColumnMetadata("test-name-3"));
     }
 
     @Test
     void testGetColumnMetadataName() throws SQLException {
-        assertThat(JdbcRowMetadata.of(this.resultSet, this.codecs).getColumnMetadata("TEST-NAME-2")).isEqualTo(this.columnMetadatas.get(1));
+        assertThat(JdbcRowMetadata.of(resultSet, codecs).getColumnMetadata("TEST-NAME-2")).isEqualTo(columnMetadatas.get(1));
     }
 
     @Test
     void testGetColumnMetadataNoIdentifier() {
-        assertThatIllegalArgumentException().isThrownBy(() -> JdbcRowMetadata.of(this.resultSet, this.codecs).getColumnMetadata(null)).withMessage("name is null");
+        assertThatIllegalArgumentException().isThrownBy(() -> JdbcRowMetadata.of(resultSet, codecs).getColumnMetadata(null)).withMessage("name is null");
     }
 
     @Test
     void testGetColumnMetadataWrongIdentifierType() {
         final String identifier = "-";
 
-        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> JdbcRowMetadata.of(this.resultSet, this.codecs).getColumnMetadata(identifier));
+        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> JdbcRowMetadata.of(resultSet, codecs).getColumnMetadata(identifier));
     }
 
     @Test

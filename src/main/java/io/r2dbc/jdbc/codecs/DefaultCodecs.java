@@ -5,6 +5,7 @@ import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -16,8 +17,9 @@ import io.r2dbc.spi.Parameter;
  *
  * @author Thomas Freese
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class DefaultCodecs implements Codecs {
-    private final Map<JDBCType, Codec<?>> codecsForJDBCType = new HashMap<>();
+    private final Map<JDBCType, Codec<?>> codecsForJDBCType = new EnumMap<>(JDBCType.class);
     private final Map<Class<?>, Codec<?>> codecsForJavaType = new HashMap<>();
 
     public DefaultCodecs() {
@@ -28,8 +30,8 @@ public class DefaultCodecs implements Codecs {
 
     public void add(final Codec<?> codec) {
         for (JDBCType jdbcType : codec.supportedJdbcTypes()) {
-            if (this.codecsForJDBCType.containsKey(jdbcType)) {
-                final String message = String.format("JDBCType '%s' already supported by %s", jdbcType.getName(), this.codecsForJDBCType.get(jdbcType).getClass().getSimpleName());
+            if (codecsForJDBCType.containsKey(jdbcType)) {
+                final String message = String.format("JDBCType '%s' already supported by %s", jdbcType.getName(), codecsForJDBCType.get(jdbcType).getClass().getSimpleName());
                 throw new IllegalArgumentException(message);
             }
 
@@ -38,10 +40,10 @@ public class DefaultCodecs implements Codecs {
 
         if (this.codecsForJavaType.containsKey(codec.getJavaType())) {
             throw new IllegalArgumentException(String.format("JavaType '%s' already supported by %s", codec.getJavaType().getSimpleName(),
-                    this.codecsForJavaType.get(codec.getJavaType()).getClass().getSimpleName()));
+                    codecsForJavaType.get(codec.getJavaType()).getClass().getSimpleName()));
         }
 
-        this.codecsForJavaType.put(codec.getJavaType(), codec);
+        codecsForJavaType.put(codec.getJavaType(), codec);
     }
 
     @Override
@@ -55,7 +57,6 @@ public class DefaultCodecs implements Codecs {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> T mapFromSql(final JDBCType jdbcType, final ResultSet resultSet, final String columnLabel) throws SQLException {
         Objects.requireNonNull(resultSet, "resultSet must not be null");
         Objects.requireNonNull(columnLabel, "columnLabel must not be null");
@@ -66,7 +67,6 @@ public class DefaultCodecs implements Codecs {
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> T mapTo(final JDBCType jdbcType, final Class<? extends T> javaType, final Object value) {
         Objects.requireNonNull(javaType, "javaType must not be null");
 
@@ -75,7 +75,6 @@ public class DefaultCodecs implements Codecs {
         return (T) codec.mapTo(javaType, value);
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public void mapToSql(final Class<?> javaType, final PreparedStatement preparedStatement, final int parameterIndex, final Object value) throws SQLException {
         Objects.requireNonNull(javaType, "javaType must not be null");
@@ -87,7 +86,6 @@ public class DefaultCodecs implements Codecs {
         codec.mapToSql(preparedStatement, parameterIndex, value);
     }
 
-    @SuppressWarnings("unchecked")
     protected <T> Codec<T> get(final Class<T> javaType) {
         Objects.requireNonNull(javaType, "javaType must not be null");
 
@@ -98,14 +96,14 @@ public class DefaultCodecs implements Codecs {
             type = Parameter.class;
         }
 
-        Codec<?> codec = this.codecsForJavaType.get(type);
+        Codec<?> codec = codecsForJavaType.get(type);
 
         if (codec == null) {
-            codec = this.codecsForJavaType.get(type.getEnclosingClass());
+            codec = codecsForJavaType.get(type.getEnclosingClass());
         }
 
         if (codec == null) {
-            codec = this.codecsForJavaType.get(type.getDeclaringClass());
+            codec = codecsForJavaType.get(type.getDeclaringClass());
         }
 
         if (codec == null) {
@@ -115,11 +113,10 @@ public class DefaultCodecs implements Codecs {
         return (Codec<T>) codec;
     }
 
-    @SuppressWarnings("unchecked")
     protected <T> Codec<T> get(final JDBCType jdbcType) {
         Objects.requireNonNull(jdbcType, "jdbcType must not be null");
 
-        final Codec<?> codec = this.codecsForJDBCType.get(jdbcType);
+        final Codec<?> codec = codecsForJDBCType.get(jdbcType);
 
         if (codec == null) {
             throw new IllegalArgumentException(String.format("No Codec found for JDBCType '%s'", jdbcType.getName()));

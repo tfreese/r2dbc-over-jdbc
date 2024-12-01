@@ -1,6 +1,8 @@
 // Created: 14.06.2019
 package io.r2dbc.jdbc.util;
 
+import static org.awaitility.Awaitility.await;
+
 import java.sql.Connection;
 import java.sql.Statement;
 import java.text.NumberFormat;
@@ -118,7 +120,8 @@ public final class DbServerExtension implements BeforeAllCallback, BeforeTestExe
 
         this.dataSource.close();
 
-        TimeUnit.MILLISECONDS.sleep(100);
+        // TimeUnit.MILLISECONDS.sleep(100L);
+        await().pollDelay(100L, TimeUnit.MILLISECONDS).until(() -> true);
 
         if (!this.dataSource.isClosed()) {
             this.dataSource.close();

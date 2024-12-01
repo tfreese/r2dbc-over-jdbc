@@ -60,8 +60,8 @@ final class ParameterizedRowTest {
         final JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("TEST-NAME-1", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
         final JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
-        assertThatNullPointerException().isThrownBy(() -> new JdbcRow(null, new HashMap<>(), this.codecs)).withMessage("rowMetadata required");
-        assertThatNullPointerException().isThrownBy(() -> new JdbcRow(rowMetadata, null, this.codecs)).withMessage("values required");
+        assertThatNullPointerException().isThrownBy(() -> new JdbcRow(null, new HashMap<>(), codecs)).withMessage("rowMetadata required");
+        assertThatNullPointerException().isThrownBy(() -> new JdbcRow(rowMetadata, null, codecs)).withMessage("values required");
     }
 
     @Test
@@ -74,7 +74,7 @@ final class ParameterizedRowTest {
         final Map<Integer, Object> values = new HashMap<>();
         values.put(0, value);
 
-        assertThat(new JdbcRow(rowMetadata, values, this.codecs).get(0, Object.class)).isSameAs(value);
+        assertThat(new JdbcRow(rowMetadata, values, codecs).get(0, Object.class)).isSameAs(value);
     }
 
     @Test
@@ -87,7 +87,7 @@ final class ParameterizedRowTest {
         final Map<Integer, Object> values = new HashMap<>();
         values.put(0, value);
 
-        assertThat(new JdbcRow(rowMetadata, values, this.codecs).get("test-name-2", Object.class)).isSameAs(value);
+        assertThat(new JdbcRow(rowMetadata, values, codecs).get("test-name-2", Object.class)).isSameAs(value);
     }
 
     @Test
@@ -95,7 +95,7 @@ final class ParameterizedRowTest {
         final ColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
         final RowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
-        assertThat(new JdbcRow(rowMetadata, new HashMap<>(), this.codecs).get(3, Object.class)).isNull();
+        assertThat(new JdbcRow(rowMetadata, new HashMap<>(), codecs).get(3, Object.class)).isNull();
     }
 
     @Test
@@ -103,7 +103,7 @@ final class ParameterizedRowTest {
         final JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
         final JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
-        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcRow(rowMetadata, new HashMap<>(), this.codecs).get(null, Object.class)).withMessage("name is null");
+        assertThatIllegalArgumentException().isThrownBy(() -> new JdbcRow(rowMetadata, new HashMap<>(), codecs).get(null, Object.class)).withMessage("name is null");
     }
 
     @Test
@@ -114,7 +114,7 @@ final class ParameterizedRowTest {
         final Map<Integer, Object> values = new HashMap<>();
         values.put(0, null);
 
-        assertThat(new JdbcRow(rowMetadata, values, this.codecs).get("test-name-3", Object.class)).isNull();
+        assertThat(new JdbcRow(rowMetadata, values, codecs).get("test-name-3", Object.class)).isNull();
     }
 
     @Test
@@ -124,7 +124,7 @@ final class ParameterizedRowTest {
         final JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
         final JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
 
-        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> new JdbcRow(rowMetadata, new HashMap<>(), this.codecs).get(identifier, Object.class))
+        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> new JdbcRow(rowMetadata, new HashMap<>(), codecs).get(identifier, Object.class))
                 .withMessage("No MetaData for Name: %s", identifier);
     }
 
