@@ -123,8 +123,9 @@ final class ParameterizedRowTest {
 
         final JdbcColumnMetadata columnMetadata = new JdbcColumnMetadata("", 0, Object.class, JDBCType.OTHER, Nullability.UNKNOWN, 0, 0);
         final JdbcRowMetadata rowMetadata = new JdbcRowMetadata(List.of(columnMetadata));
+        final JdbcRow jdbcRow = new JdbcRow(rowMetadata, new HashMap<>(), codecs);
 
-        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> new JdbcRow(rowMetadata, new HashMap<>(), codecs).get(identifier, Object.class))
+        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> jdbcRow.get(identifier, Object.class))
                 .withMessage("No MetaData for Name: %s", identifier);
     }
 

@@ -21,6 +21,7 @@ import java.util.NoSuchElementException;
 import io.r2dbc.jdbc.codecs.Codecs;
 import io.r2dbc.jdbc.codecs.DefaultCodecs;
 import io.r2dbc.spi.ColumnMetadata;
+import io.r2dbc.spi.RowMetadata;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,8 +72,10 @@ final class JdbcRowMetadataTest {
     }
 
     @Test
-    void testGetColumnMetadataInvalidName() {
-        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> JdbcRowMetadata.of(resultSet, codecs).getColumnMetadata("test-name-3"));
+    void testGetColumnMetadataInvalidName() throws SQLException {
+        final RowMetadata rowMetadata = JdbcRowMetadata.of(resultSet, codecs);
+
+        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> rowMetadata.getColumnMetadata("test-name-3"));
     }
 
     @Test
@@ -86,10 +89,11 @@ final class JdbcRowMetadataTest {
     }
 
     @Test
-    void testGetColumnMetadataWrongIdentifierType() {
+    void testGetColumnMetadataWrongIdentifierType() throws SQLException {
         final String identifier = "-";
+        final RowMetadata rowMetadata = JdbcRowMetadata.of(resultSet, codecs);
 
-        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> JdbcRowMetadata.of(resultSet, codecs).getColumnMetadata(identifier));
+        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> rowMetadata.getColumnMetadata(identifier));
     }
 
     @Test
