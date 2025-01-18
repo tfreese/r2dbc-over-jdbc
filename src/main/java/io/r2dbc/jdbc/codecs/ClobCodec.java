@@ -39,8 +39,7 @@ public class ClobCodec extends AbstractCodec<Clob> {
         }
 
         if (getJavaType().equals(javaType) || Object.class.equals(javaType)) {
-            // if (NULL_CLOB.equals(value))
-            // {
+            // if (NULL_CLOB.equals(value)) {
             // return null;
             // }
 

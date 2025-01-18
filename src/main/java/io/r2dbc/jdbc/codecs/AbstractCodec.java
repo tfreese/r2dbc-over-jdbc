@@ -18,8 +18,7 @@ public abstract class AbstractCodec<T> implements Codec<T> {
     private final Set<JDBCType> supportedJdbcTypes;
 
     // @SuppressWarnings("unchecked")
-    // protected AbstractCodec()
-    // {
+    // protected AbstractCodec() {
     // super();
     //
     // this.javaType = (Class<T>) ((ParameterizedType) (getClass().getGenericSuperclass())).getActualTypeArguments()[0];
@@ -40,12 +39,12 @@ public abstract class AbstractCodec<T> implements Codec<T> {
 
     @Override
     public Class<T> getJavaType() {
-        return this.javaType;
+        return javaType;
     }
 
     @Override
     public Set<JDBCType> supportedJdbcTypes() {
-        return this.supportedJdbcTypes;
+        return supportedJdbcTypes;
     }
 
     protected RuntimeException throwCanNotMapException(final Object object) {

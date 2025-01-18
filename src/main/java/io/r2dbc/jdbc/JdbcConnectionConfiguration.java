@@ -22,11 +22,11 @@ public final class JdbcConnectionConfiguration {
         private DataSource dataSource;
 
         public JdbcConnectionConfiguration build() {
-            if (this.codecs == null) {
-                this.codecs = new DefaultCodecs();
+            if (codecs == null) {
+                codecs = new DefaultCodecs();
             }
 
-            return new JdbcConnectionConfiguration(this.dataSource, this.codecs);
+            return new JdbcConnectionConfiguration(dataSource, codecs);
 
         }
 
@@ -46,8 +46,8 @@ public final class JdbcConnectionConfiguration {
         public String toString() {
             final StringBuilder builder = new StringBuilder();
             builder.append("Builder [");
-            builder.append("dataSource=").append(this.dataSource);
-            builder.append(", codecs=").append(this.codecs);
+            builder.append("dataSource=").append(dataSource);
+            builder.append(", codecs=").append(codecs);
             builder.append("]");
 
             return builder.toString();
@@ -69,19 +69,19 @@ public final class JdbcConnectionConfiguration {
     }
 
     public Codecs getCodecs() {
-        return this.codecs;
+        return codecs;
     }
 
     public DataSource getDataSource() {
-        return this.dataSource;
+        return dataSource;
     }
 
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
         builder.append("JdbcConnectionConfiguration [");
-        builder.append("dataSource=").append(this.dataSource);
-        builder.append(", codecs=").append(this.codecs);
+        builder.append("dataSource=").append(dataSource);
+        builder.append(", codecs=").append(codecs);
         builder.append("]");
 
         return builder.toString();

@@ -51,15 +51,15 @@ public abstract class AbstractJdbcStatement implements Statement {
         }
 
         int[] getAffectedRows() {
-            return this.affectedRows;
+            return affectedRows;
         }
 
         ResultSet getResultSet() {
-            return this.resultSet;
+            return resultSet;
         }
 
         PreparedStatement getStmt() {
-            return this.stmt;
+            return stmt;
         }
     }
 
@@ -80,37 +80,37 @@ public abstract class AbstractJdbcStatement implements Statement {
         void finish() {
             validateBinds();
 
-            this.current = null;
-            this.trailingAdd = true;
+            current = null;
+            trailingAdd = true;
         }
 
         Map<Integer, Object> getCurrent() {
-            if (this.current == null) {
-                this.current = new HashMap<>();
-                this.binds.add(this.current);
+            if (current == null) {
+                current = new HashMap<>();
+                binds.add(current);
             }
 
-            this.trailingAdd = false;
+            trailingAdd = false;
 
-            return this.current;
+            return current;
         }
 
         Map<Integer, Object> getLast() {
-            if (this.binds.isEmpty()) {
+            if (binds.isEmpty()) {
                 return getCurrent();
             }
 
-            return this.binds.getLast();
+            return binds.getLast();
         }
 
         void prepareBatch(final PreparedStatement preparedStatement) throws SQLException {
-            if (this.binds.isEmpty()) {
+            if (binds.isEmpty()) {
                 preparedStatement.addBatch();
 
                 return;
             }
 
-            for (Map<Integer, Object> bind : this.binds) {
+            for (Map<Integer, Object> bind : binds) {
                 if (bind.isEmpty()) {
                     continue;
                 }
@@ -144,13 +144,13 @@ public abstract class AbstractJdbcStatement implements Statement {
                 throw new IllegalStateException("trailing add() in bindings");
             }
 
-            if (this.current == null) {
+            if (current == null) {
                 return;
             }
 
             final long parameterCount = getSql().chars().filter(ch -> ch == '?').count();
 
-            final int bindCount = this.current.size();
+            final int bindCount = current.size();
 
             if (bindCount < parameterCount) {
                 throw new IllegalStateException("Bindings do not match Parameters: " + bindCount + " != " + parameterCount);
@@ -248,14 +248,12 @@ public abstract class AbstractJdbcStatement implements Statement {
     }
 
     // @Override
-    // public Statement bind(final Object identifier, final Object value)
-    // {
+    // public Statement bind(final Object identifier, final Object value) {
     // if (identifier instanceof Integer)
     // {
     // return bind(((Integer) identifier).intValue(), value);
     // }
-    // else if (identifier instanceof String)
-    // {
+    // else if (identifier instanceof String) {
     // return bind(Integer.parseInt((String) identifier), value);
     // }
     //
@@ -282,14 +280,12 @@ public abstract class AbstractJdbcStatement implements Statement {
     }
 
     // @Override
-    // public Statement bindNull(final Object identifier, final Class<?> type)
-    // {
+    // public Statement bindNull(final Object identifier, final Class<?> type) {
     // if (identifier instanceof Integer)
     // {
     // return bindNull(((Integer) identifier).intValue(), type);
     // }
-    // else if (identifier instanceof String)
-    // {
+    // else if (identifier instanceof String) {
     // return bindNull(Integer.parseInt((String) identifier), type);
     // }
     //
@@ -298,27 +294,27 @@ public abstract class AbstractJdbcStatement implements Statement {
     // }
 
     protected Bindings getBindings() {
-        return this.bindings;
+        return bindings;
     }
 
     protected Codecs getCodecs() {
-        return this.codecs;
+        return codecs;
     }
 
     protected java.sql.Connection getJdbcConnection() {
-        return this.jdbcConnection;
+        return jdbcConnection;
     }
 
     protected Logger getLogger() {
-        return this.logger;
+        return logger;
     }
 
     protected String getSql() {
-        return this.sql;
+        return sql;
     }
 
     protected SqlOperation getSqlOperation() {
-        return this.sqlOperation;
+        return sqlOperation;
     }
 
     /**
@@ -329,7 +325,7 @@ public abstract class AbstractJdbcStatement implements Statement {
      * @throws IndexOutOfBoundsException If the {@code index} is outside the valid range.
      */
     protected void requireValidIndex(final int index) {
-        if (index < 0 || index > this.bindings.binds.size()) {
+        if (index < 0 || index > bindings.binds.size()) {
             throw new IndexOutOfBoundsException("Parameter index is non-positive: " + index);
         }
     }
@@ -342,8 +338,7 @@ public abstract class AbstractJdbcStatement implements Statement {
     // * @param affectedRows int[]
     // * @return int[]
     // */
-    // protected int[] normalizeAffectedRowsForReactive(final int[] affectedRows)
-    // {
+    // protected int[] normalizeAffectedRowsForReactive(final int[] affectedRows) {
     // // return affectedRows;
     // // int[] rows = IntStream.of(affectedRows).flatMap(ar -> {
     // // int[] r = new int[ar];
@@ -358,8 +353,7 @@ public abstract class AbstractJdbcStatement implements Statement {
     // }
 
     // @Override
-    // public Statement returnGeneratedValues(final String...columns)
-    // {
+    // public Statement returnGeneratedValues(final String...columns) {
     // throw new UnsupportedOperationException();
     // }
 }

@@ -66,17 +66,17 @@ public class JdbcRowMetadata implements RowMetadata {
             // Bei Spalten mit identischen Namen, immer den ersten nehmen, laut Spezifikation.
             final String name = cmd.getName().toLowerCase();
 
-            final ColumnMetadata old = this.columnMetaDatasByName.put(name, cmd);
+            final ColumnMetadata old = columnMetaDatasByName.put(name, cmd);
 
             if (old != null) {
-                this.columnMetaDatasByName.put(name, old);
+                columnMetaDatasByName.put(name, old);
             }
         });
     }
 
     @Override
     public boolean contains(final String columnName) {
-        return this.columnMetaDatasByName.containsKey(columnName.toLowerCase());
+        return columnMetaDatasByName.containsKey(columnName.toLowerCase());
     }
 
     @Override
@@ -85,7 +85,7 @@ public class JdbcRowMetadata implements RowMetadata {
             throw new IllegalArgumentException("name is null");
         }
 
-        final ColumnMetadata metaData = this.columnMetaDatasByName.get(name.toLowerCase());
+        final ColumnMetadata metaData = columnMetaDatasByName.get(name.toLowerCase());
 
         if (metaData == null) {
             throw new NoSuchElementException("No MetaData for Name: " + name);
@@ -96,11 +96,11 @@ public class JdbcRowMetadata implements RowMetadata {
 
     @Override
     public ColumnMetadata getColumnMetadata(final int index) {
-        if (index < 0 || index >= this.columnMetaDatas.size()) {
-            throw new ArrayIndexOutOfBoundsException("Index: " + index + ", Size: " + this.columnMetaDatas.size());
+        if (index < 0 || index >= columnMetaDatas.size()) {
+            throw new ArrayIndexOutOfBoundsException("Index: " + index + ", Size: " + columnMetaDatas.size());
         }
 
-        final ColumnMetadata metaData = this.columnMetaDatas.get(index);
+        final ColumnMetadata metaData = columnMetaDatas.get(index);
 
         if (metaData == null) {
             throw new NoSuchElementException("No MetaData for Index: " + index);
@@ -111,6 +111,6 @@ public class JdbcRowMetadata implements RowMetadata {
 
     @Override
     public List<ColumnMetadata> getColumnMetadatas() {
-        return List.copyOf(this.columnMetaDatas);
+        return List.copyOf(columnMetaDatas);
     }
 }

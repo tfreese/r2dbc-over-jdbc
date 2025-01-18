@@ -48,7 +48,7 @@ public class JdbcResult implements Result {
             return new JdbcResult(Flux.empty(), rowMetadata, null);
         }
 
-        final Flux<JdbcRow> filteredSegments = this.rows.filter(filter);
+        final Flux<JdbcRow> filteredSegments = rows.filter(filter);
 
         return new JdbcResult(filteredSegments, rowMetadata, affectedRows);
     }
@@ -73,7 +73,7 @@ public class JdbcResult implements Result {
             });
         }
 
-        return this.rows.flatMap(segment -> {
+        return rows.flatMap(segment -> {
             final Publisher<? extends T> result = mappingFunction.apply(segment);
 
             if (result == null) {
@@ -101,7 +101,7 @@ public class JdbcResult implements Result {
     public <T> Flux<T> map(final BiFunction<Row, RowMetadata, ? extends T> function) {
         Objects.requireNonNull(function, "function must not be null");
 
-        return this.rows.zipWith(this.rowMetadata.repeat()).map(tuple -> function.apply(tuple.getT1(), tuple.getT2()));
-        // return this.rows.map(row -> function.apply(row, this.rowMetadata.block()));
+        return rows.zipWith(rowMetadata.repeat()).map(tuple -> function.apply(tuple.getT1(), tuple.getT2()));
+        // return rows.map(row -> function.apply(row, rowMetadata.block()));
     }
 }

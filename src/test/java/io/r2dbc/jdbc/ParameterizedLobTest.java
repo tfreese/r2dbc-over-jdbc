@@ -93,8 +93,7 @@ class ParameterizedLobTest {
         // connection.createStatement("INSERT INTO lob_test values(?)").bind(0, Blob.from(Flux.range(0, i).map(it -> ByteBuffer.wrap(ALL_BYTES)))));
         // awaitNone(connection.commitTransaction());
         // }
-        // finally
-        // {
+        // finally {
         // awaitNone(connection.close());
         // }
 

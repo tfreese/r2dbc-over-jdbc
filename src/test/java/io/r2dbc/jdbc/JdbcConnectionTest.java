@@ -41,7 +41,7 @@ final class JdbcConnectionTest {
     @Test
     void testBeginTransactionErrorResponse() throws SQLException {
         when(connection.getAutoCommit()).thenReturn(true);
-        doThrow(new SQLNonTransientConnectionException("Unable to disable autocommits", "some state", 999)).when(connection).setAutoCommit(ArgumentMatchers.anyBoolean());
+        doThrow(new SQLNonTransientConnectionException("Unable to disable autocommit", "some state", 999)).when(connection).setAutoCommit(ArgumentMatchers.anyBoolean());
 
         new JdbcConnection(connection, codecs).beginTransaction().as(StepVerifier::create).verifyErrorMatches(R2dbcNonTransientResourceException.class::isInstance);
     }

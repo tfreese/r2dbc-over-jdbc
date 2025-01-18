@@ -153,17 +153,13 @@ public class JdbcStatement extends AbstractJdbcStatement {
             }
         }).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::convert);
 
-        //        Mono<Long> rowsUpdated = affectedRows != null ? Mono.just(IntStream.of(affectedRows).mapToLong(Long::valueOf).sum()) : Mono.empty();
+        // Mono<Long> rowsUpdated = affectedRows != null ? Mono.just(IntStream.of(affectedRows).mapToLong(Long::valueOf).sum()) : Mono.empty();
         // Flux<Long> rowsUpdated = affectedRows != null ? Flux.fromStream(IntStream.of(affectedRows).mapToLong(Long::valueOf).boxed()) : Flux.empty();
 
         return new JdbcResult(rows, Mono.just(rowMetadata), affectedRows);
     }
 
     protected String prepareSqlForLog(final String sql) {
-        if (sql.length() < DEBUG_SQL_LENGTH) {
-            return sql;
-        }
-
         return sql.substring(0, Math.min(sql.length(), DEBUG_SQL_LENGTH - 3)) + "...";
     }
 }

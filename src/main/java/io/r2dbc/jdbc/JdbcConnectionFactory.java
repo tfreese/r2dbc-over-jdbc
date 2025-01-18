@@ -36,7 +36,7 @@ public final class JdbcConnectionFactory implements ConnectionFactory {
 
     @Override
     public Mono<io.r2dbc.spi.Connection> create() {
-        return this.connectionFactory.map(jdbcConnection -> new JdbcConnection(jdbcConnection, this.codecs));
+        return connectionFactory.map(jdbcConnection -> new JdbcConnection(jdbcConnection, codecs));
     }
 
     @Override

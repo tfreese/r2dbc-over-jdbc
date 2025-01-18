@@ -23,7 +23,8 @@ public class JanitorInvocationInterceptor implements InvocationInterceptor {
         final DbServerExtension serverExtension = invocationContext.getArguments().stream()
                 .filter(DbServerExtension.class::isInstance)
                 .map(DbServerExtension.class::cast)
-                .findFirst().orElse(null);
+                .findFirst()
+                .orElse(null);
 
         createTable(serverExtension);
 

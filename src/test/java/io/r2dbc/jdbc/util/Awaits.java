@@ -52,7 +52,9 @@ public final class Awaits {
      * @throws Throwable If the statement execution results in an error.
      */
     public static void awaitExecution(final Statement statement) {
-        assertNull(Mono.from(statement.execute()).flatMap(result -> Mono.from(result.getRowsUpdated())).block(sqlTimeout()), "Expected no update count when not updating rows");
+        assertNull(Mono.from(statement.execute())
+                .flatMap(result -> Mono.from(result.getRowsUpdated()))
+                .block(sqlTimeout()), "Expected no update count when not updating rows");
     }
 
     /**
@@ -131,7 +133,10 @@ public final class Awaits {
      */
     public static <T> void awaitQuery(final List<T> expectedRows, final Function<Row, T> rowMapper, final Statement statement) {
         assertEquals(expectedRows,
-                Flux.from(statement.execute()).concatMap(result -> Flux.from(result.map((row, metadata) -> rowMapper.apply(row)))).collectList().block(sqlTimeout()),
+                Flux.from(statement.execute())
+                        .concatMap(result -> Flux.from(result.map((row, metadata) -> rowMapper.apply(row))))
+                        .collectList()
+                        .block(sqlTimeout()),
                 "Unexpected row data");
     }
 
@@ -158,7 +163,10 @@ public final class Awaits {
      * @throws Throwable If the statement execution results in an error.
      */
     public static void awaitUpdate(final List<Long> expectedCounts, final Statement statement) {
-        assertIterableEquals(expectedCounts, Flux.from(statement.execute()).flatMap(result -> Flux.from(result.getRowsUpdated())).collectList().block(sqlTimeout()),
+        assertIterableEquals(expectedCounts, Flux.from(statement.execute())
+                        .flatMap(result -> Flux.from(result.getRowsUpdated()))
+                        .collectList()
+                        .block(sqlTimeout()),
                 "Unexpected update counts");
     }
 

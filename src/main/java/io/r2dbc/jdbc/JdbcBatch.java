@@ -26,13 +26,13 @@ public class JdbcBatch implements Batch {
 
     @Override
     public Batch add(final String sql) {
-        this.statements.add(Objects.requireNonNull(sql, "sql required"));
+        statements.add(Objects.requireNonNull(sql, "sql required"));
 
         return this;
     }
 
     @Override
     public Flux<Result> execute() {
-        return Flux.fromIterable(this.statements).map(this.connection::createStatement).flatMap(Statement::execute);
+        return Flux.fromIterable(statements).map(connection::createStatement).flatMap(Statement::execute);
     }
 }

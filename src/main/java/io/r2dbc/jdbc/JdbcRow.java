@@ -54,7 +54,7 @@ public class JdbcRow implements Row, Result.RowSegment {
             throw new IllegalArgumentException("type is null");
         }
 
-        final Object value = this.values.get(index);
+        final Object value = values.get(index);
 
         if (value == null) {
             return null;
@@ -63,7 +63,7 @@ public class JdbcRow implements Row, Result.RowSegment {
         final ColumnMetadata metadata = getMetadata().getColumnMetadata(index);
         final JDBCType jdbcType = (JDBCType) metadata.getNativeTypeMetadata();
 
-        return this.codecs.mapTo(jdbcType, type, value);
+        return codecs.mapTo(jdbcType, type, value);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class JdbcRow implements Row, Result.RowSegment {
 
     @Override
     public RowMetadata getMetadata() {
-        return this.rowMetadata;
+        return rowMetadata;
     }
 
     @Override

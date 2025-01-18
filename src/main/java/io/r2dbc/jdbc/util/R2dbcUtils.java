@@ -30,8 +30,7 @@ public final class R2dbcUtils {
         //
         // Flux.from(blob.stream()).subscribe(byteBuffer -> {
         // // baos.writeBytes(byteBuffer.array());
-        // while (byteBuffer.hasRemaining())
-        // {
+        // while (byteBuffer.hasRemaining()) {
         // baos.write(byteBuffer.get());
         // }
         // });

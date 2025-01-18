@@ -33,13 +33,13 @@ import org.junit.jupiter.api.Test;
 final class JdbcRowMetadataTest {
     @BeforeAll
     static void beforeAll() {
-        // this.columnMetadatas = Arrays.asList(new JdbcColumnMetadata("TEST-NAME-1", JDBCType.OTHER, NULLABLE, 100, 500),
+        // columnMetaDataList = Arrays.asList(new JdbcColumnMetadata("TEST-NAME-1", JDBCType.OTHER, NULLABLE, 100, 500),
         // new JdbcColumnMetadata("TEST-NAME-2", JDBCType.OTHER, NULLABLE, 300, 600));
     }
 
     private final Codecs codecs = new DefaultCodecs();
 
-    private final List<ColumnMetadata> columnMetadatas = Arrays.asList(new JdbcColumnMetadata("TEST-NAME-1", 0, Object.class, JDBCType.OTHER, NULLABLE, 100, 500),
+    private final List<ColumnMetadata> columnMetaDataList = Arrays.asList(new JdbcColumnMetadata("TEST-NAME-1", 0, Object.class, JDBCType.OTHER, NULLABLE, 100, 500),
             new JdbcColumnMetadata("TEST-NAME-2", 1, Object.class, JDBCType.OTHER, NULLABLE, 300, 600));
 
     private final ResultSet resultSet = mock(ResultSet.class, RETURNS_SMART_NULLS);
@@ -50,14 +50,14 @@ final class JdbcRowMetadataTest {
     void beforeEach() throws SQLException {
         when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
 
-        when(resultSetMetaData.getColumnCount()).thenReturn(columnMetadatas.size());
+        when(resultSetMetaData.getColumnCount()).thenReturn(columnMetaDataList.size());
 
-        for (int i = 0; i < columnMetadatas.size(); i++) {
-            when(resultSetMetaData.getColumnLabel(i + 1)).thenReturn(columnMetadatas.get(i).getName());
-            when(resultSetMetaData.getColumnType(i + 1)).thenReturn(((JDBCType) columnMetadatas.get(i).getNativeTypeMetadata()).getVendorTypeNumber());
+        for (int i = 0; i < columnMetaDataList.size(); i++) {
+            when(resultSetMetaData.getColumnLabel(i + 1)).thenReturn(columnMetaDataList.get(i).getName());
+            when(resultSetMetaData.getColumnType(i + 1)).thenReturn(((JDBCType) columnMetaDataList.get(i).getNativeTypeMetadata()).getVendorTypeNumber());
             when(resultSetMetaData.isNullable(i + 1)).thenReturn(ResultSetMetaData.columnNullable);
-            when(resultSetMetaData.getPrecision(i + 1)).thenReturn(columnMetadatas.get(i).getPrecision());
-            when(resultSetMetaData.getScale(i + 1)).thenReturn(columnMetadatas.get(i).getScale());
+            when(resultSetMetaData.getPrecision(i + 1)).thenReturn(columnMetaDataList.get(i).getPrecision());
+            when(resultSetMetaData.getScale(i + 1)).thenReturn(columnMetaDataList.get(i).getScale());
         }
     }
 
@@ -68,7 +68,7 @@ final class JdbcRowMetadataTest {
 
     @Test
     void testGetColumnMetadataIndex() throws SQLException {
-        assertThat(JdbcRowMetadata.of(resultSet, codecs).getColumnMetadata(0)).isEqualTo(columnMetadatas.getFirst());
+        assertThat(JdbcRowMetadata.of(resultSet, codecs).getColumnMetadata(0)).isEqualTo(columnMetaDataList.getFirst());
     }
 
     @Test
@@ -80,7 +80,7 @@ final class JdbcRowMetadataTest {
 
     @Test
     void testGetColumnMetadataName() throws SQLException {
-        assertThat(JdbcRowMetadata.of(resultSet, codecs).getColumnMetadata("TEST-NAME-2")).isEqualTo(columnMetadatas.get(1));
+        assertThat(JdbcRowMetadata.of(resultSet, codecs).getColumnMetadata("TEST-NAME-2")).isEqualTo(columnMetaDataList.get(1));
     }
 
     @Test
@@ -98,6 +98,6 @@ final class JdbcRowMetadataTest {
 
     @Test
     void testToRowMetadataNoResultSet() {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcRowMetadata(null)).withMessage("columnMetaDatas must not be null");
+        assertThatNullPointerException().isThrownBy(() -> new JdbcRowMetadata(null)).withMessage("columnMetaDataList must not be null");
     }
 }

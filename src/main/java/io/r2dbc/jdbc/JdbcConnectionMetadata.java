@@ -32,11 +32,11 @@ public class JdbcConnectionMetadata implements ConnectionMetadata {
 
     @Override
     public String getDatabaseProductName() {
-        return this.productName;
+        return productName;
     }
 
     @Override
     public String getDatabaseVersion() {
-        return this.version;
+        return version;
     }
 }
