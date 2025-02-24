@@ -20,6 +20,10 @@ dependencyManagement {
     }
 }
 
+configurations {
+    mockitoAgent
+}
+
 dependencies {
     implementation("io.projectreactor:reactor-core")
     implementation("io.r2dbc:r2dbc-spi")
@@ -40,6 +44,27 @@ dependencies {
     testRuntimeOnly("org.hsqldb:hsqldb")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testRuntimeOnly("org.slf4j:slf4j-simple")
+
+    // To avoid compiler warnings about @API annotations in Log4j Code.
+    // testCompileOnly("com.github.spotbugs:spotbugs-annotations")
+
+    // To avoid compiler warnings about @API annotations in JUnit Code.
+    // testCompileOnly("org.apiguardian:apiguardian-api")
+    
+    testImplementation("org.mockito:mockito-junit-jupiter")
+    mockitoAgent("org.mockito:mockito-core") {
+        transitive = false
+    }
+}
+
+// tasks.withType<Test> {
+//     jvmArgs("-XX:+EnableDynamicAgentLoading")
+// }
+test {
+    doFirst {
+        jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
+        // jvmArgs += "-XX:+EnableDynamicAgentLoading"
+    }
 }
 
 // For Composite Build.

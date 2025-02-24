@@ -54,29 +54,29 @@ public class JdbcRowMetadata implements RowMetadata {
         return new JdbcRowMetadata(list);
     }
 
-    private final List<ColumnMetadata> columnMetaDatas;
-    private final Map<String, ColumnMetadata> columnMetaDatasByName = new LinkedHashMap<>();
+    private final Map<String, ColumnMetadata> columnMetaDataByName = new LinkedHashMap<>();
+    private final List<ColumnMetadata> columnMetaDataList;
 
-    public JdbcRowMetadata(final List<ColumnMetadata> columnMetaDatas) {
+    public JdbcRowMetadata(final List<ColumnMetadata> columnMetaDataList) {
         super();
 
-        this.columnMetaDatas = Objects.requireNonNull(columnMetaDatas, "columnMetaDatas must not be null");
+        this.columnMetaDataList = Objects.requireNonNull(columnMetaDataList, "columnMetaDataList required");
 
-        columnMetaDatas.forEach(cmd -> {
+        columnMetaDataList.forEach(cmd -> {
             // Bei Spalten mit identischen Namen, immer den ersten nehmen, laut Spezifikation.
             final String name = cmd.getName().toLowerCase();
 
-            final ColumnMetadata old = columnMetaDatasByName.put(name, cmd);
+            final ColumnMetadata old = columnMetaDataByName.put(name, cmd);
 
             if (old != null) {
-                columnMetaDatasByName.put(name, old);
+                columnMetaDataByName.put(name, old);
             }
         });
     }
 
     @Override
     public boolean contains(final String columnName) {
-        return columnMetaDatasByName.containsKey(columnName.toLowerCase());
+        return columnMetaDataByName.containsKey(columnName.toLowerCase());
     }
 
     @Override
@@ -85,7 +85,7 @@ public class JdbcRowMetadata implements RowMetadata {
             throw new IllegalArgumentException("name is null");
         }
 
-        final ColumnMetadata metaData = columnMetaDatasByName.get(name.toLowerCase());
+        final ColumnMetadata metaData = columnMetaDataByName.get(name.toLowerCase());
 
         if (metaData == null) {
             throw new NoSuchElementException("No MetaData for Name: " + name);
@@ -96,11 +96,11 @@ public class JdbcRowMetadata implements RowMetadata {
 
     @Override
     public ColumnMetadata getColumnMetadata(final int index) {
-        if (index < 0 || index >= columnMetaDatas.size()) {
-            throw new ArrayIndexOutOfBoundsException("Index: " + index + ", Size: " + columnMetaDatas.size());
+        if (index < 0 || index >= columnMetaDataList.size()) {
+            throw new ArrayIndexOutOfBoundsException("Index: " + index + ", Size: " + columnMetaDataList.size());
         }
 
-        final ColumnMetadata metaData = columnMetaDatas.get(index);
+        final ColumnMetadata metaData = columnMetaDataList.get(index);
 
         if (metaData == null) {
             throw new NoSuchElementException("No MetaData for Index: " + index);
@@ -111,6 +111,6 @@ public class JdbcRowMetadata implements RowMetadata {
 
     @Override
     public List<ColumnMetadata> getColumnMetadatas() {
-        return List.copyOf(columnMetaDatas);
+        return List.copyOf(columnMetaDataList);
     }
 }

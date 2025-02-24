@@ -63,7 +63,7 @@ final class JdbcRowMetadataTest {
 
     @Test
     void testConstructorNoColumnMetadata() {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcRowMetadata(null)).withMessage("columnMetaDatas must not be null");
+        assertThatNullPointerException().isThrownBy(() -> new JdbcRowMetadata(null)).withMessage("columnMetaDataList required");
     }
 
     @Test
@@ -94,10 +94,5 @@ final class JdbcRowMetadataTest {
         final RowMetadata rowMetadata = JdbcRowMetadata.of(resultSet, codecs);
 
         assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> rowMetadata.getColumnMetadata(identifier));
-    }
-
-    @Test
-    void testToRowMetadataNoResultSet() {
-        assertThatNullPointerException().isThrownBy(() -> new JdbcRowMetadata(null)).withMessage("columnMetaDataList must not be null");
     }
 }
