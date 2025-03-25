@@ -14,6 +14,7 @@ public class BooleanCodec extends AbstractCodec<Boolean> {
         super(Boolean.class, JDBCType.BIT, JDBCType.BOOLEAN);
     }
 
+    @SuppressWarnings("java:S2447")
     @Override
     public Boolean mapFromSql(final ResultSet resultSet, final String columnLabel) throws SQLException {
         final boolean value = resultSet.getBoolean(columnLabel);
