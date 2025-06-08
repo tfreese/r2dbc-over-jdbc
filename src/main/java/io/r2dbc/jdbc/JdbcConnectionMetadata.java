@@ -19,8 +19,8 @@ public class JdbcConnectionMetadata implements ConnectionMetadata {
 
         Objects.requireNonNull(databaseMetaData, "databaseMetaData required");
 
-        this.productName = databaseMetaData.getDatabaseProductName();
-        this.version = databaseMetaData.getDatabaseProductVersion();
+        productName = databaseMetaData.getDatabaseProductName();
+        version = databaseMetaData.getDatabaseProductVersion();
     }
 
     public JdbcConnectionMetadata(final String productName, final String version) {

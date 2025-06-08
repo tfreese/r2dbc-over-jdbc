@@ -21,7 +21,7 @@ public abstract class AbstractCodec<T> implements Codec<T> {
     // protected AbstractCodec() {
     // super();
     //
-    // this.javaType = (Class<T>) ((ParameterizedType) (getClass().getGenericSuperclass())).getActualTypeArguments()[0];
+    // javaType = (Class<T>) ((ParameterizedType) (getClass().getGenericSuperclass())).getActualTypeArguments()[0];
     // }
 
     protected AbstractCodec(final Class<T> javaType, final JDBCType... supportedJdbcTypes) {

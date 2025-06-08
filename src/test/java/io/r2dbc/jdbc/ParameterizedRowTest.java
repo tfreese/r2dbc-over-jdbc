@@ -157,7 +157,7 @@ final class ParameterizedRowTest {
 
         // server.getJdbcOperations().execute("INSERT INTO test VALUES (100)");
         //
-        // Mono.from(this.connectionFactory.create())
+        // Mono.from(connectionFactory.create())
         //         .flatMapMany(connection -> Flux.from(connection.createStatement("SELECT test_value FROM test").execute())
         //                 .flatMap(TestKit::extractColumns)
         //                 .concatWith(TestKit.close(connection)))

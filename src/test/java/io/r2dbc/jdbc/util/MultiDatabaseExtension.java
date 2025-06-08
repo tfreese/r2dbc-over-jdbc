@@ -26,9 +26,9 @@ public class MultiDatabaseExtension implements BeforeAllCallback, AfterAllCallba
     public MultiDatabaseExtension() {
         super();
 
-        this.servers.computeIfAbsent(EmbeddedDatabaseType.H2, DbServerExtension::new);
-        this.servers.computeIfAbsent(EmbeddedDatabaseType.HSQL, DbServerExtension::new);
-        this.servers.computeIfAbsent(EmbeddedDatabaseType.DERBY, DbServerExtension::new);
+        servers.computeIfAbsent(EmbeddedDatabaseType.H2, DbServerExtension::new);
+        servers.computeIfAbsent(EmbeddedDatabaseType.HSQL, DbServerExtension::new);
+        servers.computeIfAbsent(EmbeddedDatabaseType.DERBY, DbServerExtension::new);
     }
 
     @Override

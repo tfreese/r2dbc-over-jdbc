@@ -35,10 +35,10 @@ public class DefaultCodecs implements Codecs {
                 throw new IllegalArgumentException(message);
             }
 
-            this.codecsForJDBCType.put(jdbcType, codec);
+            codecsForJDBCType.put(jdbcType, codec);
         }
 
-        if (this.codecsForJavaType.containsKey(codec.getJavaType())) {
+        if (codecsForJavaType.containsKey(codec.getJavaType())) {
             throw new IllegalArgumentException(String.format("JavaType '%s' already supported by %s", codec.getJavaType().getSimpleName(),
                     codecsForJavaType.get(codec.getJavaType()).getClass().getSimpleName()));
         }

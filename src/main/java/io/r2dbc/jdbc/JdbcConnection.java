@@ -41,7 +41,7 @@ public class JdbcConnection implements Connection {
         this.connection = Objects.requireNonNull(connection, "connection must not be null");
         this.codecs = Objects.requireNonNull(codecs, "codecs must not be null");
 
-        this.connectionMono = Mono.just(connection);
+        connectionMono = Mono.just(connection);
     }
 
     @Override
@@ -129,7 +129,7 @@ public class JdbcConnection implements Connection {
 
         // // Begin Transaction.
         // try {
-        // this.connection.setAutoCommit(false);
+        // connection.setAutoCommit(false);
         // }
         // catch (SQLException ex) {
         // // Ignore
@@ -145,7 +145,7 @@ public class JdbcConnection implements Connection {
                 con.setAutoCommit(false);
 
                 final Savepoint savepoint = con.setSavepoint(name);
-                this.savePoints.put(name, savepoint);
+                savePoints.put(name, savepoint);
 
                 sink.next(Mono.empty());
                 sink.complete();
@@ -163,7 +163,7 @@ public class JdbcConnection implements Connection {
         }
 
         return new JdbcStatement(connection, sql, codecs);
-        // return this.connectionMono.handle((connection, sink) -> {
+        // return connectionMono.handle((connection, sink) -> {
         // try {
         // getLogger().debug("create statement");
         // sink.next(new JdbcStatement(connection, sql));
@@ -234,7 +234,7 @@ public class JdbcConnection implements Connection {
             throw JdbcR2dbcExceptionFactory.convert(sex);
         }
 
-        // return this.connectionMono.handle((connection, sink) -> {
+        // return connectionMono.handle((connection, sink) -> {
         // try {
         // getLogger().debug("is autocommit");
         //

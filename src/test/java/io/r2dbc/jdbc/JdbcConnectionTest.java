@@ -110,7 +110,7 @@ final class JdbcConnectionTest {
 
     @Test
     void testCreateSavepointNoName() {
-        // new JdbcConnection(this.connection).createSavepoint(null).as(StepVerifier::create).verifyErrorMatches(IllegalArgumentException.class::isInstance);
+        // new JdbcConnection(connection).createSavepoint(null).as(StepVerifier::create).verifyErrorMatches(IllegalArgumentException.class::isInstance);
 
         assertThatIllegalArgumentException().isThrownBy(() -> new JdbcConnection(connection, codecs).createSavepoint(null));
     }
@@ -122,7 +122,7 @@ final class JdbcConnectionTest {
         assertThat(new JdbcConnection(connection, codecs).createStatement("update-query-?")).isInstanceOf(JdbcStatement.class);
         assertThat(new JdbcConnection(connection, codecs).createStatement("delete-query-?")).isInstanceOf(JdbcStatement.class);
 
-        // assertThatThrownBy(() -> new JdbcConnection(this.connection,codecs).createStatement("some-query-?")).isInstanceOf(R2dbcBadGrammarException.class);
+        // assertThatThrownBy(() -> new JdbcConnection(connection,codecs).createStatement("some-query-?")).isInstanceOf(R2dbcBadGrammarException.class);
     }
 
     @Test
@@ -136,8 +136,7 @@ final class JdbcConnectionTest {
     void testReleaseSavepointNoName() {
         // new JdbcConnection(connection,codecs).releaseSavepoint(null).as(StepVerifier::create)
         // .verifyErrorMatches(JdbcR2dbcNonTransientException.class::isInstance);
-        // new
-        // JdbcConnection(connection,codecs).releaseSavepoint(null).as(StepVerifier::create).verifyErrorMatches(IllegalArgumentException.class::isInstance);
+        // new JdbcConnection(connection,codecs).releaseSavepoint(null).as(StepVerifier::create).verifyErrorMatches(IllegalArgumentException.class::isInstance);
 
         assertThatIllegalArgumentException().isThrownBy(() -> new JdbcConnection(connection, codecs).releaseSavepoint(null));
     }

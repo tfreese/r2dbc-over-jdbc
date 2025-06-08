@@ -74,7 +74,7 @@ public abstract class AbstractJdbcStatement implements Statement {
         private boolean trailingAdd;
 
         public boolean isTrailingAdd() {
-            return this.trailingAdd;
+            return trailingAdd;
         }
 
         void finish() {
@@ -176,19 +176,19 @@ public abstract class AbstractJdbcStatement implements Statement {
         final String s = sql.substring(0, 6).toLowerCase();
 
         if (s.startsWith("select") || s.startsWith("with")) {
-            this.sqlOperation = SqlOperation.SELECT;
+            sqlOperation = SqlOperation.SELECT;
         }
         else if (s.startsWith("delete")) {
-            this.sqlOperation = SqlOperation.DELETE;
+            sqlOperation = SqlOperation.DELETE;
         }
         else if (s.startsWith("update")) {
-            this.sqlOperation = SqlOperation.UPDATE;
+            sqlOperation = SqlOperation.UPDATE;
         }
         else if (s.startsWith("insert")) {
-            this.sqlOperation = SqlOperation.INSERT;
+            sqlOperation = SqlOperation.INSERT;
         }
         else {
-            this.sqlOperation = SqlOperation.EXECUTE;
+            sqlOperation = SqlOperation.EXECUTE;
         }
     }
 
