@@ -229,7 +229,7 @@ public abstract class AbstractJdbcStatement implements Statement {
         try {
             return bind(Integer.parseInt(name), value);
         }
-        catch (Exception ex) {
+        catch (Exception _) {
             throw new NoSuchElementException(String.format("Name '%s' is not valid. Should either be an Integer index or a String represented integer.", name));
         }
     }
@@ -274,15 +274,14 @@ public abstract class AbstractJdbcStatement implements Statement {
         try {
             return bind(Integer.parseInt(name), type);
         }
-        catch (Exception ex) {
+        catch (Exception _) {
             throw new IllegalArgumentException(String.format("Name '%s' is not valid. Should either be an Integer index or a String represented integer.", name));
         }
     }
 
     // @Override
     // public Statement bindNull(final Object identifier, final Class<?> type) {
-    // if (identifier instanceof Integer)
-    // {
+    // if (identifier instanceof Integer) {
     // return bindNull(((Integer) identifier).intValue(), type);
     // }
     // else if (identifier instanceof String) {
