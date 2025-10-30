@@ -14,20 +14,13 @@ mvnw                    text eol=lf
 *.multipart             -text
 
 # binary is a macro for '-text -diff'
-*.aif                   binary
-*.au                    binary
-*.flac                  binary
 *.gif                   binary
 *.jar                   binary
 *.jks                   binary
 *.jpeg                  binary
 *.jpg                   binary
-*.m4a                   binary
-*.m4b                   binary
-*.mp3                   binary
 *.p12                   binary
-*.pgg                   binary
 *.png                   binary
 *.svg                   text
-*.wav                   binary
-*.wma                   binary
+*.zip                   binary
+#*.zip filter=lfs diff=lfs merge=lfs -text
