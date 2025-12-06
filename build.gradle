@@ -56,10 +56,13 @@ dependencies {
     }
 }
 
-// tasks.withType<Test> {
-//     jvmArgs("-XX:+EnableDynamicAgentLoading")
-// }
-test {
+// test {
+// tasks.named("test")
+tasks.withType(Test).configureEach {
+    enabled = true
+    ignoreFailures = false
+    useJUnitPlatform()
+    
     String mockitoFiles = configurations.mockitoAgent.asPath
 
     doFirst {
