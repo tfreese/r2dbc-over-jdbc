@@ -6,7 +6,7 @@ plugins {
 
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:$version_springBoot")
+        mavenBom("org.springframework.boot:spring-boot-dependencies:" + property("version_springBoot"))
     }
 
     dependencies {
@@ -56,25 +56,11 @@ dependencies {
     }
 }
 
-// test {
-// tasks.named("test")
 tasks.withType(Test).configureEach {
-    enabled = true
-    ignoreFailures = false
-    useJUnitPlatform()
-    
     String mockitoFiles = configurations.mockitoAgent.asPath
 
     doFirst {
         jvmArgs += "-javaagent:" + mockitoFiles
         // jvmArgs += "-XX:+EnableDynamicAgentLoading"
     }
-}
-
-// For Composite Build.
-tasks.register("cleanAll", GradleBuild) {
-    tasks = ["clean"]
-}
-tasks.register("buildAll", GradleBuild) {
-    tasks = ["build"]
 }
