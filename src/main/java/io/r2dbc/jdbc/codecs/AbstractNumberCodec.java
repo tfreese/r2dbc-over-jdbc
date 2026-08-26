@@ -1,10 +1,10 @@
-// Created: 27.03.2021
 package io.r2dbc.jdbc.codecs;
 
 import java.sql.JDBCType;
 
 /**
  * @author Thomas Freese
+ * @since 27.03.2021
  */
 abstract class AbstractNumberCodec<T extends Number> extends AbstractCodec<T> {
     protected AbstractNumberCodec(final Class<T> javaType, final JDBCType... supportedJdbcTypes) {

@@ -1,4 +1,3 @@
-// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.util.Objects;
@@ -12,12 +11,13 @@ import io.r2dbc.jdbc.codecs.DefaultCodecs;
  * R2DBC Adapter for JDBC.
  *
  * @author Thomas Freese
+ * @since 14.06.2019
  */
 public final class JdbcConnectionConfiguration {
     /**
      * @author Thomas Freese
      */
-    static final class Builder {
+    public static final class Builder {
         private Codecs codecs;
         private DataSource dataSource;
 
@@ -64,8 +64,8 @@ public final class JdbcConnectionConfiguration {
     private JdbcConnectionConfiguration(final DataSource dataSource, final Codecs codecs) {
         super();
 
-        this.dataSource = Objects.requireNonNull(dataSource, "dataSource must not be null");
-        this.codecs = Objects.requireNonNull(codecs, "codecs must not be null");
+        this.dataSource = Objects.requireNonNull(dataSource, "dataSource required");
+        this.codecs = Objects.requireNonNull(codecs, "codecs required");
     }
 
     public Codecs getCodecs() {

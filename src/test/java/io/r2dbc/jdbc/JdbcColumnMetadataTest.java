@@ -1,4 +1,3 @@
-// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import static io.r2dbc.spi.Nullability.NULLABLE;
@@ -10,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Thomas Freese
+ * @since 14.06.2019
  */
 final class JdbcColumnMetadataTest {
     @Test

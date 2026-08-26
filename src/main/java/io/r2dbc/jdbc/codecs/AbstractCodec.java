@@ -1,4 +1,3 @@
-// Created: 27.03.2021
 package io.r2dbc.jdbc.codecs;
 
 import java.sql.JDBCType;
@@ -12,6 +11,7 @@ import java.util.stream.Stream;
  * Basic-Implementation for a {@link Codec}.
  *
  * @author Thomas Freese
+ * @since 27.03.2021
  */
 public abstract class AbstractCodec<T> implements Codec<T> {
     private final Class<T> javaType;

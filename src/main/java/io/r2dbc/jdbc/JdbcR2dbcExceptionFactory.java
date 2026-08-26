@@ -1,4 +1,3 @@
-// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.io.Serial;
@@ -31,6 +30,7 @@ import io.r2dbc.spi.R2dbcTransientResourceException;
  * R2DBC Adapter for JDBC.
  *
  * @author Thomas Freese
+ * @since 14.06.2019
  */
 public final class JdbcR2dbcExceptionFactory {
     /**

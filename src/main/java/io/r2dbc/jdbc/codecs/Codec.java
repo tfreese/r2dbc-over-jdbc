@@ -1,4 +1,3 @@
-// Created: 27.03.2021
 package io.r2dbc.jdbc.codecs;
 
 import java.sql.JDBCType;
@@ -10,9 +9,8 @@ import java.util.Set;
 /**
  * Codex for a SQL-Type from the {@link ResultSet} to a Java-Object and vice versa.
  *
- * @param <T> Type
- *
  * @author Thomas Freese
+ * @since 27.03.2021
  */
 public interface Codec<T> {
     Class<T> getJavaType();

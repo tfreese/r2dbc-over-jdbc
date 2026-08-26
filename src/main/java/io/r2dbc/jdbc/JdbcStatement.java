@@ -1,4 +1,3 @@
-// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.sql.JDBCType;
@@ -18,6 +17,7 @@ import reactor.core.publisher.SynchronousSink;
 
 /**
  * @author Thomas Freese
+ * @since 14.06.2019
  */
 public class JdbcStatement extends AbstractJdbcStatement {
     private static final int DEBUG_SQL_LENGTH = 80;

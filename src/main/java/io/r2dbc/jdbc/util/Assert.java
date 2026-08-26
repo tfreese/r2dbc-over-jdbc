@@ -1,10 +1,10 @@
-// Created: 14.06.2019
 package io.r2dbc.jdbc.util;
 
 import java.sql.SQLException;
 
 /**
  * @author Thomas Freese
+ * @since 14.06.2019
  */
 public final class Assert {
     public static void assertNotNull(final Object value, final String message) throws SQLException {

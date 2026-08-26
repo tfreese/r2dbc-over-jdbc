@@ -1,4 +1,3 @@
-// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.sql.DatabaseMetaData;
@@ -26,6 +25,7 @@ import reactor.core.publisher.Mono;
  * R2DBC Adapter for JDBC.
  *
  * @author Thomas Freese
+ * @since 14.06.2019
  */
 public class JdbcConnection implements Connection {
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcConnection.class);
@@ -138,7 +138,7 @@ public class JdbcConnection implements Connection {
         // return Mono.error(new SQLFeatureNotSupportedException()).onErrorMap(SQLException.class, JdbcR2dbcExceptionFactory::create).then();
         return connectionMono.handle((con, sink) -> {
             try {
-                Objects.requireNonNull(name, "name must not be null");
+                Objects.requireNonNull(name, "name required");
 
                 getLogger().debug("create savepoint: {}", name);
 

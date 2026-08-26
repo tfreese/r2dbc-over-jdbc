@@ -1,4 +1,3 @@
-// Created: 27.03.2021
 package io.r2dbc.jdbc.codecs;
 
 import java.sql.JDBCType;
@@ -8,6 +7,7 @@ import java.sql.SQLException;
 
 /**
  * @author Thomas Freese
+ * @since 27.03.2021
  */
 public class LongCodec extends AbstractNumberCodec<Long> {
     public LongCodec() {

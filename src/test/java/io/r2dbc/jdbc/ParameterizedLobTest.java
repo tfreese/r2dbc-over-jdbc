@@ -1,4 +1,3 @@
-// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.nio.Buffer;
@@ -32,6 +31,7 @@ import reactor.test.StepVerifier;
 
 /**
  * @author Thomas Freese
+ * @since 14.06.2019
  */
 class ParameterizedLobTest {
     static final byte[] ALL_BYTES = new byte[-(-128) + 127];

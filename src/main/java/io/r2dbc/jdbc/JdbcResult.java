@@ -1,4 +1,3 @@
-// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.util.Objects;
@@ -18,6 +17,7 @@ import reactor.core.publisher.Mono;
  * R2DBC Adapter for JDBC.
  *
  * @author Thomas Freese
+ * @since 14.06.2019
  */
 public class JdbcResult implements Result {
     private final int[] affectedRows;

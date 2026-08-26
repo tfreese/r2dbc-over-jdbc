@@ -1,4 +1,3 @@
-// Created: 28.03.2021
 package io.r2dbc.jdbc.codecs;
 
 import java.io.InputStream;
@@ -14,6 +13,7 @@ import reactor.core.publisher.Mono;
 
 /**
  * @author Thomas Freese
+ * @since 28.03.2021
  */
 public class BlobCodec extends AbstractCodec<Blob> {
     public static final Blob NULL_BLOB = Blob.from(Mono.empty());
@@ -41,8 +41,7 @@ public class BlobCodec extends AbstractCodec<Blob> {
         }
 
         if (getJavaType().equals(javaType) || Object.class.equals(javaType)) {
-            // if (NULL_BLOB.equals(value))
-            // {
+            // if (NULL_BLOB.equals(value)) {
             // return null;
             // }
 

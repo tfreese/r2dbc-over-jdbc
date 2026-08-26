@@ -1,4 +1,3 @@
-// Created: 28.03.2021
 package io.r2dbc.jdbc.codecs;
 
 import java.sql.JDBCType;
@@ -12,6 +11,7 @@ import reactor.core.publisher.Mono;
 
 /**
  * @author Thomas Freese
+ * @since 28.03.2021
  */
 public class ClobCodec extends AbstractCodec<Clob> {
     public static final Clob NULL_CLOB = Clob.from(Mono.empty());

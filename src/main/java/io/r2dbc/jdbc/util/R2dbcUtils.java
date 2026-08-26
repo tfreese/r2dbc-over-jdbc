@@ -1,4 +1,3 @@
-// Created: 14.06.2019
 package io.r2dbc.jdbc.util;
 
 import java.io.BufferedInputStream;
@@ -23,6 +22,7 @@ import reactor.core.publisher.Mono;
 
 /**
  * @author Thomas Freese
+ * @since 14.06.2019
  */
 public final class R2dbcUtils {
     public static byte[] blobToByteArray(final Blob blob) {

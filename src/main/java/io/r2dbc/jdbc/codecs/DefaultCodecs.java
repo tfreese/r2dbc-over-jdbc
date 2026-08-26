@@ -58,8 +58,8 @@ public class DefaultCodecs implements Codecs {
 
     @Override
     public <T> T mapFromSql(final JDBCType jdbcType, final ResultSet resultSet, final String columnLabel) throws SQLException {
-        Objects.requireNonNull(resultSet, "resultSet must not be null");
-        Objects.requireNonNull(columnLabel, "columnLabel must not be null");
+        Objects.requireNonNull(resultSet, "resultSet required");
+        Objects.requireNonNull(columnLabel, "columnLabel required");
 
         final Codec<?> codec = get(jdbcType);
 
@@ -68,7 +68,7 @@ public class DefaultCodecs implements Codecs {
 
     @Override
     public <T> T mapTo(final JDBCType jdbcType, final Class<? extends T> javaType, final Object value) {
-        Objects.requireNonNull(javaType, "javaType must not be null");
+        Objects.requireNonNull(javaType, "javaType required");
 
         final Codec codec = get(jdbcType);
 
@@ -77,8 +77,8 @@ public class DefaultCodecs implements Codecs {
 
     @Override
     public void mapToSql(final Class<?> javaType, final PreparedStatement preparedStatement, final int parameterIndex, final Object value) throws SQLException {
-        Objects.requireNonNull(javaType, "javaType must not be null");
-        Objects.requireNonNull(preparedStatement, "preparedStatement must not be null");
+        Objects.requireNonNull(javaType, "javaType required");
+        Objects.requireNonNull(preparedStatement, "preparedStatement required");
         Objects.checkIndex(parameterIndex, Integer.MAX_VALUE);
 
         final Codec codec = get(javaType);
@@ -87,7 +87,7 @@ public class DefaultCodecs implements Codecs {
     }
 
     protected <T> Codec<T> get(final Class<T> javaType) {
-        Objects.requireNonNull(javaType, "javaType must not be null");
+        Objects.requireNonNull(javaType, "javaType required");
 
         Class<?> type = javaType;
 
@@ -114,7 +114,7 @@ public class DefaultCodecs implements Codecs {
     }
 
     protected <T> Codec<T> get(final JDBCType jdbcType) {
-        Objects.requireNonNull(jdbcType, "jdbcType must not be null");
+        Objects.requireNonNull(jdbcType, "jdbcType required");
 
         final Codec<?> codec = codecsForJDBCType.get(jdbcType);
 

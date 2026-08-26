@@ -1,4 +1,3 @@
-// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.nio.ByteBuffer;
@@ -18,6 +17,7 @@ import io.r2dbc.spi.RowMetadata;
  * R2DBC Adapter for JDBC.
  *
  * @author Thomas Freese
+ * @since 14.06.2019
  */
 public class JdbcRow implements Row, Result.RowSegment {
     private final Codecs codecs;

@@ -1,4 +1,3 @@
-// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.sql.PreparedStatement;
@@ -21,6 +20,7 @@ import org.slf4j.LoggerFactory;
  * R2DBC Adapter for JDBC.
  *
  * @author Thomas Freese
+ * @since 14.06.2019
  */
 public abstract class AbstractJdbcStatement implements Statement {
     /**
@@ -203,9 +203,7 @@ public abstract class AbstractJdbcStatement implements Statement {
     public Statement bind(final int index, final Object value) {
         requireValidIndex(index);
 
-        if (value == null) {
-            throw new IllegalArgumentException("value is null");
-        }
+        Objects.requireNonNull(value, "value required");
 
         if (Class.class.equals(value)) {
             throw new IllegalArgumentException("value is type of class");
@@ -218,13 +216,8 @@ public abstract class AbstractJdbcStatement implements Statement {
 
     @Override
     public Statement bind(final String name, final Object value) {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-
-        if (value == null) {
-            throw new IllegalArgumentException("value is null");
-        }
+        Objects.requireNonNull(name, "name required");
+        Objects.requireNonNull(value, "value required");
 
         try {
             return bind(Integer.parseInt(name), value);
@@ -238,9 +231,7 @@ public abstract class AbstractJdbcStatement implements Statement {
     public Statement bindNull(final int index, final Class<?> type) {
         requireValidIndex(index);
 
-        if (type == null) {
-            throw new IllegalArgumentException("type is null");
-        }
+        Objects.requireNonNull(type, "type required");
 
         getBindings().getCurrent().put(index, null);
 
@@ -263,13 +254,8 @@ public abstract class AbstractJdbcStatement implements Statement {
 
     @Override
     public Statement bindNull(final String name, final Class<?> type) {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-
-        if (type == null) {
-            throw new IllegalArgumentException("type is null");
-        }
+        Objects.requireNonNull(name, "name required");
+        Objects.requireNonNull(type, "type required");
 
         try {
             return bind(Integer.parseInt(name), type);

@@ -1,4 +1,3 @@
-// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.util.Objects;
@@ -15,6 +14,7 @@ import io.r2dbc.spi.Option;
  * R2DBC Adapter for JDBC.
  *
  * @author Thomas Freese
+ * @since 14.06.2019
  */
 public final class JdbcConnectionFactoryProvider implements ConnectionFactoryProvider {
     public static final Option<Codecs> CODECS = Option.valueOf("codecs");

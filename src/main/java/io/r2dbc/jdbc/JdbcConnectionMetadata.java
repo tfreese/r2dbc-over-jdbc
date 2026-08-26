@@ -1,4 +1,3 @@
-// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.sql.DatabaseMetaData;
@@ -9,15 +8,16 @@ import io.r2dbc.spi.ConnectionMetadata;
 
 /**
  * @author Thomas Freese
+ * @since 14.06.2019
  */
 public class JdbcConnectionMetadata implements ConnectionMetadata {
     private final String productName;
     private final String version;
 
     public JdbcConnectionMetadata(final DatabaseMetaData databaseMetaData) throws SQLException {
-        super();
-
         Objects.requireNonNull(databaseMetaData, "databaseMetaData required");
+
+        super();
 
         productName = databaseMetaData.getDatabaseProductName();
         version = databaseMetaData.getDatabaseProductVersion();

@@ -1,4 +1,3 @@
-// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,6 +18,7 @@ import reactor.test.StepVerifier;
 
 /**
  * @author Thomas Freese
+ * @since 14.06.2019
  */
 final class ParameterizedConnectionFactoryTest {
     @RegisterExtension

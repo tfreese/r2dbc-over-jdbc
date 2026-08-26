@@ -1,4 +1,3 @@
-// Created: 27.03.2021
 package io.r2dbc.jdbc.codecs;
 
 import java.sql.JDBCType;
@@ -13,6 +12,7 @@ import java.util.Date;
 
 /**
  * @author Thomas Freese
+ * @since 27.03.2021
  */
 public class DateCodec extends AbstractCodec<Date> {
     public DateCodec() {

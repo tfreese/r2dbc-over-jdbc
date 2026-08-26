@@ -1,4 +1,3 @@
-// Created: 25.03.2021
 package io.r2dbc.jdbc.testKit;
 
 import java.util.stream.IntStream;
@@ -18,6 +17,7 @@ import reactor.test.StepVerifier;
 
 /**
  * @author Thomas Freese
+ * @since 25.03.2021
  */
 abstract class AbstractTestKit implements TestKit<Integer> {
     public static <T> Mono<T> close(final Connection connection) {

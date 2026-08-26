@@ -1,4 +1,3 @@
-// Created: 31.03.2021
 package io.r2dbc.jdbc;
 
 import java.util.ArrayList;
@@ -13,6 +12,7 @@ import reactor.core.publisher.Flux;
 
 /**
  * @author Thomas Freese
+ * @since 31.03.2021
  */
 public class JdbcBatch implements Batch {
     private final Connection connection;

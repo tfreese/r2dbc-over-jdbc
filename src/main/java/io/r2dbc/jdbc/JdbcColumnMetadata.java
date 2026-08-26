@@ -1,4 +1,3 @@
-// Created: 14.06.2019
 package io.r2dbc.jdbc;
 
 import java.sql.JDBCType;
@@ -12,6 +11,7 @@ import io.r2dbc.spi.Type;
  * R2DBC Adapter for JDBC.
  *
  * @author Thomas Freese
+ * @since 14.06.2019
  */
 public class JdbcColumnMetadata implements ColumnMetadata, Type {
     private final int column;
