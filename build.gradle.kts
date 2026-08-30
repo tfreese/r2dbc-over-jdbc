@@ -55,9 +55,5 @@ dependencies {
 }
 
 tasks.withType<Test>().configureEach {
-    val mockitoFiles = mockitoAgent.asPath
-
-    doFirst {
-        jvmArgs.add("-javaagent:$mockitoFiles")
-    }
+    jvmArgs.add("-javaagent:${mockitoAgent.asPath}")
 }
