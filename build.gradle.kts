@@ -36,6 +36,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.springframework:spring-jdbc")
 
+    testImplementation("org.mockito:mockito-junit-jupiter")
+    mockitoAgent("org.mockito:mockito-core")
+
     testRuntimeOnly("com.h2database:h2")
     testRuntimeOnly("org.apache.derby:derby")
     testRuntimeOnly("org.hsqldb:hsqldb")
@@ -47,13 +50,10 @@ dependencies {
 
     // To avoid compiler warnings about @API annotations in JUnit Code.
     // testCompileOnly("org.apiguardian:apiguardian-api")
-
-    testImplementation("org.mockito:mockito-junit-jupiter")
-    mockitoAgent("org.mockito:mockito-core") {
-        isTransitive = false
-    }
 }
 
 tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+    
     jvmArgs.add("-javaagent:${mockitoAgent.asPath}")
 }

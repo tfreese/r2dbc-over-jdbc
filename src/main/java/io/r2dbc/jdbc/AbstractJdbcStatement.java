@@ -126,7 +126,7 @@ public abstract class AbstractJdbcStatement implements Statement {
                 final Integer index = entry.getKey();
                 final Object value = entry.getValue();
 
-                // JDBC fängt bei 1 an !
+                // JDBC fängt bei 1 an!
                 final int parameterIndex = index + 1;
 
                 if (value == null) {
@@ -240,8 +240,7 @@ public abstract class AbstractJdbcStatement implements Statement {
 
     // @Override
     // public Statement bind(final Object identifier, final Object value) {
-    // if (identifier instanceof Integer)
-    // {
+    // if (identifier instanceof Integer) {
     // return bind(((Integer) identifier).intValue(), value);
     // }
     // else if (identifier instanceof String) {
