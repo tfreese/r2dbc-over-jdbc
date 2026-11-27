@@ -14,9 +14,6 @@ pluginManagement {
     }
 }
 
-// Without rootProject.name the Name of the Projekt-Directory is used.
-rootProject.name = "r2dbc-over-jdbc"
-
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
 
@@ -25,3 +22,6 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+
+// Without rootProject.name the Name of the Projekt-Directory is used.
+rootProject.name = "r2dbc-over-jdbc"

@@ -23,6 +23,8 @@ dependencyManagement {
 val mockitoAgent = configurations.create("mockitoAgent")
 
 dependencies {
+    // implementation(platform("org.springframework.boot:spring-boot-dependencies:" + property("version_springBoot")))
+
     implementation("io.projectreactor:reactor-core")
     implementation("io.r2dbc:r2dbc-spi")
     implementation("org.slf4j:slf4j-api")
@@ -54,6 +56,6 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
-    
+
     jvmArgs.add("-javaagent:${mockitoAgent.asPath}")
 }
